@@ -76,7 +76,7 @@ WSGI_APPLICATION = 'bookhub.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "",
+        "NAME": "bookhub",
         "USER": "postgres",
         "PASSWORD": "1234",
         "HOST": "localhost",
