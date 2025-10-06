@@ -13,7 +13,7 @@ class User(models.Model):
     
 class Book(models.Model):
     title = models.CharField(max_length=150)
-    image = models.FileField(upload_to="image/book/")
+    image = models.FileField(upload_to="book/")
     author = models.CharField(max_length=150)
     detail = models.CharField(max_length=500)
     price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -64,7 +64,7 @@ class OrderDetail(models.Model):
 
 class Payment(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    image = models.FileField(upload_to="image/payment/")
+    image = models.FileField(upload_to="payment/")
     payment_date = models.DateTimeField(auto_now_add=True)
     method = models.CharField(max_length=50)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
