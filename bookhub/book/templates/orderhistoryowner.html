@@ -129,18 +129,18 @@
             </div>
 
             <!-- Filter and Search -->
-            <div class="mb-6 flex flex-col sm:flex-row gap-4">
-                <div class="flex-1">
+            <div class="mb-6 flex flex-col lg:flex-row gap-4">
+                <div class="flex-1 min-w-0">
                     <div class="relative">
                         <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
-                        <input type="text" id="searchInput" placeholder="ค้นหาคำสั่งซื้อด้วยหมายเลขคำสั่งซื้อ, ชื่อลูกค้า หรือชื่อหนังสือ" 
+                        <input type="text" id="searchInput" placeholder="ค้นหาคำสั่งซื้อ..." 
                                class="w-full pl-12 pr-4 py-3 bg-white border-2 border-gray-300 rounded-lg focus:outline-none focus:border-orange-600 focus:ring-2 focus:ring-orange-100 transition-all">
                     </div>
                 </div>
-                <div class="sm:w-48">
-                    <select id="statusFilter" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-orange-600 focus:ring-2 focus:ring-orange-100 transition-all">
+                <div class="w-full sm:w-44 lg:w-40">
+                    <select id="statusFilter" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-orange-600 focus:ring-2 focus:ring-orange-100 transition-all text-sm">
                         <option value="">สถานะทั้งหมด</option>
                         <option value="pending">รอดำเนินการ</option>
                         <option value="processing">กำลังประมวลผล</option>
@@ -149,8 +149,8 @@
                         <option value="cancelled">ยกเลิกแล้ว</option>
                     </select>
                 </div>
-                <div class="sm:w-40">
-                    <select id="dateFilter" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-orange-600 focus:ring-2 focus:ring-orange-100 transition-all">
+                <div class="w-full sm:w-36 lg:w-32">
+                    <select id="dateFilter" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-orange-600 focus:ring-2 focus:ring-orange-100 transition-all text-sm">
                         <option value="">ทั้งหมด</option>
                         <option value="today">วันนี้</option>
                         <option value="week">สัปดาห์นี้</option>
@@ -160,54 +160,54 @@
             </div>
 
             <!-- Stats Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+            <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+                <div class="bg-white rounded-lg border border-gray-200 p-4 md:p-6 shadow-sm">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-600 text-sm font-medium mb-1">คำสั่งซื้อทั้งหมด</p>
-                            <p class="text-2xl font-bold text-gray-900">248</p>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-gray-600 text-xs md:text-sm font-medium mb-1 truncate">คำสั่งซื้อทั้งหมด</p>
+                            <p class="text-xl md:text-2xl font-bold text-gray-900">248</p>
                         </div>
-                        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="w-8 h-8 md:w-10 md:h-10 bg-blue-100 rounded-full flex items-center justify-center ml-2">
+                            <svg class="w-4 h-4 md:w-5 md:h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                             </svg>
                         </div>
                     </div>
                 </div>
-                <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+                <div class="bg-white rounded-lg border border-gray-200 p-4 md:p-6 shadow-sm">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-600 text-sm font-medium mb-1">รอดำเนินการ</p>
-                            <p class="text-2xl font-bold text-yellow-600">12</p>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-gray-600 text-xs md:text-sm font-medium mb-1 truncate">รอดำเนินการ</p>
+                            <p class="text-xl md:text-2xl font-bold text-yellow-600">12</p>
                         </div>
-                        <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                            <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="w-8 h-8 md:w-10 md:h-10 bg-yellow-100 rounded-full flex items-center justify-center ml-2">
+                            <svg class="w-4 h-4 md:w-5 md:h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
                     </div>
                 </div>
-                <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+                <div class="bg-white rounded-lg border border-gray-200 p-4 md:p-6 shadow-sm">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-600 text-sm font-medium mb-1">กำลังจัดส่ง</p>
-                            <p class="text-2xl font-bold text-orange-600">34</p>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-gray-600 text-xs md:text-sm font-medium mb-1 truncate">กำลังจัดส่ง</p>
+                            <p class="text-xl md:text-2xl font-bold text-orange-600">34</p>
                         </div>
-                        <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                            <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="w-8 h-8 md:w-10 md:h-10 bg-orange-100 rounded-full flex items-center justify-center ml-2">
+                            <svg class="w-4 h-4 md:w-5 md:h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
                     </div>
                 </div>
-                <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+                <div class="bg-white rounded-lg border border-gray-200 p-4 md:p-6 shadow-sm">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-600 text-sm font-medium mb-1">จัดส่งสำเร็จ</p>
-                            <p class="text-2xl font-bold text-green-600">202</p>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-gray-600 text-xs md:text-sm font-medium mb-1 truncate">จัดส่งสำเร็จ</p>
+                            <p class="text-xl md:text-2xl font-bold text-green-600">202</p>
                         </div>
-                        <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="w-8 h-8 md:w-10 md:h-10 bg-green-100 rounded-full flex items-center justify-center ml-2">
+                            <svg class="w-4 h-4 md:w-5 md:h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                             </svg>
                         </div>
@@ -217,8 +217,8 @@
 
             <!-- Orders Table -->
             <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
-                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
-                    <div class="flex items-center justify-between">
+                <div class="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <h3 class="text-lg font-semibold text-gray-900">รายการคำสั่งซื้อ</h3>
                         <div class="flex items-center gap-2 text-sm text-gray-500">
                             <span>แสดง</span>
@@ -233,261 +233,261 @@
                 </div>
                 
                 <div class="overflow-x-auto">
-                    <table class="w-full divide-y divide-gray-200">
+                    <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    <div class="flex items-center gap-2 cursor-pointer hover:text-gray-700" onclick="sortTable('id')">
-                                        รหัสคำสั่งซื้อ
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <th class="px-3 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24 sm:w-32">
+                                    <div class="flex items-center gap-1 cursor-pointer hover:text-gray-700" onclick="sortTable('id')">
+                                        <span>รหัสคำสั่งซื้อ</span>
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
                                         </svg>
                                     </div>
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    <div class="flex items-center gap-2 cursor-pointer hover:text-gray-700" onclick="sortTable('customer')">
+                                <th class="px-3 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32 sm:w-40">
+                                    <div class="flex items-center gap-1 cursor-pointer hover:text-gray-700" onclick="sortTable('customer')">
                                         ลูกค้า
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
                                         </svg>
                                     </div>
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="px-3 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32 sm:w-48">
                                     หนังสือ
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    <div class="flex items-center gap-2 cursor-pointer hover:text-gray-700" onclick="sortTable('quantity')">
-                                        จำนวน
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <th class="px-3 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16 sm:w-20">
+                                    <div class="flex items-center gap-1 cursor-pointer hover:text-gray-700" onclick="sortTable('quantity')">
+                                        <span>จำนวน</span>
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
                                         </svg>
                                     </div>
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    <div class="flex items-center gap-2 cursor-pointer hover:text-gray-700" onclick="sortTable('price')">
+                                <th class="px-3 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20 sm:w-24">
+                                    <div class="flex items-center gap-1 cursor-pointer hover:text-gray-700" onclick="sortTable('price')">
                                         ราคา
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
                                         </svg>
                                     </div>
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    <div class="flex items-center gap-2 cursor-pointer hover:text-gray-700" onclick="sortTable('date')">
-                                        วันที่สั่งซื้อ
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <th class="px-3 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20 sm:w-28 hidden md:table-cell">
+                                    <div class="flex items-center gap-1 cursor-pointer hover:text-gray-700" onclick="sortTable('date')">
+                                        วันที่
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
                                         </svg>
                                     </div>
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    ที่อยู่จัดส่ง
+                                <th class="px-3 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24 sm:w-32 hidden lg:table-cell">
+                                    ที่อยู่
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="px-3 sm:px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-20 sm:w-24">
                                     สถานะ
                                 </th>
-                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    การดำเนินการ
+                                <th class="px-3 sm:px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-20 sm:w-24">
+                                    จัดการ
                                 </th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200" id="ordersTableBody">
                             <tr class="hover:bg-gray-50 transition-colors" data-order-id="ORD-001" data-status="shipped">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="text-sm font-medium text-gray-900">#ORD-001</span>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4">
+                                    <span class="text-xs sm:text-sm font-medium text-gray-900">#ORD-001</span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div>
-                                            <p class="text-sm font-medium text-gray-900">สมชาย ใสใจ</p>
-                                            <p class="text-xs text-gray-500">somchai@email.com</p>
-                                        </div>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4">
+                                    <div class="min-w-0">
+                                        <p class="text-xs sm:text-sm font-medium text-gray-900 truncate">สมชาย ใสใจ</p>
+                                        <p class="text-xs text-gray-500 truncate hidden sm:block">somchai@email.com</p>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">จิตวิทยาสายดาร์ก</div>
-                                    <div class="text-xs text-gray-500">โดย Taneaw</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <span class="text-sm text-gray-900">1</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="text-sm font-medium text-gray-900">฿520</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">15/01/2024</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-xs text-gray-500 max-w-32 truncate" title="123/45 ถ.สุขุมวิท แขวงคลองเตย เขตคลองเตย กรุงเทพฯ 10110">
-                                        123/45 ถ.สุขุมวิท แขวงคลองเตย...
+                                <td class="px-3 sm:px-4 py-3 sm:py-4">
+                                    <div class="min-w-0">
+                                        <div class="text-xs sm:text-sm text-gray-900 truncate">จิตวิทยาสายดาร์ก</div>
+                                        <div class="text-xs text-gray-500 truncate hidden sm:block">โดย Taneaw</div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800">
-                                        กำลังจัดส่ง
+                                <td class="px-3 sm:px-4 py-3 sm:py-4 text-center">
+                                    <span class="text-xs sm:text-sm text-gray-900">1</span>
+                                </td>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4">
+                                    <span class="text-xs sm:text-sm font-medium text-gray-900">฿520</span>
+                                </td>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 hidden md:table-cell">15/01/24</td>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4 hidden lg:table-cell">
+                                    <div class="text-xs text-gray-500 max-w-24 sm:max-w-32 truncate" title="123/45 ถ.สุขุมวิท แขวงคลองเตย เขตคลองเตย กรุงเทพฯ 10110">
+                                        123/45 ถ.สุขุมวิท...
+                                    </div>
+                                </td>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4">
+                                    <span class="px-2 py-1 inline-flex text-xs leading-4 font-semibold rounded-full bg-orange-100 text-orange-800">
+                                        <span class="text-center">กำลังจัดส่ง</span>
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <div class="flex justify-end gap-2">
-                                        <button onclick="viewOrder('ORD-001')" class="text-orange-600 hover:text-orange-900 px-2 py-1 rounded">ดู</button>
-                                        <button onclick="updateStatus('ORD-001')" class="text-blue-600 hover:text-blue-900 px-2 py-1 rounded">อัปเดต</button>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4 text-right text-xs font-medium">
+                                    <div class="flex justify-end gap-1">
+                                        <button onclick="viewOrder('ORD-001')" class="text-orange-600 hover:text-orange-900 px-1 sm:px-2 py-1 rounded text-xs">ดู</button>
+                                        <button onclick="updateStatus('ORD-001')" class="text-blue-600 hover:text-blue-900 px-1 sm:px-2 py-1 rounded text-xs hidden sm:inline">แก้ไข</button>
                                     </div>
                                 </td>
                             </tr>
                             <tr class="hover:bg-gray-50 transition-colors" data-order-id="ORD-002" data-status="pending">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="text-sm font-medium text-gray-900">#ORD-002</span>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4">
+                                    <span class="text-xs sm:text-sm font-medium text-gray-900">#ORD-002</span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div>
-                                            <p class="text-sm font-medium text-gray-900">สุดา สวยงาม</p>
-                                            <p class="text-xs text-gray-500">suda@email.com</p>
-                                        </div>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4">
+                                    <div class="min-w-0">
+                                        <p class="text-xs sm:text-sm font-medium text-gray-900 truncate">สุดา สวยงาม</p>
+                                        <p class="text-xs text-gray-500 truncate hidden sm:block">suda@email.com</p>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">The Psychology of Money</div>
-                                    <div class="text-xs text-gray-500">โดย Morgan Housel</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <span class="text-sm text-gray-900">2</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="text-sm font-medium text-gray-900">฿840</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">14/01/2024</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-xs text-gray-500 max-w-32 truncate" title="456/78 ถ.รัชดาภิเษก แขวงหัวหมาก เขตบางกะปิ กรุงเทพฯ 10240">
-                                        456/78 ถ.รัชดาภิเษก แขวงหัวหมาก...
+                                <td class="px-3 sm:px-4 py-3 sm:py-4">
+                                    <div class="min-w-0">
+                                        <div class="text-xs sm:text-sm text-gray-900 truncate">The Psychology of Money</div>
+                                        <div class="text-xs text-gray-500 truncate hidden sm:block">โดย Morgan Housel</div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                        รอดำเนินการ
+                                <td class="px-3 sm:px-4 py-3 sm:py-4 text-center">
+                                    <span class="text-xs sm:text-sm text-gray-900">2</span>
+                                </td>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4">
+                                    <span class="text-xs sm:text-sm font-medium text-gray-900">฿840</span>
+                                </td>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 hidden md:table-cell">14/01/24</td>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4 hidden lg:table-cell">
+                                    <div class="text-xs text-gray-500 max-w-24 sm:max-w-32 truncate" title="456/78 ถ.รัชดาภิเษก แขวงหัวหมาก เขตบางกะปิ กรุงเทพฯ 10240">
+                                        456/78 ถ.รัชดาภิเษก...
+                                    </div>
+                                </td>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4">
+                                    <span class="px-2 py-1 inline-flex text-xs leading-4 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                        <span class="text-center">รอดำเนินการ</span>
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <div class="flex justify-end gap-2">
-                                        <button onclick="viewOrder('ORD-002')" class="text-orange-600 hover:text-orange-900 px-2 py-1 rounded">ดู</button>
-                                        <button onclick="updateStatus('ORD-002')" class="text-blue-600 hover:text-blue-900 px-2 py-1 rounded">อัปเดต</button>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4 text-right text-xs font-medium">
+                                    <div class="flex justify-end gap-1">
+                                        <button onclick="viewOrder('ORD-002')" class="text-orange-600 hover:text-orange-900 px-1 sm:px-2 py-1 rounded text-xs">ดู</button>
+                                        <button onclick="updateStatus('ORD-002')" class="text-blue-600 hover:text-blue-900 px-1 sm:px-2 py-1 rounded text-xs hidden sm:inline">แก้ไข</button>
                                     </div>
                                 </td>
                             </tr>
                             <tr class="hover:bg-gray-50 transition-colors" data-order-id="ORD-003" data-status="delivered">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="text-sm font-medium text-gray-900">#ORD-003</span>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4">
+                                    <span class="text-xs sm:text-sm font-medium text-gray-900">#ORD-003</span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div>
-                                            <p class="text-sm font-medium text-gray-900">นิรันดร์ รักเรียน</p>
-                                            <p class="text-xs text-gray-500">niran@email.com</p>
-                                        </div>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4">
+                                    <div class="min-w-0">
+                                        <p class="text-xs sm:text-sm font-medium text-gray-900 truncate">นิรันดร์ รักเรียน</p>
+                                        <p class="text-xs text-gray-500 truncate hidden sm:block">niran@email.com</p>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">Atomic Habits</div>
-                                    <div class="text-xs text-gray-500">โดย James Clear</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <span class="text-sm text-gray-900">1</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="text-sm font-medium text-gray-900">฿420</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">13/01/2024</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-xs text-gray-500 max-w-32 truncate" title="789/12 ถ.พระราม 4 แขวงสีลม เขตบางรัก กรุงเทพฯ 10500">
-                                        789/12 ถ.พระราม 4 แขวงสีลม...
+                                <td class="px-3 sm:px-4 py-3 sm:py-4">
+                                    <div class="min-w-0">
+                                        <div class="text-xs sm:text-sm text-gray-900 truncate">Atomic Habits</div>
+                                        <div class="text-xs text-gray-500 truncate hidden sm:block">โดย James Clear</div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                        จัดส่งสำเร็จ
+                                <td class="px-3 sm:px-4 py-3 sm:py-4 text-center">
+                                    <span class="text-xs sm:text-sm text-gray-900">1</span>
+                                </td>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4">
+                                    <span class="text-xs sm:text-sm font-medium text-gray-900">฿420</span>
+                                </td>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 hidden md:table-cell">13/01/24</td>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4 hidden lg:table-cell">
+                                    <div class="text-xs text-gray-500 max-w-24 sm:max-w-32 truncate" title="789/12 ถ.พระราม 4 แขวงสีลม เขตบางรัก กรุงเทพฯ 10500">
+                                        789/12 ถ.พระราม 4...
+                                    </div>
+                                </td>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4">
+                                    <span class="px-2 py-1 inline-flex text-xs leading-4 font-semibold rounded-full bg-green-100 text-green-800">
+                                        <span class="text-center">จัดส่งสำเร็จ</span>
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <div class="flex justify-end gap-2">
-                                        <button onclick="viewOrder('ORD-003')" class="text-orange-600 hover:text-orange-900 px-2 py-1 rounded">ดู</button>
-                                        <button onclick="generateInvoice('ORD-003')" class="text-green-600 hover:text-green-900 px-2 py-1 rounded">ใบเสร็จ</button>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4 text-right text-xs font-medium">
+                                    <div class="flex justify-end gap-1">
+                                        <button onclick="viewOrder('ORD-003')" class="text-orange-600 hover:text-orange-900 px-1 sm:px-2 py-1 rounded text-xs">ดู</button>
+                                        <button onclick="updateStatus('ORD-003')" class="text-blue-600 hover:text-blue-900 px-1 sm:px-2 py-1 rounded text-xs hidden sm:inline">แก้ไข</button>
                                     </div>
                                 </td>
                             </tr>
                             <tr class="hover:bg-gray-50 transition-colors" data-order-id="ORD-004" data-status="processing">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="text-sm font-medium text-gray-900">#ORD-004</span>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4">
+                                    <span class="text-xs sm:text-sm font-medium text-gray-900">#ORD-004</span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div>
-                                            <p class="text-sm font-medium text-gray-900">มานะ ขยันหมั่นเพียร</p>
-                                            <p class="text-xs text-gray-500">mana@email.com</p>
-                                        </div>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4">
+                                    <div class="min-w-0">
+                                        <p class="text-xs sm:text-sm font-medium text-gray-900 truncate">มานะ ขยันหมั่นเพียร</p>
+                                        <p class="text-xs text-gray-500 truncate hidden sm:block">mana@email.com</p>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">Think and Grow Rich</div>
-                                    <div class="text-xs text-gray-500">โดย Napoleon Hill</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <span class="text-sm text-gray-900">1</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="text-sm font-medium text-gray-900">฿350</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">12/01/2024</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-xs text-gray-500 max-w-32 truncate" title="321/54 ถ.ลาดพร้าว แขวงจอมพล เขตจตุจักร กรุงเทพฯ 10900">
-                                        321/54 ถ.ลาดพร้าว แขวงจอมพล...
+                                <td class="px-3 sm:px-4 py-3 sm:py-4">
+                                    <div class="min-w-0">
+                                        <div class="text-xs sm:text-sm text-gray-900 truncate">Think and Grow Rich</div>
+                                        <div class="text-xs text-gray-500 truncate hidden sm:block">โดย Napoleon Hill</div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                        กำลังประมวลผล
+                                <td class="px-3 sm:px-4 py-3 sm:py-4 text-center">
+                                    <span class="text-xs sm:text-sm text-gray-900">1</span>
+                                </td>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4">
+                                    <span class="text-xs sm:text-sm font-medium text-gray-900">฿350</span>
+                                </td>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 hidden md:table-cell">12/01/24</td>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4 hidden lg:table-cell">
+                                    <div class="text-xs text-gray-500 max-w-24 sm:max-w-32 truncate" title="321/54 ถ.ลาดพร้าว แขวงจอมพล เขตจตุจักร กรุงเทพฯ 10900">
+                                        321/54 ถ.ลาดพร้าว...
+                                    </div>
+                                </td>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4">
+                                    <span class="px-2 py-1 inline-flex text-xs leading-4 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                        <span class="text-center">กำลังประมวลผล</span>
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <div class="flex justify-end gap-2">
-                                        <button onclick="viewOrder('ORD-004')" class="text-orange-600 hover:text-orange-900 px-2 py-1 rounded">ดู</button>
-                                        <button onclick="updateStatus('ORD-004')" class="text-blue-600 hover:text-blue-900 px-2 py-1 rounded">อัปเดต</button>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4 text-right text-xs font-medium">
+                                    <div class="flex justify-end gap-1">
+                                        <button onclick="viewOrder('ORD-004')" class="text-orange-600 hover:text-orange-900 px-1 sm:px-2 py-1 rounded text-xs">ดู</button>
+                                        <button onclick="updateStatus('ORD-004')" class="text-blue-600 hover:text-blue-900 px-1 sm:px-2 py-1 rounded text-xs hidden sm:inline">แก้ไข</button>
                                     </div>
                                 </td>
                             </tr>
                             <tr class="hover:bg-gray-50 transition-colors" data-order-id="ORD-005" data-status="shipped">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="text-sm font-medium text-gray-900">#ORD-005</span>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4">
+                                    <span class="text-xs sm:text-sm font-medium text-gray-900">#ORD-005</span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div>
-                                            <p class="text-sm font-medium text-gray-900">อรุณี ใจดี</p>
-                                            <p class="text-xs text-gray-500">arunee@email.com</p>
-                                        </div>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4">
+                                    <div class="min-w-0">
+                                        <p class="text-xs sm:text-sm font-medium text-gray-900 truncate">อรุณี ใจดี</p>
+                                        <p class="text-xs text-gray-500 truncate hidden sm:block">arunee@email.com</p>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">Rich Dad Poor Dad</div>
-                                    <div class="text-xs text-gray-500">โดย Robert Kiyosaki</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <span class="text-sm text-gray-900">2</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="text-sm font-medium text-gray-900">฿760</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">11/01/2024</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-xs text-gray-500 max-w-32 truncate" title="654/87 ถ.เพชรบุรี แขวงมักกะสัน เขตราชเทวี กรุงเทพฯ 10400">
-                                        654/87 ถ.เพชรบุรี แขวงมักกะสัน...
+                                <td class="px-3 sm:px-4 py-3 sm:py-4">
+                                    <div class="min-w-0">
+                                        <div class="text-xs sm:text-sm text-gray-900 truncate">Rich Dad Poor Dad</div>
+                                        <div class="text-xs text-gray-500 truncate hidden sm:block">โดย Robert Kiyosaki</div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800">
-                                        กำลังจัดส่ง
+                                <td class="px-3 sm:px-4 py-3 sm:py-4 text-center">
+                                    <span class="text-xs sm:text-sm text-gray-900">2</span>
+                                </td>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4">
+                                    <span class="text-xs sm:text-sm font-medium text-gray-900">฿760</span>
+                                </td>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 hidden md:table-cell">11/01/24</td>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4 hidden lg:table-cell">
+                                    <div class="text-xs text-gray-500 max-w-24 sm:max-w-32 truncate" title="654/87 ถ.เพชรบุรี แขวงมักกะสัน เขตราชเทวี กรุงเทพฯ 10400">
+                                        654/87 ถ.เพชรบุรี...
+                                    </div>
+                                </td>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4">
+                                    <span class="px-2 py-1 inline-flex text-xs leading-4 font-semibold rounded-full bg-orange-100 text-orange-800">
+                                        <span class="text-center">กำลังจัดส่ง</span>
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <div class="flex justify-end gap-2">
-                                        <button onclick="viewOrder('ORD-005')" class="text-orange-600 hover:text-orange-900 px-2 py-1 rounded">ดู</button>
-                                        <button onclick="updateStatus('ORD-005')" class="text-blue-600 hover:text-blue-900 px-2 py-1 rounded">อัปเดต</button>
+                                <td class="px-3 sm:px-4 py-3 sm:py-4 text-right text-xs font-medium">
+                                    <div class="flex justify-end gap-1">
+                                        <button onclick="viewOrder('ORD-005')" class="text-orange-600 hover:text-orange-900 px-1 sm:px-2 py-1 rounded text-xs">ดู</button>
+                                        <button onclick="updateStatus('ORD-005')" class="text-blue-600 hover:text-blue-900 px-1 sm:px-2 py-1 rounded text-xs hidden sm:inline">แก้ไข</button>
                                     </div>
                                 </td>
                             </tr>
@@ -496,27 +496,27 @@
                 </div>
 
                 <!-- Pagination -->
-                <div class="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-gray-50">
-                    <div class="flex items-center gap-2 text-sm text-gray-500">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-6 py-4 border-t border-gray-200 bg-gray-50 gap-4">
+                    <div class="flex items-center gap-2 text-xs sm:text-sm text-gray-500 justify-center sm:justify-start">
                         <span>แสดง</span>
                         <span id="currentRange" class="font-medium text-gray-900">1-5</span>
                         <span>จาก</span>
                         <span id="totalItems" class="font-medium text-gray-900">248</span>
                         <span>รายการ</span>
                     </div>
-                    <nav class="flex items-center gap-2">
-                        <button id="prevPage" class="px-3 py-2 text-gray-500 hover:text-gray-700 disabled:opacity-50" disabled>
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <nav class="flex items-center gap-1 sm:gap-2 justify-center sm:justify-end">
+                        <button id="prevPage" class="p-2 text-gray-500 hover:text-gray-700 disabled:opacity-50" disabled>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                             </svg>
                         </button>
-                        <button class="px-4 py-2 bg-orange-600 text-white rounded-lg">1</button>
-                        <button class="px-4 py-2 text-gray-700 hover:text-gray-900 rounded-lg hover:bg-gray-100">2</button>
-                        <button class="px-4 py-2 text-gray-700 hover:text-gray-900 rounded-lg hover:bg-gray-100">3</button>
-                        <span class="px-2 text-gray-500">...</span>
-                        <button class="px-4 py-2 text-gray-700 hover:text-gray-900 rounded-lg hover:bg-gray-100">50</button>
-                        <button id="nextPage" class="px-3 py-2 text-gray-500 hover:text-gray-700">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <button class="px-3 py-1.5 bg-orange-600 text-white rounded text-sm">1</button>
+                        <button class="px-3 py-1.5 text-gray-700 hover:text-gray-900 rounded hover:bg-gray-100 text-sm">2</button>
+                        <button class="px-3 py-1.5 text-gray-700 hover:text-gray-900 rounded hover:bg-gray-100 text-sm">3</button>
+                        <span class="px-2 text-gray-500 text-sm">...</span>
+                        <button class="px-3 py-1.5 text-gray-700 hover:text-gray-900 rounded hover:bg-gray-100 text-sm">50</button>
+                        <button id="nextPage" class="p-2 text-gray-500 hover:text-gray-700">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                             </svg>
                         </button>
@@ -562,10 +562,6 @@
                         <option value="delivered">จัดส่งสำเร็จ</option>
                         <option value="cancelled">ยกเลิก</option>
                     </select>
-                </div>
-                <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">หมายเหตุ (ไม่บังคับ)</label>
-                    <textarea id="statusNote" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-600" placeholder="เพิ่มหมายเหตุเกี่ยวกับการเปลี่ยนสถานะ..."></textarea>
                 </div>
                 <div class="flex gap-3">
                     <button onclick="closeStatusModal()" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
@@ -689,11 +685,6 @@
             
             alert('อัปเดตสถานะเรียบร้อยแล้ว');
             closeStatusModal();
-        }
-
-        function generateInvoice(orderId) {
-            // Generate and download invoice
-            alert(`กำลังสร้างใบเสร็จสำหรับคำสั่งซื้อ ${orderId}`);
         }
 
         function getStatusClasses(status) {
