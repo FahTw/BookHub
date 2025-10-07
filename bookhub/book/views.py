@@ -47,7 +47,7 @@ class OrderHistoryView(View):
         context = {
             "orders": orders,
         }
-        return render(request, "order_history.html", context)
+        return render(request, "orderhistory.html", context)
 
 class OrderHistoryDetailView(View):
     def get(self, request, user, order):
@@ -58,4 +58,4 @@ class OrderHistoryDetailView(View):
             "order": order,
             "order_details": order_details,
         }
-        return render(request, "order_history_detail.html", context)
+        return render(request, "orderhistorydetail.html", context)
