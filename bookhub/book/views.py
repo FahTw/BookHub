@@ -22,17 +22,6 @@ class CartView(View):
         }
         return render(request, "cart.html", context)
 
-class OrderView(View):
-    def get(self, request, user):
-        order = Order.objects.get(id=user)
-        order_details = OrderDetail.objects.filter(order=order)
-
-        context = {
-            "order": order,
-            "order_details": order_details,
-        }
-        return render(request, "order.html", context)
-
 class PaymentView(View):
     def get(self, request, user):
         order = Order.objects.get(id=user)
