@@ -1,5 +1,4 @@
 from django.db import models
-from jango.core.validators import MinValueValidator, MaxValueValidator
 
 class User(models.Model):
     first_name = models.CharField(max_length=150)
@@ -121,9 +120,7 @@ class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True, blank=True)
-    rating = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(5)]
-    )
+    rating = models.PositiveSmallIntegerField()
     comment = models.TextField(max_length=500, blank=True)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
