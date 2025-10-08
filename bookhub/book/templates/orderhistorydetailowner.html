@@ -4,8 +4,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Detail - Bookstore</title>
+    <title>รายละเอียดคำสั่งซื้อ - BookHub</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'orange': {
+                            500: '#f97316',
+                            600: '#ea580c',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
@@ -19,128 +33,330 @@
     <div class="flex min-h-screen">
         <!-- Sidebar -->
         <aside class="w-64 bg-white border-r border-gray-200 flex flex-col">
-            <div class="p-6">
-                <h1 class="text-2xl font-bold">Bookstore</h1>
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-orange-600 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                    </div>
+                    <h1 class="text-2xl font-bold text-orange-600">BookHub</h1>
+                </div>
             </div>
 
-            <nav class="flex-1 px-4 space-y-2">
-                <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 text-red-600 bg-red-50 rounded-lg">
+            <nav class="flex-1 px-4 space-y-2 mt-6">
+                <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-orange-600 rounded-lg transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <rect x="3" y="3" width="7" height="7" stroke-width="2" />
                         <rect x="14" y="3" width="7" height="7" stroke-width="2" />
                         <rect x="3" y="14" width="7" height="7" stroke-width="2" />
                         <rect x="14" y="14" width="7" height="7" stroke-width="2" />
                     </svg>
-                    <span class="font-medium">Dashboard</span>
+                    <span class="font-medium">แดชบอร์ด</span>
                 </a>
 
                 <a href="#"
-                    class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                    class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-orange-600 rounded-lg transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
-                    <span class="font-medium">Books</span>
+                    <span class="font-medium">จัดการหนังสือ</span>
                 </a>
 
-                <a href="orders.html"
-                    class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                <a href="orderhistoryowner.html"
+                    class="flex items-center gap-3 px-4 py-3 text-orange-600 bg-orange-50 rounded-lg">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                     </svg>
-                    <span class="font-medium">Orders</span>
+                    <span class="font-medium">จัดการคำสั่งซื้อ</span>
                 </a>
 
                 <a href="#"
-                    class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                    class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-orange-600 rounded-lg transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
-                    <span class="font-medium">Profile<br>Management</span>
+                    <span class="font-medium">จัดการผู้ใช้</span>
                 </a>
             </nav>
 
+            <!-- User Profile & Logout -->
             <div class="p-4 border-t border-gray-200">
+                <div class="flex items-center gap-3 mb-4 px-4 py-2">
+                    <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                        <svg class="w-4 h-4 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-gray-900 truncate">ผู้ดูแลระบบ</p>
+                        <p class="text-xs text-gray-500 truncate">admin@bookhub.com</p>
+                    </div>
+                </div>
                 <button
-                    class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors w-full">
+                    class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg font-medium w-full transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                     </svg>
-                    <span class="font-medium">Logout</span>
+                    ออกจากระบบ
                 </button>
             </div>
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 p-8">
+        <main class="flex-1 p-4 md:p-8">
             <div class="max-w-5xl">
-                <h1 class="text-4xl font-bold mb-2">Order ID: 1</h1>
-                <p class="text-gray-600 mb-8">October 15, 2025 at 3pm.</p>
+                <div class="mb-6">
+                    <h1 class="text-3xl md:text-4xl font-bold mb-2 text-gray-900">รายละเอียดคำสั่งซื้อ #1</h1>
+                    <div class="flex flex-wrap items-center gap-4 text-gray-600">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span>15 ตุลาคม 2568 เวลา 15:00 น.</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">จัดส่งสำเร็จ</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customer Information -->
+                <div class="bg-white rounded-lg border border-gray-200 p-4 md:p-6 mb-6 shadow-sm">
+                    <h2 class="text-lg font-semibold mb-6 text-gray-900">ข้อมูลลูกค้า</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-700 mb-2">ข้อมูลผู้สั่ง</h3>
+                            <div class="space-y-1 text-gray-600">
+                                <p class="font-medium">นายสมชาย ใจดี</p>
+                                <p>โทร: 098-765-4321</p>
+                                <p>อีเมล: somchai@email.com</p>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-700 mb-2">ที่อยู่จัดส่ง</h3>
+                            <div class="text-gray-600">
+                                <p>123 ถนนสุขุมวิท</p>
+                                <p>แขวงคลองตัน เขตคลองตัน</p>
+                                <p>กรุงเทพฯ 10110</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Order Item Section -->
-                <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-                    <h2 class="text-lg font-semibold mb-6">Order Item</h2>
+                <div class="bg-white rounded-lg border border-gray-200 p-4 md:p-6 mb-6 shadow-sm">
+                    <h2 class="text-lg font-semibold mb-6 text-gray-900">รายการสินค้า</h2>
 
-                    <div class="flex items-center gap-6">
+                    <div class="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6">
                         <!-- Book Image -->
-                        <div class="w-20 h-28 bg-gray-300 rounded flex-shrink-0"></div>
+                        <div class="w-20 h-28 bg-gradient-to-br from-orange-100 to-orange-200 rounded-lg flex-shrink-0 flex items-center justify-center">
+                            <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                        </div>
 
                         <!-- Book Details -->
-                        <div class="flex-1">
+                        <div class="flex-1 min-w-0">
                             <p class="text-sm text-gray-600 mb-1">การพัฒนาตนเอง</p>
-                            <h3 class="text-lg font-medium">จิตวิทยาสายดาร์ก</h3>
+                            <h3 class="text-lg font-medium text-gray-900">จิตวิทยาสายดาร์ก</h3>
+                            <p class="text-sm text-gray-500 mt-1">รหัสสินค้า: BK001</p>
                         </div>
 
-                        <!-- Quantity -->
-                        <div class="px-4 py-2 border border-gray-300 rounded-lg text-sm">
-                            1 × 127
-                        </div>
+                        <div class="flex flex-col md:flex-row items-start md:items-center gap-4 w-full md:w-auto">
+                            <!-- Quantity -->
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm text-gray-600">จำนวน:</span>
+                                <div class="px-3 py-1.5 bg-gray-100 border border-gray-300 rounded-lg text-sm font-medium">
+                                    1 เล่ม
+                                </div>
+                            </div>
 
-                        <!-- Price -->
-                        <div class="text-lg font-medium w-24 text-right">
-                            127 บาท
-                        </div>
+                            <!-- Unit Price -->
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm text-gray-600">ราคา:</span>
+                                <span class="text-lg font-medium text-gray-900">127 บาท</span>
+                            </div>
 
-                        <!-- Delete Button -->
-                        <button class="p-2 hover:bg-gray-100 rounded transition-colors">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                        </button>
+                            <!-- Total Price -->
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm text-gray-600">รวม:</span>
+                                <span class="text-lg font-bold text-orange-600">127 บาท</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Order Summary Section -->
-                <div class="bg-white rounded-lg border border-gray-200 p-6">
-                    <h2 class="text-lg font-semibold mb-6">Order Summary</h2>
+                <div class="bg-white rounded-lg border border-gray-200 p-4 md:p-6 shadow-sm">
+                    <h2 class="text-lg font-semibold mb-6 text-gray-900">สรุปคำสั่งซื้อ</h2>
 
                     <div class="space-y-4">
                         <div class="flex justify-between items-center">
-                            <span class="text-gray-700">Subtotal</span>
-                            <div class="flex items-center gap-8">
-                                <span class="text-gray-600">1 Item</span>
-                                <span class="font-medium w-16 text-right">127</span>
+                            <span class="text-gray-700">ราคาสินค้า</span>
+                            <div class="flex items-center gap-4 md:gap-8">
+                                <span class="text-gray-600 text-sm">1 รายการ</span>
+                                <span class="font-medium w-20 text-right">127 บาท</span>
                             </div>
                         </div>
 
                         <div class="flex justify-between items-center">
-                            <span class="text-gray-700">Shipping</span>
-                            <span class="font-medium w-16 text-right">0</span>
+                            <span class="text-gray-700">ค่าจัดส่ง</span>
+                            <span class="font-medium w-20 text-right text-green-600">ฟรี</span>
                         </div>
 
                         <div class="border-t border-gray-200 pt-4 flex justify-between items-center">
-                            <span class="text-lg font-semibold">Total</span>
-                            <span class="text-lg font-bold w-16 text-right">127</span>
+                            <span class="text-lg font-semibold text-gray-900">ยอดรวมทั้งหมด</span>
+                            <span class="text-xl font-bold text-orange-600 w-24 text-right">127 บาท</span>
+                        </div>
+                    </div>
+
+                    <!-- Order Status Management -->
+                    <div class="mt-8 pt-6 border-t border-gray-200">
+                        <h3 class="text-md font-semibold mb-4 text-gray-900">จัดการสถานะคำสั่งซื้อ</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                            <button onclick="updateOrderStatus('รอดำเนินการ')" class="px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 transition-colors text-sm font-medium">
+                                รอดำเนินการ
+                            </button>
+                            <button onclick="updateOrderStatus('กำลังเตรียมสินค้า')" class="px-4 py-2 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium">
+                                กำลังเตรียมสินค้า
+                            </button>
+                            <button onclick="updateOrderStatus('กำลังจัดส่ง')" class="px-4 py-2 bg-purple-100 text-purple-800 rounded-lg hover:bg-purple-200 transition-colors text-sm font-medium">
+                                กำลังจัดส่ง
+                            </button>
+                            <button onclick="updateOrderStatus('จัดส่งสำเร็จ')" class="px-4 py-2 bg-green-100 text-green-800 rounded-lg hover:bg-green-200 transition-colors text-sm font-medium">
+                                จัดส่งสำเร็จ
+                            </button>
+                            <button onclick="updateOrderStatus('ยกเลิก')" class="px-4 py-2 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition-colors text-sm font-medium">
+                                ยกเลิก
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
         </main>
     </div>
+
+    <script>
+        // Order Status Management
+        function updateOrderStatus(newStatus) {
+            if (confirm(`คุณต้องการเปลี่ยนสถานะเป็น "${newStatus}" หรือไม่?`)) {
+                // Update status display
+                const statusDisplay = document.querySelector('.bg-green-100');
+                if (statusDisplay) {
+                    statusDisplay.textContent = newStatus;
+                    
+                    // Update colors based on status
+                    statusDisplay.className = 'px-3 py-1 rounded-full text-sm font-medium';
+                    if (newStatus.includes('รอดำเนินการ')) {
+                        statusDisplay.classList.add('bg-yellow-100', 'text-yellow-800');
+                    } else if (newStatus.includes('เตรียม')) {
+                        statusDisplay.classList.add('bg-blue-100', 'text-blue-800');
+                    } else if (newStatus.includes('จัดส่ง') && !newStatus.includes('สำเร็จ')) {
+                        statusDisplay.classList.add('bg-purple-100', 'text-purple-800');
+                    } else if (newStatus.includes('สำเร็จ')) {
+                        statusDisplay.classList.add('bg-green-100', 'text-green-800');
+                    } else if (newStatus.includes('ยกเลิก')) {
+                        statusDisplay.classList.add('bg-red-100', 'text-red-800');
+                    }
+                }
+                
+                // Show success notification
+                showNotification('อัปเดตสถานะสำเร็จ!', 'success');
+            }
+        }
+
+        // Print order function
+        function printOrder() {
+            window.print();
+        }
+
+        // Send email function
+        function sendEmail() {
+            if (confirm('ส่งอีเมลการยืนยันคำสั่งซื้อให้ลูกค้าหรือไม่?')) {
+                // Simulate sending email
+                setTimeout(() => {
+                    showNotification('ส่งอีเมลสำเร็จแล้ว!', 'success');
+                }, 1000);
+            }
+        }
+
+        // View customer function
+        function viewCustomer() {
+            // Simulate opening customer profile
+            alert('เปิดข้อมูลลูกค้า:\n\nชื่อ: นายสมชาย ใจดี\nอีเมล: somchai@email.com\nโทรศัพท์: 098-765-4321\nสมาชิกตั้งแต่: 15 มกราคม 2568');
+        }
+
+        // Notification system
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white transform transition-all duration-300 translate-x-full opacity-0`;
+            
+            if (type === 'success') {
+                notification.classList.add('bg-green-500');
+            } else if (type === 'error') {
+                notification.classList.add('bg-red-500');
+            } else {
+                notification.classList.add('bg-blue-500');
+            }
+            
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // Show notification
+            setTimeout(() => {
+                notification.classList.remove('translate-x-full', 'opacity-0');
+            }, 100);
+            
+            // Hide notification
+            setTimeout(() => {
+                notification.classList.add('translate-x-full', 'opacity-0');
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Breadcrumb hover effects
+        document.addEventListener('DOMContentLoaded', function() {
+            const breadcrumbLinks = document.querySelectorAll('nav a');
+            breadcrumbLinks.forEach(link => {
+                link.addEventListener('mouseenter', function() {
+                    if (!this.classList.contains('text-orange-600')) {
+                        this.classList.add('text-orange-600');
+                    }
+                });
+                link.addEventListener('mouseleave', function() {
+                    if (this.textContent !== 'รายละเอียดคำสั่งซื้อ #1') {
+                        this.classList.remove('text-orange-600');
+                    }
+                });
+            });
+        });
+
+        // Responsive handling
+        function handleResize() {
+            const width = window.innerWidth;
+            const productDetails = document.querySelectorAll('.flex.flex-col.md\\:flex-row');
+            
+            productDetails.forEach(element => {
+                if (width < 768) {
+                    element.classList.remove('md:flex-row');
+                    element.classList.add('flex-col');
+                } else {
+                    element.classList.remove('flex-col');
+                    element.classList.add('md:flex-row');
+                }
+            });
+        }
+
+        window.addEventListener('resize', handleResize);
+        document.addEventListener('DOMContentLoaded', handleResize);
+    </script>
 </body>
 
 </html>
