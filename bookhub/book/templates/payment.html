@@ -400,14 +400,19 @@
                         section.classList.remove('active');
                     });
                     
-                    if (this.value === 'qr_code') {
+                    if (this.value === 'promptpay') {
                         document.getElementById('qr-section').classList.remove('hidden');
                         document.getElementById('qr-section').classList.add('active');
+                        document.querySelector('.mb-8:has(#file-drop-zone)').style.display = 'block';
                     } else if (this.value === 'bank_transfer') {
                         document.getElementById('bank-transfer-section').classList.remove('hidden');
                         document.getElementById('bank-transfer-section').classList.add('active');
+                        document.querySelector('.mb-8:has(#file-drop-zone)').style.display = 'block';
+                    } else if (this.value === 'cash_on_delivery') {
+                        // Hide file upload section for cash on delivery
+                        document.querySelector('.mb-8:has(#file-drop-zone)').style.display = 'none';
                     }
-                    
+
                     updateSubmitButton();
                 });
             });
@@ -439,7 +444,10 @@
             document.getElementById('paymentForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 
-                if (!selectedFile) {
+                const selectedMethod = document.querySelector('.payment-method-radio:checked');
+                
+                // Check if file is required (not required for cash_on_delivery)
+                if (selectedMethod.value !== 'cash_on_delivery' && !selectedFile) {
                     showError('กรุณาอัพโหลดหลักฐานการชำระเงิน');
                     return;
                 }
@@ -562,7 +570,11 @@
             const hasFile = selectedFile !== null;
             const selectedMethod = document.querySelector('.payment-method-radio:checked');
             
-            if (hasFile && selectedMethod) {
+            // For cash on delivery, no file upload is required
+            if (selectedMethod && selectedMethod.value === 'cash_on_delivery') {
+                submitButton.disabled = false;
+                submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else if (hasFile && selectedMethod) {
                 submitButton.disabled = false;
                 submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
             } else {
