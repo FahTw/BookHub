@@ -97,22 +97,30 @@
                     </div>
 
                     <!-- Cart Item -->
-                    <div class="cart-item border-b border-gray-100 last:border-b-0" data-price="127">
+                    <div class="cart-item border-b border-gray-100 last:border-b-0" data-price="350" data-book-id="1">
                         <div class="hidden lg:grid lg:grid-cols-12 gap-4 px-6 py-6 items-center">
                             <div class="col-span-1 flex items-center justify-center">
                                 <input type="checkbox" checked class="item-checkbox w-4 h-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500" />
                             </div>
                             <div class="col-span-5 flex items-center gap-4">
                                 <div class="w-16 h-20 bg-gray-200 rounded flex-shrink-0 overflow-hidden">
-                                    <img src="/api/placeholder/64/80" alt="จิตวิทยาสายดาร์ก" class="w-full h-full object-cover" />
+                                    <img src="/api/placeholder/64/80" alt="พอใจ" class="w-full h-full object-cover" />
                                 </div>
                                 <div class="min-w-0">
-                                    <h3 class="font-semibold text-gray-900 mb-1 truncate">จิตวิทยาสายดาร์ก</h3>
-                                    <p class="text-sm text-gray-500 mb-2">โดย Taneaw</p>
+                                    <h3 class="font-semibold text-gray-900 mb-1 truncate">พอใจ</h3>
+                                    <p class="text-sm text-gray-500 mb-1">ผู้เขียน: นิตยา เทวดา</p>
+                                    <p class="text-xs text-gray-400 mb-1">สำนักพิมพ์: นานมีบุ๊คส์</p>
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <div class="flex text-yellow-400 text-xs">
+                                            <span>★★★★☆</span>
+                                        </div>
+                                        <span class="text-gray-500 text-xs">(4.2)</span>
+                                        <span class="text-green-600 text-xs">คงเหลือ 15 เล่ม</span>
+                                    </div>
                                     <button class="text-sm text-red-500 hover:text-red-700 font-medium" data-remove>ลบออก</button>
                                 </div>
                             </div>
-                            <div class="col-span-2 text-center text-gray-700 font-medium">฿127</div>
+                            <div class="col-span-2 text-center text-gray-700 font-medium">฿350</div>
                             <div class="col-span-2 flex items-center justify-center gap-1">
                                 <button data-action="decrease">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -126,7 +134,7 @@
                                     </svg>
                                 </button>
                             </div>
-                            <div class="col-span-2 text-right font-semibold text-gray-900">฿<span data-item-total>127</span>
+                            <div class="col-span-2 text-right font-semibold text-gray-900">฿<span data-item-total>350</span>
                             </div>
                         </div>
                     </div>
@@ -151,7 +159,7 @@
                     <div class="space-y-3 mb-6">
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-600">ยอดรวมสินค้า (<span data-item-count>1 รายการ</span>)</span>
-                            <span class="text-gray-900" data-subtotal>฿127</span>
+                            <span class="text-gray-900" data-subtotal>฿350</span>
                         </div>
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-600">ค่าจัดส่ง</span>
@@ -160,7 +168,7 @@
                         <div class="border-t border-gray-200 pt-3">
                             <div class="flex justify-between">
                                 <span class="font-semibold text-gray-900">ยอดรวมทั้งหมด</span>
-                                <span class="font-semibold text-lg text-orange-600" data-total>฿127</span>
+                                <span class="font-semibold text-lg text-orange-600" data-total>฿350</span>
                             </div>
                         </div>
                     </div>
@@ -252,7 +260,7 @@
 
                 itemCheckboxes.forEach(checkbox => {
                     if (checkbox.checked) {
-                        const price = parseFloat(checkbox.closest('.cart-item').dataset.price || 127);
+                        const price = parseFloat(checkbox.closest('.cart-item').dataset.price || 350);
                         const quantity = parseInt(checkbox.closest('.cart-item').querySelector('[data-quantity]')?.textContent || 1);
                         total += price * quantity;
                         itemCount += quantity;
@@ -263,10 +271,12 @@
                 const subtotalElement = document.querySelector('[data-subtotal]');
                 const totalElement = document.querySelector('[data-total]');
                 const itemCountElement = document.querySelector('[data-item-count]');
+                const dataItemTotal = document.querySelector('[data-item-total]');
 
                 if (subtotalElement) subtotalElement.textContent = `฿${total}`;
                 if (totalElement) totalElement.textContent = `฿${total}`;
                 if (itemCountElement) itemCountElement.textContent = `${itemCount} รายการ`;
+                if (dataItemTotal) dataItemTotal.textContent = `${total}`;
             }
 
             function checkEmptyCart() {
@@ -278,15 +288,6 @@
                     cartContent.classList.add('hidden');
                     emptyCartState.classList.remove('hidden');
                 }
-            }
-
-            // Mobile menu toggle
-            const mobileMenuButton = document.querySelector('[data-mobile-menu]');
-            if (mobileMenuButton) {
-                mobileMenuButton.addEventListener('click', function () {
-                    // Add mobile menu functionality if needed
-                    console.log('Mobile menu clicked');
-                });
             }
         });
     </script>
