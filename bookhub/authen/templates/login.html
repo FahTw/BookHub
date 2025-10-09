@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base_a.html' %}
 
 {% block content %}
 <div class="flex flex-col items-center justify-center min-h-screen px-4">
@@ -32,6 +32,11 @@
           placeholder="กรอกรหัสผ่าน"
           required
         >
+      </div>
+      <div>
+        <h2>ยังไม่มีบัญชีผู้ใช้? 
+          <a href="{% url 'register' %}" class="text-[#FF2348]">คลิกที่นี่เพื่อสมัครสมาชิก</a>
+        </h2>
       </div>
 
       <div>
