@@ -15,11 +15,14 @@ class LoginView(View):
             user = form.get_user() 
             login(request,user)
             return redirect('/book/')
-
+        else:
+            print(form.errors)
         return render(request,'login.html', {"form":form})
 class RegisterView(View):
+    
     def get(self, request):
-        return render(request, 'register.html')
+        form = RegisterForm()
+        return render(request, 'register.html', {'form': form})
     
     def post(self, request):
         form = RegisterForm(request.POST)
@@ -30,5 +33,7 @@ class RegisterView(View):
             user.set_password(form.cleaned_data['password'])
             user.save()
             return redirect('/login/')
+        else:
+            print(form.errors)
         return render(request, 'register.html', {'form': form})
 

@@ -9,22 +9,23 @@
 
     <form method="POST" class="space-y-4">
       {% csrf_token %}
+
       <div>
         <label class="mb-2 block text-gray-700" for="firstname">Firstname</label>
         <input
           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF2348]"
           type="text"
-          id="username"
-          name="username"
-          placeholder="กรอกชื่อผู้ใช้"
+          id="first_name"
+          name="first_name"
+          placeholder="กรอกชื่อจริง"
           required
         >
-        <label for="lastname">Lastname</label>
+        <label for="last_name">Lastname</label>
         <input
           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF2348]"
           type="text"
-          id="lastname"
-          name="lastname"
+          id="last_name"
+          name="last_name"
           placeholder="กรอกนามสกุล"
           required
         >

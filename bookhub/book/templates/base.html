@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,12 +7,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}BookHub{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=shopping_cart" />
 </head>
 
-<body class="flex flex-col min-h-screen bg-gray-50">
+<body class="flex flex-col min-h-screen">
 
     <!-- ✅ Navigation Bar -->
-    <header class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md shadow-md z-50">
+
+    <header class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md shadow-md">
         <nav class="max-w-7xl mx-auto flex justify-between items-center px-6 py-3">
             <!-- Logo -->
             <a href="/" class="flex items-center space-x-3">
@@ -29,9 +33,15 @@
                     </a>
                 </li>
                 <li>
-                    <a href="/best-sellers"
-                        class="text-[#176599] hover:text-[#df4300] transition-colors duration-200 font-medium">
-                        Best Sellers
+                    <a href="/cart">
+                        <span class="material-symbols-outlined hover:bg-orange-500 hover:rounded-md">
+                            shopping_cart
+                        </span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/profile">
+                        <img class="w-6 h-6" src="{% static 'images/profile.png' %}" alt="Profile">
                     </a>
                 </li>
             </ul>

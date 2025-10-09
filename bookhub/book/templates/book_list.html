@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+    
+    
+{% block content %}
+<section class="max-w-7xl mx-auto min-h-screen flex justify-center items-center">
+    <div class="text-center space-y-6">
+        <h1 class="text-5xl font-bold text-orange-500">Product</h1>
+        <p class="text-lg text-gray-600">เลือกหนังสือคุณภาพที่คุณชื่นชอบ</p>
+    </div>
+</section>
+<section class="max-w-7xl mx-auto py-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    {% for book in books %}
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" class="w-full h-48 object-cover">
+        <div class="p-4">
+            <h2 class="text-xl font-semibold text-gray-800">{{ book.title }}</h2>
+            <p class="text-gray-600 mt-2">Author: {{ book.author }}</p>
+            <p class="text-gray-600 mt-1">Price: ${{ book.price }}</p>
+            <a href="{% url 'book_detail' book.id %}" class="mt-4 inline-block bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">View Details</a>
+        </div>
+    </div>
+    {% empty %}
+    <p class="text-center text-gray-600 col-span-full">No books available at the moment.</p>
+    {% endfor %}
+
+</section>
+{% endblock %}

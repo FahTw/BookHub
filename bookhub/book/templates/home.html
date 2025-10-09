@@ -11,14 +11,14 @@
                     <h1 class="text-5xl font-bold text-[#df4300] text-center">ยินดีต้อนรับสู่ BookHub</h1>
                     <p class="text-lg text-[#176599] text-center">หนังสือคุณภาพพร้อมให้คุณได้เลือกซื้อแล้ว ตอนนี้</p>
                     <div class="flex justify-center">
-                        <a href="/"
+                        <a href="{% url 'book_list' %}"
                             class="bg-[#ff2348] hover:bg-[#ff2348]/90 text-white px-12 py-6 text-lg rounded-full h-auto font-semibold">
                             คลิกเลย
                         </a>
                     </div>
                 </div>
                 <div class="flex justify-center">
-                    <img src="{% static 'images/colorful-stacked-books-illustration-with-blue-yell.jpg' %}"
+                    <img src="{% static 'images/home.svg' %}"
                         alt="Stacked books illustration" class="w-full max-w-md">
                 </div>
             </div>
