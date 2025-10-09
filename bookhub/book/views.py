@@ -1,7 +1,11 @@
+import re
 from django.shortcuts import render,redirect
 from django.views import View
 from .models import Book, BookCategory
-from .form import ProfileForm
+from .form import ManageBookForm, ProfileForm
+from .form import ReviewForm
+
+
 
 # Create your views here.
 class BookCategoryView(View):
@@ -29,3 +33,32 @@ class BookListView(View):
     def get(self, request):
         books = Book.objects.all()
         return render(request, 'book_list.html', {'books': books})
+class ReviewView(View):
+    def get(self, request, book_id):
+        form = ReviewForm()
+        book = Book.objects.get(pk=book_id)
+        return render(request, 'review.html', {'form': form, 'book': book})
+    def post(self, request, book_id):
+        form = ReviewForm(request.POST)
+        book = Book.objects.get(pk=book_id)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.book = book
+            review.user = request.user
+            review.save()
+            return redirect('book_detail', book_id=book_id)
+        
+
+        return render(request, 'review.html', {'form': form, 'book': book})
+class ManageBookView(View):
+    def get(self, request):
+        form = ManageBookForm()
+        books = Book.objects.all()
+        return render(request, 'book_manage.html', {'form': form, 'books': books})
+    def post(self, request):
+        form = ManageBookForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('manage_book')
+        books = Book.objects.all()
+        return render(request, 'book_manage.html', {'form': form, 'books': books})
