@@ -1,4 +1,5 @@
 import re
+from urllib import request
 
 from django.shortcuts import render, redirect
 from django.views import View
@@ -28,9 +29,8 @@ class LoginView(View):
             return redirect('/book/')
         else:
             print(form.errors)
-        return render(request,'home/home.html', {"form":form})
+        return render(request,'login/login.html', {"form":form})
 class RegisterView(View):
-    
     def get(self, request):
         form = CustomUserCreationForm()
         return render(request, 'login/register.html', {'form': form})
@@ -38,32 +38,40 @@ class RegisterView(View):
     def post(self, request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            # save in db
             user = form.save(commit=False)
             user.username = user.email
-            user.set_password(form.cleaned_data['password'])
+            user.set_password(form.cleaned_data['password1'])
             user.save()
-            return redirect('/login/')
+            return redirect('login')
         else:
             print(form.errors)
-        return render(request, 'login/login.html', {'form': form})
+        return render(request, 'login/register.html', {'form': form})
+
 
 class ProfileView(View):
     def get(self, request):
         form = ProfileForm()
-        return render(request, 'profile.html')
+        return render(request, 'home/profile.html', {'form': form})
+
+
     def post(self, request):
         # Handle profile update logic here
         form = ProfileForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
             return redirect('/book/')
-        return redirect('profile')
+        return redirect('home/profile', {'form': form})
 
 class BookListView(View):
     def get(self, request):
         books = Book.objects.all()
-        return render(request, 'book_list.html', {'books': books})
+        return render(request, 'home/book_list.html', {'books': books})
+    
+class BookDetailView(View):
+    def get(self, request, book_id):
+        book = Book.objects.get(pk=book_id)
+        return render(request, 'home/book_detail.html', {'book': book})
+    
 
 class CategoryView(View):
     def get(self, request, category_id):

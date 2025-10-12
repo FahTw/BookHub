@@ -4,18 +4,20 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import UserCreationForm
-
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
-        fields = ['username', 'email', 'phone', 'address', 'province', 'postal_code', 'password1', 'password2']
+        fields = [
+            'username', 'first_name', 'last_name', 'email', 'phone', 
+            'address', 'province', 'postal_code', 'password1', 'password2'
+        ]
+
     def clean_email(self):
-        cleand_data = super().clean()
         email = self.cleaned_data.get('email')
         if CustomUser.objects.filter(email=email).exists():
             raise ValidationError("อีเมลถูกใช้งานแล้ว กรุณาใช้อีเมลอื่น")
         return email
-        
+
 
 # class RegisterForm(forms.ModelForm):
 #     confirm_password = forms.CharField()
@@ -44,19 +46,18 @@ class CustomUserCreationForm(UserCreationForm):
 
 class ProfileForm(forms.ModelForm):
     class Meta:
-        model = User
-        fields = ['first_name', 'last_name', 'email']
+        model = CustomUser
+        fields = ['first_name', 'last_name', 'email', 'address']
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-input'}),
             'last_name': forms.TextInput(attrs={'class': 'form-input'}),
             'email': forms.EmailInput(attrs={'class': 'form-input'}),
-            # 'profile.address': forms.Textarea(attrs={'class': 'form-textarea', 'rows': 4}),
+            'address': forms.Textarea(attrs={'class': 'form-textarea', 'rows': 4}),
         }
 
     def clean_email(self):
-        
         email = self.cleaned_data.get('email')
-        if User.objects.exclude(pk=self.instance.pk).filter(email=email).exists():
+        if CustomUser.objects.exclude(pk=self.instance.pk).filter(email=email).exists():
             raise ValidationError("This email is already in use.")
         return email
 

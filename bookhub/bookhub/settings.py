@@ -27,6 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+AUTH_USER_MODEL = 'book.CustomUser'
 
 # Application definition
 
@@ -78,7 +79,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'bookhub',
         'USER': 'postgres',
-        'PASSWORD': '1234',
+        'PASSWORD': 'fahnoipost',
         'HOST': 'localhost',
         'PORT': '5432',
     }
