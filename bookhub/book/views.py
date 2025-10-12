@@ -7,14 +7,13 @@ from django.db.models import *
 from django.db.models.functions import *
 from book.forms import *
 from django.db import transaction
-from .form import *
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import logout, login
 
 class HomeView(View):
     def get(self, request):
         categories = BookCategory.objects.all()
-        return render(request, 'home.html', {'categories': categories})
+        return render(request, 'home/home.html', {'categories': categories})
 
 class LoginView(View):
     def get(self, request):
