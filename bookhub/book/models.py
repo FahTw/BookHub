@@ -1,21 +1,25 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
-class User(models.Model):
-    first_name = models.CharField(max_length=150)
-    last_name = models.CharField(max_length=150)
-    email = models.EmailField(unique=True, null=True, blank=True)
+# class User(models.Model):
+#     first_name = models.CharField(max_length=150)
+#     last_name = models.CharField(max_length=150)
+#     email = models.EmailField(unique=True, null=True, blank=True)
+#     phone = models.CharField(max_length=20, null=True, blank=True)
+#     password = models.CharField(max_length=150)
+#     role = models.CharField(max_length=50, default='user', choices=[
+#         ('user', 'ลูกค้า'),
+#         ('admin', 'ผู้ดูแลระบบ')
+#     ])
+
+#     def __str__(self):
+#         return f'{self.first_name} {self.last_name}'
+
+class CustomUser(AbstractUser):
     phone = models.CharField(max_length=20, null=True, blank=True)
-    password = models.CharField(max_length=150)
-    role = models.CharField(max_length=50, default='user', choices=[
-        ('user', 'ลูกค้า'),
-        ('admin', 'ผู้ดูแลระบบ')
-    ])
     address = models.TextField(null=True, blank=True)
     province = models.CharField(max_length=100, null=True, blank=True)
     postal_code = models.CharField(max_length=10, null=True, blank=True)
-
-    def __str__(self):
-        return f'{self.first_name} {self.last_name}'
 
 class Book(models.Model):
     title = models.CharField(max_length=200)
@@ -44,7 +48,7 @@ class BookCategory(models.Model):
         return self.category_name
 
 class Cart(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
 
@@ -72,7 +76,7 @@ class Order(models.Model):
         ('refunded', 'คืนเงิน')
     ]
     
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     order_date = models.DateTimeField(auto_now_add=True)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
@@ -117,7 +121,7 @@ class Payment(models.Model):
         return f'Payment {self.id} for Order {self.order.id}'
 
 class Review(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True, blank=True)
     rating = models.PositiveSmallIntegerField()

@@ -18,7 +18,7 @@ class HomeView(View):
 class LoginView(View):
     def get(self, request):
         form = AuthenticationForm()
-        return render(request, 'login.html', {"form": form})
+        return render(request, 'login/login.html', {"form": form})
     
     def post(self, request):
         form = AuthenticationForm(data=request.POST)
@@ -28,15 +28,15 @@ class LoginView(View):
             return redirect('/book/')
         else:
             print(form.errors)
-        return render(request,'login.html', {"form":form})
+        return render(request,'home/home.html', {"form":form})
 class RegisterView(View):
     
     def get(self, request):
-        form = RegisterForm()
-        return render(request, 'register.html', {'form': form})
+        form = CustomUserCreationForm()
+        return render(request, 'login/register.html', {'form': form})
     
     def post(self, request):
-        form = RegisterForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             # save in db
             user = form.save(commit=False)
@@ -46,7 +46,7 @@ class RegisterView(View):
             return redirect('/login/')
         else:
             print(form.errors)
-        return render(request, 'register.html', {'form': form})
+        return render(request, 'login/login.html', {'form': form})
 
 class ProfileView(View):
     def get(self, request):
