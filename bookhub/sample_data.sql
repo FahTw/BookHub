@@ -1,21 +1,13 @@
 -- BookHub Sample Data for Models Migration
 -- This file contains sample data that matches the models.py structure
 
--- Insert Users into auth_user table password 123456789@za
-INSERT INTO auth_user (id, username, first_name, last_name, email, is_staff, is_active, is_superuser, date_joined, password) VALUES
-(10, 'admin', 'Admin', 'System', 'admin@bookhub.com', true, true, true, '2025-01-01 00:00:00', 'pbkdf2_sha256$1000000$2Ke79T51Wwh3p492ZJ3AaI$sML7HagBRHvVOhYFA4UIJmnBpNFiLQeVP/OOxJ+otQM='),
-(11, 'somchai', 'สมชาย', 'ใจดี', 'somchai@email.com', false, true, false, '2025-01-01 00:00:00', 'pbkdf2_sha256$1000000$2Ke79T51Wwh3p492ZJ3AaI$sML7HagBRHvVOhYFA4UIJmnBpNFiLQeVP/OOxJ+otQM='),
-(12, 'suda', 'สุดา', 'สวยงาม', 'suda@email.com', false, true, false, '2025-01-01 00:00:00', 'pbkdf2_sha256$1000000$2Ke79T51Wwh3p492ZJ3AaI$sML7HagBRHvVOhYFA4UIJmnBpNFiLQeVP/OOxJ+otQM='),
-(13, 'niran', 'นิรันดร์', 'รักเรียน', 'niran@email.com', false, true, false, '2025-01-01 00:00:00', 'pbkdf2_sha256$1000000$2Ke79T51Wwh3p492ZJ3AaI$sML7HagBRHvVOhYFA4UIJmnBpNFiLQeVP/OOxJ+otQM='),
-(14, 'mana', 'มานะ', 'ขยันหมั่นเพียร', 'mana@email.com', true, true, false, '2025-01-01 00:00:00', 'pbkdf2_sha256$1000000$2Ke79T51Wwh3p492ZJ3AaI$sML7HagBRHvVOhYFA4UIJmnBpNFiLQeVP/OOxJ+otQM=');
-
--- Insert CustomUser (OneToOne with User)
-INSERT INTO book_customuser (id, user_id, phone, address, province, postal_code) VALUES
-(10, 10, '02-123-4567', '456 ถนนสีลม', 'กรุงเทพมหานคร', '10500'),
-(11, 11, '081-234-5678', '123 ถนนพระราม 4 แขวงสีลม เขตบางรัก', 'กรุงเทพมหานคร', '10500'),
-(12, 12, '081-345-6789', '789 ถนนสุขุมวิท แขวงคลองตัน เขตคลองตัน', 'กรุงเทพมหานคร', '10110'),
-(13, 13, '081-456-7890', '321 ถนนลาดพร้าว แขวงจอมพล เขตจตุจักร', 'กรุงเทพมหานคร', '10900'),
-(14, 14, '081-567-8901', '654 ถนนเพชรบุรี แขวงมักกะสัน เขตราชเทวี', 'กรุงเทพมหานคร', '10400');
+-- Insert CustomUsers - password: 123456789@za
+INSERT INTO book_customuser (id, username, first_name, last_name, email, is_staff, is_active, is_superuser, date_joined, password, phone, address, province, postal_code) VALUES
+(10, 'admin', 'Admin', 'System', 'admin@bookhub.com', true, true, true, '2025-01-01 00:00:00', 'pbkdf2_sha256$1000000$2Ke79T51Wwh3p492ZJ3AaI$sML7HagBRHvVOhYFA4UIJmnBpNFiLQeVP/OOxJ+otQM=', '02-123-4567', '456 ถนนสีลม', 'กรุงเทพมหานคร', '10500'),
+(11, 'somchai', 'สมชาย', 'ใจดี', 'somchai@email.com', false, true, false, '2025-01-01 00:00:00', 'pbkdf2_sha256$1000000$2Ke79T51Wwh3p492ZJ3AaI$sML7HagBRHvVOhYFA4UIJmnBpNFiLQeVP/OOxJ+otQM=', '081-234-5678', '123 ถนนพระราม 4 แขวงสีลม เขตบางรัก', 'กรุงเทพมหานคร', '10500'),
+(12, 'suda', 'สุดา', 'สวยงาม', 'suda@email.com', false, true, false, '2025-01-01 00:00:00', 'pbkdf2_sha256$1000000$2Ke79T51Wwh3p492ZJ3AaI$sML7HagBRHvVOhYFA4UIJmnBpNFiLQeVP/OOxJ+otQM=', '081-345-6789', '789 ถนนสุขุมวิท แขวงคลองตัน เขตคลองตัน', 'กรุงเทพมหานคร', '10110'),
+(13, 'niran', 'นิรันดร์', 'รักเรียน', 'niran@email.com', false, true, false, '2025-01-01 00:00:00', 'pbkdf2_sha256$1000000$2Ke79T51Wwh3p492ZJ3AaI$sML7HagBRHvVOhYFA4UIJmnBpNFiLQeVP/OOxJ+otQM=', '081-456-7890', '321 ถนนลาดพร้าว แขวงจอมพล เขตจตุจักร', 'กรุงเทพมหานคร', '10900'),
+(14, 'mana', 'มานะ', 'ขยันหมั่นเพียร', 'mana@email.com', true, true, false, '2025-01-01 00:00:00', 'pbkdf2_sha256$1000000$2Ke79T51Wwh3p492ZJ3AaI$sML7HagBRHvVOhYFA4UIJmnBpNFiLQeVP/OOxJ+otQM=', '081-567-8901', '654 ถนนเพชรบุรี แขวงมักกะสัน เขตราชเทวี', 'กรุงเทพมหานคร', '10400');
 
 -- Insert Books
 INSERT INTO book_book (id, title, image, author, publisher, publication_date, pages, language, detail, price, stock, sold, rating_average, rating_count) VALUES

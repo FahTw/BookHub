@@ -5,14 +5,9 @@ from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
  
 class UserRegistrationForm(UserCreationForm):
-    phone = forms.CharField(max_length=20, required=False)
-    address = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 3}))
-    province = forms.CharField(max_length=100, required=False)
-    postal_code = forms.CharField(max_length=10, required=False)
-
     class Meta:
         model = CustomUser
-        fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2', 'phone', 'address', 'province', 'postal_code']
+        fields = ['username', 'first_name', 'last_name', 'email', 'password', 'phone', 'address', 'province', 'postal_code']
         widgets = {"address": forms.Textarea(attrs={'rows': 3})}
 
     def clean(self):

@@ -1,15 +1,14 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 
-class CustomUser(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+class CustomUser(AbstractUser):
     phone = models.CharField(max_length=20, null=True, blank=True)
     address = models.TextField(null=True, blank=True)
     province = models.CharField(max_length=100, null=True, blank=True)
     postal_code = models.CharField(max_length=10, null=True, blank=True)
 
     def __str__(self):
-        return self.user.username
+        return self.username
 
 class Book(models.Model):
     title = models.CharField(max_length=200)
@@ -58,7 +57,7 @@ class Order(models.Model):
         REFUNDED = 'refunded', 'คืนเงิน'
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
-    order_date = models.DateTimeField(auto_now_add=True)
+    order_date = models.DateTimeField()
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=orderstatus.choices, default=orderstatus.PAID)
 
@@ -78,7 +77,7 @@ class Payment(models.Model):
 
     order = models.OneToOneField(Order, on_delete=models.CASCADE)
     payment_slip = models.FileField(upload_to="payment/", null=True, blank=True)
-    payment_date = models.DateTimeField(auto_now_add=True)
+    payment_date = models.DateTimeField()
     method = models.CharField(max_length=20, choices=paymentmethod.choices)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=paymentstatus.choices, default=paymentstatus.PENDING)
@@ -92,7 +91,7 @@ class Review(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     rating = models.PositiveSmallIntegerField()
     comment = models.TextField(max_length=500, blank=True)
-    created_date = models.DateTimeField(auto_now_add=True)
+    created_date = models.DateTimeField()
 
     def __str__(self):
         return f'Review by {self.user.first_name} for {self.book.title} ({self.rating} stars)'
