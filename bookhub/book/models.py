@@ -49,6 +49,7 @@ class Cart(models.Model):
 
 class Order(models.Model):
     class orderstatus(models.TextChoices):
+        UNPAID = 'unpaid', 'ยังไม่ชำระเงิน'
         PAID = 'paid', 'ชำระเงินแล้ว'
         PROCESSING = 'processing', 'กำลังเตรียมสินค้า'
         SHIPPED = 'shipped', 'กำลังจัดส่ง'
@@ -59,7 +60,7 @@ class Order(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     order_date = models.DateTimeField()
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    status = models.CharField(max_length=20, choices=orderstatus.choices, default=orderstatus.PAID)
+    status = models.CharField(max_length=20, choices=orderstatus.choices, default=orderstatus.UNPAID)
 
     def __str__(self):
         return f'Order {self.id} for {self.cart}'

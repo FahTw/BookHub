@@ -7,6 +7,7 @@ from .models import *
 from django.db.models import *
 from django.db.models.functions import *
 from book.forms import *
+from django.forms import modelformset_factory
 from django.db import transaction
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import logout, login
@@ -30,6 +31,7 @@ class LoginView(View):
         else:
             print(form.errors)
         return render(request,'login/login.html', {"form":form})
+
 class RegisterView(View):
     def get(self, request):
         form = CustomUserCreationForm()
@@ -99,46 +101,119 @@ class ReviewView(View):
         return render(request, 'review.html', {'form': form, 'book': book})
 
 class CartView(View):
-
     def get(self, request, user):
-        cart = Cart.objects.get(id=user)
-        cart_details = CartDetail.objects.filter(cart=cart)
+        try:
+            user = CustomUser.objects.get(id=user)
+            CartFormSet = modelformset_factory(Cart, form=CartForm)
+            cart = CartFormSet(Cart.objects.filter(user=user, status='in_cart').select_related('book'))
+            
+            # Calculate totals
+            total_amount = sum(item.total_price for item in cart)
+            total_items = sum(item.quantity for item in cart)
 
-        context = {
-            "cart": cart,
-            "cart_details": cart_details,
-        }
-        return render(request, "cart.html", context)
+            context = {
+                "cart": cart,
+                "user": user,
+                "total_amount": total_amount,
+                "total_items": total_items,
+                "cart_form": CartForm(),
+            }
+            return render(request, "payment/cart.html", context)
+        except CustomUser.DoesNotExist:
+            return redirect('login')
+
+    def post(self, request, user):
+        try:
+            user_obj = CustomUser.objects.get(id=user)
+            form = CartForm(request.POST)
+            if form.is_valid():
+                cart_item = form.save(commit=False)
+                cart_item.user = user_obj
+                cart_item.total_price = cart_item.price * cart_item.quantity
+                cart_item.save()
+                return redirect('cart', user=user)
+            
+            cart_items = Cart.objects.filter(user=user_obj, status='in_cart').select_related('book')
+            total_amount = sum(item.total_price for item in cart_items)
+            total_items = sum(item.quantity for item in cart_items)
+            
+            context = {
+                "cart_items": cart_items,
+                "user_obj": user_obj,
+                "total_amount": total_amount,
+                "total_items": total_items,
+                "cart_form": form,
+            }
+            return render(request, "payment/cart.html", context)
+        except CustomUser.DoesNotExist:
+            return redirect('login')
 
 class PaymentView(View):
-
     def get(self, request, user):
-        order = Order.objects.get(id=user)
-        context = {
-            "order": order,
-        }
-        return render(request, "payment.html", context)
+        try:
+            user_obj = CustomUser.objects.get(id=user)
+            # Get user's latest order or create new one from cart
+            latest_order = Order.objects.filter(user=user_obj).order_by('-order_date').first()
+            
+            context = {
+                "order": latest_order,
+                "user_obj": user_obj,
+                "payment_form": PaymentForm(),
+            }
+            return render(request, "payment/payment.html", context)
+        except CustomUser.DoesNotExist:
+            return redirect('login')
+    
+    def post(self, request, user):
+        try:
+            user_obj = CustomUser.objects.get(id=user)
+            form = PaymentForm(request.POST, request.FILES)
+            if form.is_valid():
+                payment = form.save(commit=False)
+                payment.save()
+                return redirect('order_history_user', user=user)
+            
+            latest_order = Order.objects.filter(user=user_obj).order_by('-order_date').first()
+            context = {
+                "order": latest_order,
+                "user_obj": user_obj,
+                "payment_form": form,
+            }
+            return render(request, "payment/payment.html", context)
+        except CustomUser.DoesNotExist:
+            return redirect('login')
 
 class OrderHistoryView(View):
-
     def get(self, request, user):
-        orders = Order.objects.filter(user=user).order_by("-order_date")
-        context = {
-            "orders": orders,
-        }
-        return render(request, "orderhistory.html", context)
+        try:
+            user_obj = CustomUser.objects.get(id=user)
+            orders = Order.objects.filter(user=user_obj).order_by("-order_date").select_related('cart', 'cart__book')
+            
+            context = {
+                "orders": orders,
+                "user_obj": user_obj,
+            }
+            return render(request, "orderhistory.html", context)
+        except CustomUser.DoesNotExist:
+            return redirect('login')
 
 class OrderHistoryDetailView(View):
-
     def get(self, request, user, order):
-        order = Order.objects.get(id=order, user=user)
-        order_details = OrderDetail.objects.filter(order=order)
-
-        context = {
-            "order": order,
-            "order_details": order_details,
-        }
-        return render(request, "orderhistorydetail.html", context)
+        try:
+            user_obj = CustomUser.objects.get(id=user)
+            order_obj = Order.objects.get(id=order, user=user_obj)
+            
+            # Get cart details for this order
+            cart_info = order_obj.cart
+            
+            context = {
+                "order": order_obj,
+                "cart_info": cart_info,
+                "user_obj": user_obj,
+            }
+            return render(request, "orderhistorydetail.html", context)
+        except (CustomUser.DoesNotExist, Order.DoesNotExist):
+            return redirect('login')
 
 class ManageBookView(View):
     def get(self, request):
