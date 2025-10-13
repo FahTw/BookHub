@@ -95,7 +95,7 @@ class BookDetailView(View, LoginRequiredMixin):
             review.book = book
             review.user = request.user
             review.save()
-            return redirect('/book_detail', book_id=book_id)
+            return redirect('book_detail', book_id=book_id)
 
         return render(request, 'home/book_detail.html', {
             'book': book,
@@ -104,10 +104,10 @@ class BookDetailView(View, LoginRequiredMixin):
         })
 class CategoryView(View):
     def get(self, request, category_id):
-        category = BookCategory.objects.get(id=category_id)
-        books = Book.objects.filter(category=category)
+        category = BookCategory.objects.get(pk=category_id)
+        books = Book.objects.filter(categories=category)
         categories = BookCategory.objects.all()
-        return render(request, 'home.html', {'category': category, 'books': books})
+        return render(request, 'home/category.html', {'category': category, 'books': books, 'categories': categories})
 
 # class ReviewView(View):
 #     def get(self, request, book_id):
