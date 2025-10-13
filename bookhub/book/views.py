@@ -3,6 +3,7 @@ from urllib import request
 
 from django.shortcuts import render, redirect
 from django.views import View
+
 from .models import *
 from django.db.models import *
 from django.db.models.functions import *
@@ -32,11 +33,11 @@ class LoginView(View):
         return render(request,'login/login.html', {"form":form})
 class RegisterView(View):
     def get(self, request):
-        form = CustomUserCreationForm()
+        form = UserRegistrationForm()
         return render(request, 'login/register.html', {'form': form})
     
     def post(self, request):
-        form = CustomUserCreationForm(request.POST)
+        form = UserRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
             user.username = user.email
@@ -47,16 +48,20 @@ class RegisterView(View):
             print(form.errors)
         return render(request, 'login/register.html', {'form': form})
 
+class LogoutView(View):
+    def get(self, request):
+        logout(request)
+        return redirect('/login')
 
 class ProfileView(View):
     def get(self, request):
-        form = ProfileForm()
+        form = UserProfileForm()
         return render(request, 'home/profile.html', {'form': form})
 
 
     def post(self, request):
         # Handle profile update logic here
-        form = ProfileForm(request.POST, instance=request.user)
+        form = UserProfileForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
             return redirect('/book/')
@@ -70,9 +75,30 @@ class BookListView(View):
 class BookDetailView(View):
     def get(self, request, book_id):
         book = Book.objects.get(pk=book_id)
-        return render(request, 'home/book_detail.html', {'book': book})
-    
+        reviews = Review.objects.filter(book=book).order_by('-created_date')
+        form = ReviewForm()
+        return render(request, 'home/book_detail.html', {
+            'book': book,
+            'reviews': reviews,
+            'form': form
+        })
 
+    def post(self, request, book_id):
+        book = Book.objects.get(pk=book_id)
+        form = ReviewForm(request.POST)
+        reviews = Review.objects.filter(book=book).order_by('-created_date')
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.book = book
+            review.user = request.user
+            review.save()
+            return redirect('book_detail', book_id=book_id)
+
+        return render(request, 'home/book_detail.html', {
+            'book': book,
+            'reviews': reviews,
+            'form': form
+        })
 class CategoryView(View):
     def get(self, request, category_id):
         category = BookCategory.objects.get(id=category_id)
@@ -80,29 +106,30 @@ class CategoryView(View):
         categories = BookCategory.objects.all()
         return render(request, 'home.html', {'category': category, 'books': books})
 
-class ReviewView(View):
-    def get(self, request, book_id):
-        form = ReviewForm()
-        book = Book.objects.get(pk=book_id)
-        return render(request, 'review.html', {'form': form, 'book': book})
-    def post(self, request, book_id):
-        form = ReviewForm(request.POST)
-        book = Book.objects.get(pk=book_id)
-        if form.is_valid():
-            review = form.save(commit=False)
-            review.book = book
-            review.user = request.user
-            review.save()
-            return redirect('book_detail', book_id=book_id)
-        
+# class ReviewView(View):
+#     def get(self, request, book_id):
+#         form = ReviewForm()
+#         book = Book.objects.get(pk=book_id)
+#         reviews = Review.objects.filter(book=book)
+#         return render(request, 'home/book_detail.html', {'form': form, "book": book, "reviews": reviews})
+#     def post(self, request, book_id):
+#         form = ReviewForm(request.POST)
+#         book = Book.objects.get(pk=book_id)
+#         reviews = Review.objects.filter(book=book)
+#         if form.is_valid():
+#             review = form.save(commit=False)
+#             review.book = book
+#             review.user = request.user
+#             review.save()
+#             return redirect('book_detail', book_id=book_id)
 
-        return render(request, 'review.html', {'form': form, 'book': book})
+#         return render(request, 'home/book_detail.html', {'form': form, 'book': book, 'reviews': reviews})
 
 class CartView(View):
 
     def get(self, request, user):
         cart = Cart.objects.get(id=user)
-        cart_details = CartDetail.objects.filter(cart=cart)
+        cart_details = Cart.objects.filter(cart=cart)
 
         context = {
             "cart": cart,
@@ -132,7 +159,7 @@ class OrderHistoryDetailView(View):
 
     def get(self, request, user, order):
         order = Order.objects.get(id=order, user=user)
-        order_details = OrderDetail.objects.filter(order=order)
+        order_details = Order.objects.filter(order=order)
 
         context = {
             "order": order,
@@ -142,11 +169,11 @@ class OrderHistoryDetailView(View):
 
 class ManageBookView(View):
     def get(self, request):
-        form = ManageBookForm()
+        form = BookForm()
         books = Book.objects.all()
         return render(request, 'book_manage.html', {'form': form, 'books': books})
     def post(self, request):
-        form = ManageBookForm(request.POST, request.FILES)
+        form = BookForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             return redirect('manage_book')

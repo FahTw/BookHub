@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 class UserRegistrationForm(UserCreationForm):
     class Meta:
         model = CustomUser
-        fields = ['username', 'first_name', 'last_name', 'email', 'password', 'phone', 'address', 'province', 'postal_code']
+        fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2', 'phone', 'address', 'province', 'postal_code']
         widgets = {"address": forms.Textarea(attrs={'rows': 3})}
 
     def clean(self):
