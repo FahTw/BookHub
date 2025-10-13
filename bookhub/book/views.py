@@ -301,11 +301,7 @@ class DashboardView(View, LoginRequiredMixin):
         pending_orders = Order.objects.filter(status='unpaid').count()
         total_books = Book.objects.count()
         total_users = CustomUser.objects.count()
-        
-        # Recent orders
         recent_orders = Order.objects.all().order_by('-order_date')[:5].select_related('user', 'cart', 'cart__book')
-        
-        # Popular books
         popular_books = Book.objects.order_by('-sold')[:5]
         
         context = {

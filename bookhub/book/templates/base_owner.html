@@ -16,11 +16,17 @@
     {% endblock %}
 </head>
 
-<body>
-    {% include 'sidebar.html' %}
+<body class="bg-gray-50">
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        {% include 'sidebar.html' %}
 
-    {% block content %}
-    {% endblock %}
+        <!-- Main Content Area -->
+        <div class="flex-1">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
 
     {% block script2 %}
     {% endblock %}
