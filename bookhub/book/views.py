@@ -29,7 +29,10 @@ class LoginView(View):
         if form.is_valid():
             user = form.get_user() 
             login(request,user)
-            return redirect('/book/')
+            if user.is_staff:
+                return redirect('/dashboard')
+            else:
+                return redirect('/home')
         else:
             print(form.errors)
         return render(request,'login/login.html', {"form":form})
@@ -95,7 +98,7 @@ class BookDetailView(View, LoginRequiredMixin):
             review.book = book
             review.user = request.user
             review.save()
-            return redirect('book_detail', book_id=book_id)
+            return redirect('/book_detail', book_id=book_id)
 
         return render(request, 'home/book_detail.html', {
             'book': book,
@@ -133,7 +136,7 @@ class CartView(View):
         try:
             user = CustomUser.objects.get(id=user)
             cart = Cart.objects.filter(user=user, status='in_cart').select_related('book')
-            CartFormSet = modelformset_factory(Cart, form=CartForm(), extra=0)
+            CartFormSet = modelformset_factory(Cart, form=CartForm, extra=0)  # Pass the class, not an instance
             cartform = CartFormSet(queryset=cart)
 
             # Calculate totals
@@ -142,9 +145,9 @@ class CartView(View):
 
             context = {
                 "user": user,
+                "cartform": cartform,
                 "total_amount": total_amount,
                 "total_items": total_items,
-                "cartform": cartform,
             }
             return render(request, "payment/cart.html", context)
         except CustomUser.DoesNotExist:
