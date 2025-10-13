@@ -20,4 +20,5 @@ urlpatterns = [
     path("orderhistoryowner/", OrderHistoryOwnerView.as_view(), name="order_history_owner"),
     path("orderhistoryowner/<int:order>/", OrderHistoryOwnerDetailView.as_view(), name="order_history_owner_detail"),
     path('managebooks/', ManageBookView.as_view(), name='manage_book'),
+    path('stat/', StatView.as_view(), name='stat'),
 ]

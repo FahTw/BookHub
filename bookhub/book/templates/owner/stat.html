@@ -1,0 +1,307 @@
+{% extends 'base_owner.html' %}
+{% load static %}
+
+{% block title %}สถิติและยอดขาย - BookHub{% endblock %}
+
+{% block script1 %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 bg-gray-50">
+    <!-- Header -->
+    <div class="bg-white border-b border-gray-200 px-8 py-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">รายงานและสถิติ</h1>
+                <p class="text-sm text-gray-600 mt-1">ภาพรวมยอดขายและสถิติของร้าน</p>
+            </div>
+            <button onclick="window.print()"
+                class="flex items-center gap-2 bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                </svg>
+                พิมพ์รายงาน
+            </button>
+        </div>
+    </div>
+
+    <div class="p-8 space-y-6">
+        <!-- Overall Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Total Revenue -->
+            <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-green-100 text-sm font-medium">รายได้ทั้งหมด</p>
+                        <p class="text-3xl font-bold mt-2">฿{{ total_revenue|floatformat:2 }}</p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 p-3 rounded-lg">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Orders -->
+            <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-blue-100 text-sm font-medium">คำสั่งซื้อสำเร็จ</p>
+                        <p class="text-3xl font-bold mt-2">{{ total_orders }}</p>
+                        <p class="text-blue-100 text-xs mt-1">คำสั่งซื้อ</p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 p-3 rounded-lg">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Books Sold -->
+            <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white shadow-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-purple-100 text-sm font-medium">หนังสือที่ขายแล้ว</p>
+                        <p class="text-3xl font-bold mt-2">{{ total_books_sold }}</p>
+                        <p class="text-purple-100 text-xs mt-1">เล่ม</p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 p-3 rounded-lg">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Books -->
+            <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white shadow-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-orange-100 text-sm font-medium">หนังสือในสต็อก</p>
+                        <p class="text-3xl font-bold mt-2">{{ total_books }}</p>
+                        <p class="text-orange-100 text-xs mt-1">รายการ</p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 p-3 rounded-lg">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Selling Books -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-gray-900">หนังสือขายดี Top 10</h3>
+                <span class="text-sm text-gray-500">เรียงตามจำนวนที่ขายได้</span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                อันดับ
+                            </th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                หนังสือ
+                            </th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                ผู้แต่ง
+                            </th>
+                            <th
+                                class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                ขายแล้ว
+                            </th>
+                            <th
+                                class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                คงเหลือ
+                            </th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                ราคา
+                            </th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                เรตติ้ง
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        {% for book in top_selling_books %}
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-4 py-4 whitespace-nowrap">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-full 
+                                    {% if forloop.counter == 1 %}bg-yellow-100 text-yellow-700
+                                    {% elif forloop.counter == 2 %}bg-gray-100 text-gray-700
+                                    {% elif forloop.counter == 3 %}bg-orange-100 text-orange-700
+                                    {% else %}bg-blue-50 text-blue-600{% endif %} font-bold text-sm">
+                                    {{ forloop.counter }}
+                                </div>
+                            </td>
+                            <td class="px-4 py-4">
+                                <div class="flex items-center gap-3">
+                                    {% if book.image %}
+                                    <img src="{{ book.image.url }}" alt="{{ book.title }}"
+                                        class="w-12 h-16 object-cover rounded shadow-sm">
+                                    {% else %}
+                                    <div class="w-12 h-16 bg-gray-200 rounded flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <path
+                                                d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
+                                        </svg>
+                                    </div>
+                                    {% endif %}
+                                    <div>
+                                        <p class="font-medium text-gray-900">{{ book.title }}</p>
+                                        <p class="text-xs text-gray-500">รหัส: BK{{ book.id }}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-4 py-4 text-sm text-gray-700">{{ book.author }}</td>
+                            <td class="px-4 py-4 text-center">
+                                <span
+                                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    {{ book.sold }} เล่ม
+                                </span>
+                            </td>
+                            <td class="px-4 py-4 text-center">
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium 
+                                    {% if book.stock < 10 %}bg-red-100 text-red-800
+                                    {% elif book.stock < 30 %}bg-yellow-100 text-yellow-800
+                                    {% else %}bg-blue-100 text-blue-800{% endif %}">
+                                    {{ book.stock }} เล่ม
+                                </span>
+                            </td>
+                            <td class="px-4 py-4 text-right text-sm font-medium text-gray-900">
+                                ฿{{ book.price|floatformat:2 }}
+                            </td>
+                            <td class="px-4 py-4 text-right">
+                                <div class="flex items-center justify-end gap-1">
+                                    <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path
+                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                    <span class="text-sm font-medium text-gray-900">{{ book.rating_average }}</span>
+                                    <span class="text-xs text-gray-500">({{ book.rating_count }})</span>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="px-4 py-8 text-center text-gray-500">ยังไม่มีข้อมูลการขาย</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Category Statistics -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-gray-900">สถิติตามหมวดหมู่</h3>
+                <span class="text-sm text-gray-500">ข้อมูลทั้งหมด</span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                หมวดหมู่
+                            </th>
+                            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                จำนวนหนังสือ
+                            </th>
+                            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                ขายแล้ว
+                            </th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                รายได้
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        {% for category in category_stats %}
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-4 py-4">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-2 h-2 bg-orange-500 rounded-full"></div>
+                                    <span class="font-medium text-gray-900">{{ category.category_name }}</span>
+                                </div>
+                            </td>
+                            <td class="px-4 py-4 text-center text-sm text-gray-700">{{ category.total_books }} รายการ
+                            </td>
+                            <td class="px-4 py-4 text-center">
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                    {{ category.total_sold|default:0 }} เล่ม
+                                </span>
+                            </td>
+                            <td class="px-4 py-4 text-right text-sm font-medium text-gray-900">
+                                ฿{{ category.total_revenue|default:0|floatformat:2 }}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="px-4 py-8 text-center text-gray-500">ยังไม่มีข้อมูลหมวดหมู่</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Low Stock Alert -->
+        {% if low_stock_books %}
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="bg-red-100 p-2 rounded-lg">
+                    <svg class="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">แจ้งเตือนสินค้าใกล้หมด</h3>
+                    <p class="text-sm text-gray-600">หนังสือที่มีสต็อกน้อยกว่า 10 เล่ม</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                {% for book in low_stock_books %}
+                <div class="border border-red-200 bg-red-50 rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div class="flex flex-col h-full">
+                        {% if book.image %}
+                        <img src="{{ book.image.url }}" alt="{{ book.title }}" class="w-full h-32 object-cover rounded mb-3">
+                        {% else %}
+                        <div class="w-full h-32 bg-gray-200 rounded mb-3 flex items-center justify-center">
+                            <svg class="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
+                            </svg>
+                        </div>
+                        {% endif %}
+                        <h4 class="font-medium text-gray-900 text-sm mb-1 line-clamp-2">{{ book.title }}</h4>
+                        <p class="text-xs text-gray-600 mb-2">{{ book.author }}</p>
+                        <div class="mt-auto">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-gray-500">คงเหลือ:</span>
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-red-600 text-white">
+                                    {{ book.stock }} เล่ม
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}
