@@ -289,3 +289,112 @@ class ManageBookView(View, LoginRequiredMixin):
         book = Book.objects.get(id=book_id)
         book.delete()
         return redirect('manage_book')
+
+class DashboardView(View, LoginRequiredMixin):
+    def get(self, request):
+        # Get statistics for dashboard
+        total_orders = Order.objects.count()
+        total_revenue = Order.objects.filter(status='paid').aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+        pending_orders = Order.objects.filter(status='unpaid').count()
+        total_books = Book.objects.count()
+        total_users = CustomUser.objects.count()
+        
+        # Recent orders
+        recent_orders = Order.objects.all().order_by('-order_date')[:5].select_related('user', 'cart', 'cart__book')
+        
+        # Popular books
+        popular_books = Book.objects.order_by('-sold')[:5]
+        
+        context = {
+            'total_orders': total_orders,
+            'total_revenue': total_revenue,
+            'pending_orders': pending_orders,
+            'total_books': total_books,
+            'total_users': total_users,
+            'recent_orders': recent_orders,
+            'popular_books': popular_books,
+        }
+        return render(request, 'owner/dashboard.html', context)
+
+class OrderHistoryOwnerView(View, LoginRequiredMixin):
+    def get(self, request):
+        # Get all orders for owner view
+        orders = Order.objects.all().order_by('-order_date').select_related('user', 'cart', 'cart__book')
+        
+        # Get filter parameters
+        status_filter = request.GET.get('status', '')
+        search_query = request.GET.get('search', '')
+        
+        # Apply filters
+        if status_filter:
+            orders = orders.filter(status=status_filter)
+        
+        if search_query:
+            orders = orders.filter(
+                Q(cart__book__title__icontains=search_query) | 
+                Q(user__first_name__icontains=search_query) |
+                Q(user__last_name__icontains=search_query) |
+                Q(user__email__icontains=search_query)
+            )
+        
+        context = {
+            'orders': orders,
+            'total_orders': orders.count(),
+            'status_filter': status_filter,
+            'search_query': search_query,
+        }
+        return render(request, 'owner/orderhistory_owner.html', context)
+
+class OrderHistoryOwnerDetailView(View, LoginRequiredMixin):
+    def get(self, request, order):
+        try:
+            order_obj = Order.objects.get(id=order)
+            cart_info = order_obj.cart
+            user_info = order_obj.user
+            
+            # Try to get payment information
+            try:
+                payment_info = Payment.objects.get(order=order_obj)
+            except Payment.DoesNotExist:
+                payment_info = None
+            
+            context = {
+                'order': order_obj,
+                'cart_info': cart_info,
+                'user_info': user_info,
+                'payment_info': payment_info,
+            }
+            return render(request, 'owner/orderhistory_detail_owner.html', context)
+        except Order.DoesNotExist:
+            return redirect('order_history_owner')
+    
+    def post(self, request, order):
+        try:
+            order_obj = Order.objects.get(id=order)
+            action = request.POST.get('action')
+            
+            # Update order status
+            if action == 'update_status':
+                new_status = request.POST.get('status')
+                if new_status in dict(Order.orderstatus.choices):
+                    order_obj.status = new_status
+                    order_obj.save()
+            
+            # Update payment status
+            elif action == 'update_payment':
+                payment_status = request.POST.get('payment_status')
+                try:
+                    payment = Payment.objects.get(order=order_obj)
+                    if payment_status in dict(Payment.paymentstatus.choices):
+                        payment.status = payment_status
+                        if payment_status == 'approved':
+                            payment.verified_date = datetime.now()
+                            order_obj.status = 'paid'
+                            order_obj.save()
+                        payment.save()
+                except Payment.DoesNotExist:
+                    pass
+            
+            return redirect('order_history_owner_detail', order=order)
+        except Order.DoesNotExist:
+            return redirect('order_history_owner')
