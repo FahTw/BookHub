@@ -36,7 +36,10 @@
         <!-- Page Header -->
         <div class="mb-8">
             <h1 class="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">ประวัติการสั่งซื้อ</h1>
-            <p class="text-gray-600">ติดตามและจัดการการสั่งซื้อของคุณ</p>
+            <p class="text-gray-600">
+                ติดตามและจัดการการสั่งซื้อของคุณ
+                {% if total_orders %}({{ total_orders }} รายการ){% endif %}
+            </p>
         </div>
 
         <!-- Filter and Search -->
@@ -46,93 +49,48 @@
                     <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
-                    <input type="text" placeholder="ค้นหาคำสั่งซื้อด้วยหมายเลขคำสั่งซื้อหรือชื่อหนังสือ" class="w-full pl-12 pr-4 py-3 bg-white border-2 border-gray-300 rounded-lg focus:outline-none focus:border-orange-600 focus:ring-2 focus:ring-orange-100 transition-all">
+                    <input type="text" placeholder="ค้นหาชื่อหนังสือ" class="w-full pl-12 pr-4 py-3 bg-white border-2 border-gray-300 rounded-lg focus:outline-none focus:border-orange-600 focus:ring-2 focus:ring-orange-100 transition-all">
                 </div>
             </div>
             <div class="sm:w-48">
                 <select class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-orange-600 focus:ring-2 focus:ring-orange-100 transition-all">
                     <option value="">สถานะทั้งหมด</option>
-                    <option value="pending">รอดำเนินการ</option>
-                    <option value="processing">กำลังประมวลผล</option>
-                    <option value="shipped">จัดส่งแล้ว</option>
-                    <option value="delivered">ส่งมอบแล้ว</option>
-                    <option value="cancelled">ยกเลิกแล้ว</option>
+                    <option value="unpaid">ยังไม่ชำระเงิน</option>
+                    <option value="paid">ชำระเงินแล้ว</option>
+                    <option value="processing">กำลังเตรียมสินค้า</option>
+                    <option value="shipped">กำลังจัดส่ง</option>
+                    <option value="delivered">จัดส่งสำเร็จ</option>
+                    <option value="cancelled">ยกเลิก</option>
                 </select>
             </div>
         </div>
 
         <!-- Orders List -->
+        {% if orders %}
         <div class="space-y-6">
-            <!-- Order Card 1 -->
+            {% for order in orders %}
             <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
                 <div class="px-6 py-4 bg-gray-50 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between">
                     <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-2 sm:mb-0">
-                        <h3 class="font-semibold text-gray-900">คำสั่งซื้อ #ORD123456</h3>
-                        <span class="inline-flex px-3 py-1 text-sm font-medium bg-orange-100 text-orange-700 rounded-full w-fit">จัดส่งแล้ว</span>
+                        <h3 class="font-semibold text-gray-900">คำสั่งซื้อ {{ order.id}}</h3>
+                        {% if order.status == 'paid' %}
+                            <span class="inline-flex px-3 py-1 text-sm font-medium bg-green-100 text-green-700 rounded-full w-fit">ชำระเงินแล้ว</span>
+                        {% elif order.status == 'unpaid' %}
+                            <span class="inline-flex px-3 py-1 text-sm font-medium bg-red-100 text-red-700 rounded-full w-fit">ยังไม่ชำระเงิน</span>
+                        {% elif order.status == 'processing' %}
+                            <span class="inline-flex px-3 py-1 text-sm font-medium bg-yellow-100 text-yellow-700 rounded-full w-fit">กำลังเตรียมสินค้า</span>
+                        {% elif order.status == 'shipped' %}
+                            <span class="inline-flex px-3 py-1 text-sm font-medium bg-blue-100 text-blue-700 rounded-full w-fit">กำลังจัดส่ง</span>
+                        {% elif order.status == 'delivered' %}
+                            <span class="inline-flex px-3 py-1 text-sm font-medium bg-green-100 text-green-700 rounded-full w-fit">จัดส่งสำเร็จ</span>
+                        {% elif order.status == 'cancelled' %}
+                            <span class="inline-flex px-3 py-1 text-sm font-medium bg-gray-100 text-gray-700 rounded-full w-fit">ยกเลิก</span>
+                        {% else %}
+                            <span class="inline-flex px-3 py-1 text-sm font-medium bg-gray-100 text-gray-700 rounded-full w-fit">{{ order.get_status_display }}</span>
+                        {% endif %}
                     </div>
                     <div class="text-sm text-gray-600">
-                        สั่งซื้อเมื่อ: 15 กรกฎาคม 2024
-                    </div>
-                </div>
-                
-                <div class="p-6">
-                    <!-- Order Item -->
-                    <div class="flex flex-col sm:flex-row gap-4 mb-4">
-                        <div class="w-full sm:w-20 h-32 sm:h-24 bg-gray-200 rounded flex-shrink-0 overflow-hidden">
-                            <img src="/api/placeholder/80/96" alt="จิตวิทยาสายดาร์ก" class="w-full h-full object-cover" />
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 mb-1">จิตวิทยาสายดาร์ก</h4>
-                            <p class="text-sm text-gray-600 mb-2">โดย Taneaw</p>
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm text-gray-600">จำนวน: 1</span>
-                                <span class="font-semibold text-gray-900">฿590</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Order Item 2 -->
-                    <div class="flex flex-col sm:flex-row gap-4 mb-6 pb-4 border-b border-gray-100">
-                        <div class="w-full sm:w-20 h-32 sm:h-24 bg-gray-200 rounded flex-shrink-0 overflow-hidden">
-                            <img src="/api/placeholder/80/96" alt="The Psychology of Money" class="w-full h-full object-cover" />
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 mb-1">The Psychology of Money</h4>
-                            <p class="text-sm text-gray-600 mb-2">โดย Morgan Housel</p>
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm text-gray-600">จำนวน: 1</span>
-                                <span class="font-semibold text-gray-900">฿350</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Order Summary -->
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        <div class="text-sm text-gray-600">
-                            <p>รวม 2 รายการ • ยอดรวม: <span class="font-semibold text-gray-900">฿940</span></p>
-                            <p>หมายเลขติดตาม: TH1234567890</p>
-                        </div>
-                        <div class="flex gap-3">
-                            <a href="/orderhistorydetail" class="px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium rounded-lg transition-colors">
-                                ดูรายละเอียด
-                            </a>
-                            <button class="px-4 py-2 bg-orange-600 text-white hover:bg-orange-700 font-medium rounded-lg transition-colors">
-                                สั่งซื้อใหม่
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Order Card 2 -->
-            <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
-                <div class="px-6 py-4 bg-gray-50 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                    <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-2 sm:mb-0">
-                        <h3 class="font-semibold text-gray-900">คำสั่งซื้อ #ORD789012</h3>
-                        <span class="inline-flex px-3 py-1 text-sm font-medium bg-green-100 text-green-700 rounded-full w-fit">ส่งมอบแล้ว</span>
-                    </div>
-                    <div class="text-sm text-gray-600">
-                        สั่งซื้อเมื่อ: 20 มิถุนายน 2024
+                        สั่งซื้อเมื่อ: {{ order.order_date|date:"j M Y เวลา H:i น." }}
                     </div>
                 </div>
                 
@@ -140,14 +98,25 @@
                     <!-- Order Item -->
                     <div class="flex flex-col sm:flex-row gap-4 mb-6 pb-4 border-b border-gray-100">
                         <div class="w-full sm:w-20 h-32 sm:h-24 bg-gray-200 rounded flex-shrink-0 overflow-hidden">
-                            <img src="/api/placeholder/80/96" alt="Atomic Habits" class="w-full h-full object-cover" />
+                            {% if order.cart.book.image %}
+                                <img src="{{ order.cart.book.image.url }}" alt="{{ order.cart.book.title }}" class="w-full h-full object-cover" />
+                            {% else %}
+                                <div class="w-full h-full bg-gray-300 flex items-center justify-center">
+                                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                    </svg>
+                                </div>
+                            {% endif %}
                         </div>
                         <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 mb-1">Atomic Habits</h4>
-                            <p class="text-sm text-gray-600 mb-2">โดย James Clear</p>
+                            <h4 class="font-semibold text-gray-900 mb-1">{{ order.cart.book.title }}</h4>
+                            <p class="text-sm text-gray-600 mb-2">โดย {{ order.cart.book.author }}</p>
+                            {% if order.cart.book.publisher %}
+                                <p class="text-xs text-gray-500 mb-2">สำนักพิมพ์: {{ order.cart.book.publisher }}</p>
+                            {% endif %}
                             <div class="flex items-center justify-between">
-                                <span class="text-sm text-gray-600">จำนวน: 1</span>
-                                <span class="font-semibold text-gray-900">฿420</span>
+                                <span class="text-sm text-gray-600">จำนวน: {{ order.cart.quantity }}</span>
+                                <span class="font-semibold text-gray-900">฿{{ order.total_amount|floatformat:2 }}</span>
                             </div>
                         </div>
                     </div>
@@ -155,73 +124,38 @@
                     <!-- Order Summary -->
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div class="text-sm text-gray-600">
-                            <p>รวม 1 รายการ • ยอดรวม: <span class="font-semibold text-gray-900">฿420</span></p>
-                            <p>ส่งมอบเมื่อ: 22 มิถุนายน 2024</p>
+                            <p>ยอดรวม: <span class="font-semibold text-gray-900">฿{{ order.total_amount|floatformat:2 }}</span></p>
+                            {% if order.status == 'delivered' %}
+                                <p>ส่งมอบเมื่อ: {{ order.order_date|date:"d M Y" }}</p>
+                            {% elif order.status == 'shipped' %}
+                                <p>หมายเลขติดตาม: TH{{ order.id}}</p>
+                            {% elif order.status == 'unpaid' %}
+                                <p class="text-red-600">กรุณาชำระเงิน</p>
+                            {% endif %}
                         </div>
                         <div class="flex gap-3">
-                            <a href="/orderhistorydetail" class="px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium rounded-lg transition-colors">
+                            <a href="{% url 'order_history_detail' user_obj.id order.id %}" class="px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium rounded-lg transition-colors">
                                 ดูรายละเอียด
                             </a>
-                            <button class="px-4 py-2 bg-orange-600 text-white hover:bg-orange-700 font-medium rounded-lg transition-colors">
-                                รีวิว & ให้คะแนน
-                            </button>
+                            {% if order.status == 'delivered' %}
+                                <button class="px-4 py-2 bg-orange-600 text-white hover:bg-orange-700 font-medium rounded-lg transition-colors">
+                                    รีวิว & ให้คะแนน
+                                </button>
+                            {% elif order.status == 'paid' or order.status == 'processing' %}
+                                <button class="px-4 py-2 border border-red-300 text-red-700 hover:bg-red-50 font-medium rounded-lg transition-colors">
+                                    ยกเลิกคำสั่งซื้อ
+                                </button>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Order Card 3 -->
-            <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
-                <div class="px-6 py-4 bg-gray-50 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                    <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-2 sm:mb-0">
-                        <h3 class="font-semibold text-gray-900">คำสั่งซื้อ #ORD345678</h3>
-                        <span class="inline-flex px-3 py-1 text-sm font-medium bg-yellow-100 text-yellow-700 rounded-full w-fit">กำลังประมวลผล</span>
-                    </div>
-                    <div class="text-sm text-gray-600">
-                        สั่งซื้อเมื่อ: 12 ตุลาคม 2024
-                    </div>
-                </div>
-                
-                <div class="p-6">
-                    <!-- Order Item -->
-                    <div class="flex flex-col sm:flex-row gap-4 mb-6 pb-4 border-b border-gray-100">
-                        <div class="w-full sm:w-20 h-32 sm:h-24 bg-gray-200 rounded flex-shrink-0 overflow-hidden">
-                            <img src="/api/placeholder/80/96" alt="Think and Grow Rich" class="w-full h-full object-cover" />
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 mb-1">Think and Grow Rich</h4>
-                            <p class="text-sm text-gray-600 mb-2">โดย Napoleon Hill</p>
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm text-gray-600">จำนวน: 1</span>
-                                <span class="font-semibold text-gray-900">฿295</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Order Summary -->
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        <div class="text-sm text-gray-600">
-                            <p>รวม 1 รายการ • ยอดรวม: <span class="font-semibold text-gray-900">฿295</span></p>
-                            <p>คาดว่าจะส่งมอบภายใน: 15 ตุลาคม 2024</p>
-                        </div>
-                        <div class="flex gap-3">
-                            <a href="/orderhistorydetail" class="px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium rounded-lg transition-colors">
-                                ดูรายละเอียด
-                            </a>
-                            <button class="px-4 py-2 border border-red-300 text-red-700 hover:bg-red-50 font-medium rounded-lg transition-colors">
-                                ยกเลิกคำสั่งซื้อ
-                            </button>
-                            <button class="px-4 py-2 bg-orange-600 text-white hover:bg-orange-700 font-medium rounded-lg transition-colors">
-                                ชำระเงิน
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {% endfor %}
         </div>
+        {% else %}
 
-        <!-- Empty State (Hidden by default) -->
-        <div id="empty-orders" class="hidden bg-white rounded-lg shadow-sm p-12 text-center">
+        <!-- Empty State -->
+        <div class="bg-white rounded-lg shadow-sm p-12 text-center">
             <div class="mb-6">
                 <svg class="w-24 h-24 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -229,41 +163,11 @@
             </div>
             <h2 class="text-xl font-semibold text-gray-900 mb-2">ยังไม่มีประวัติการสั่งซื้อ</h2>
             <p class="text-gray-600 mb-6">เมื่อคุณสั่งซื้อหนังสือ คำสั่งซื้อจะแสดงที่นี่</p>
-            <a href="/" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-orange-600 hover:bg-orange-700 transition-colors">
+            <a href="{% url 'book' %}" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-orange-600 hover:bg-orange-700 transition-colors">
                 เลือกซื้อหนังสือ
             </a>
         </div>
-
-        <!-- Pagination -->
-        <div class="mt-8 flex justify-center">
-            <nav class="flex items-center gap-2">
-                <button class="px-3 py-2 text-gray-500 hover:text-gray-700 disabled:opacity-50" disabled>
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                    </svg>
-                </button>
-                <button class="px-4 py-2 bg-orange-600 text-white rounded-lg">1</button>
-                <button class="px-4 py-2 text-gray-700 hover:text-gray-900 rounded-lg hover:bg-gray-100">2</button>
-                <button class="px-4 py-2 text-gray-700 hover:text-gray-900 rounded-lg hover:bg-gray-100">3</button>
-                <span class="px-2 text-gray-500">...</span>
-                <button class="px-4 py-2 text-gray-700 hover:text-gray-900 rounded-lg hover:bg-gray-100">10</button>
-                <button class="px-3 py-2 text-gray-500 hover:text-gray-700">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                </button>
-            </nav>
-        </div>
-
-        <!-- Back to Shopping -->
-        <div class="mt-8 text-center">
-            <a href="/" class="inline-flex items-center text-orange-600 hover:text-orange-700 font-medium">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                </svg>
-                กลับไปเลือกซื้อหนังสือ
-            </a>
-        </div>
+        {% endif %}
     </main>
 </div>
 {% endblock %}

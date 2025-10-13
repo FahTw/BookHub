@@ -55,7 +55,6 @@ class Order(models.Model):
         SHIPPED = 'shipped', 'กำลังจัดส่ง'
         DELIVERED = 'delivered', 'จัดส่งสำเร็จ'
         CANCELLED = 'cancelled', 'ยกเลิก'
-        REFUNDED = 'refunded', 'คืนเงิน'
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     order_date = models.DateTimeField()

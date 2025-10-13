@@ -1,57 +1,44 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Search functionality
+    // Get search input and status select elements
     const searchInput = document.querySelector('input[type="text"]');
     const statusSelect = document.querySelector('select');
 
+    // Add event listener for search input
     if (searchInput) {
         searchInput.addEventListener('input', function () {
             const searchTerm = this.value.toLowerCase();
-            filterOrders(searchTerm, statusSelect.value);
+            const selectedStatus = statusSelect ? statusSelect.value : '';
+            filterOrders(searchTerm, selectedStatus);
         });
     }
 
+    // Add event listener for status select
     if (statusSelect) {
         statusSelect.addEventListener('change', function () {
             const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-            filterOrders(searchTerm, this.value);
+            const selectedStatus = this.value;
+            filterOrders(searchTerm, selectedStatus);
         });
     }
 
-    // Cancel order functionality
-    const cancelButtons = document.querySelectorAll('button:contains("ยกเลิกคำสั่งซื้อ")');
-    cancelButtons.forEach(button => {
-        button.addEventListener('click', function () {
-            if (confirm('คุณต้องการยกเลิกคำสั่งซื้อนี้หรือไม่?')) {
-                // Handle order cancellation
-                alert('คำสั่งซื้อถูกยกเลิกแล้ว');
-                // Reload or update the page
-                location.reload();
-            }
-        });
-    });
-
-    // Reorder functionality
-    const reorderButtons = document.querySelectorAll('button:contains("สั่งซื้อใหม่")');
-    reorderButtons.forEach(button => {
-        button.addEventListener('click', function () {
-            // Add items to cart and redirect
-            alert('เพิ่มสินค้าในตะกร้าแล้ว');
-            window.location.href = '/cart';
-        });
-    });
-
-    function filterOrders(searchTerm, status) {
-        const orderCards = document.querySelectorAll('.bg-white.rounded-lg.shadow-sm');
+    function filterOrders(searchTerm, statusFilter) {
+        const orderCards = document.querySelectorAll('.bg-white.rounded-lg.shadow-sm.overflow-hidden.border');
         let visibleCount = 0;
 
         orderCards.forEach(card => {
-            if (card.id === 'empty-orders') return;
-
-            const orderText = card.textContent.toLowerCase();
-            const orderStatus = card.querySelector('.inline-flex').textContent.toLowerCase();
-
-            const matchesSearch = !searchTerm || orderText.includes(searchTerm);
-            const matchesStatus = !status || orderStatus.includes(getStatusText(status));
+            // Get book title from h4 element (not order number)
+            const bookTitleElement = card.querySelector('h4.font-semibold.text-gray-900');
+            const bookTitle = bookTitleElement ? bookTitleElement.textContent.toLowerCase() : '';
+            
+            // Get order status from the status badge
+            const statusBadge = card.querySelector('.inline-flex.px-3.py-1');
+            const orderStatus = statusBadge ? statusBadge.textContent.toLowerCase().trim() : '';
+            
+            // Check if order matches search term (book title only)
+            const matchesSearch = !searchTerm || bookTitle.includes(searchTerm);
+            
+            // Check if order matches status filter
+            const matchesStatus = !statusFilter || checkStatusMatch(orderStatus, statusFilter);
 
             if (matchesSearch && matchesStatus) {
                 card.style.display = 'block';
@@ -61,23 +48,44 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        // Show empty state if no orders match
-        const emptyState = document.getElementById('empty-orders');
-        if (visibleCount === 0) {
-            emptyState.classList.remove('hidden');
-        } else {
-            emptyState.classList.add('hidden');
+        // Show/hide empty state message when no results found
+        const emptyState = document.querySelector('.bg-white.rounded-lg.shadow-sm.p-12.text-center');
+        if (emptyState) {
+            const hasNoOrders = emptyState.querySelector('h2')?.textContent.includes('ยังไม่มีประวัติการสั่งซื้อ');
+            
+            if (visibleCount === 0 && (searchTerm || statusFilter)) {
+                // Show "no results found" state when filtering but no matches
+                emptyState.style.display = 'block';
+                const heading = emptyState.querySelector('h2');
+                const description = emptyState.querySelector('p');
+                if (heading) heading.textContent = 'ไม่พบผลลัพธ์ที่ค้นหา';
+                if (description) description.textContent = 'ลองค้นหาด้วยชื่อหนังสือหรือสถานะที่แตกต่างกัน';
+            } else if (visibleCount === 0 && !searchTerm && !statusFilter && hasNoOrders) {
+                // Show original empty state when no orders exist
+                emptyState.style.display = 'block';
+            } else if (visibleCount > 0) {
+                // Hide empty state when there are visible orders
+                emptyState.style.display = 'none';
+            }
         }
     }
 
-    function getStatusText(status) {
+    function checkStatusMatch(orderStatus, statusFilter) {
+        // Map status filter values to Thai status text
         const statusMap = {
-            'pending': 'รอดำเนินการ',
-            'processing': 'กำลังประมวลผล',
-            'shipped': 'จัดส่งแล้ว',
-            'delivered': 'ส่งมอบแล้ว',
-            'cancelled': 'ยกเลิกแล้ว'
+            'pending': ['รอดำเนินการ'],
+            'processing': ['กำลังประมวลผล', 'กำลังเตรียมสินค้า'],
+            'shipped': ['จัดส่งแล้ว', 'กำลังจัดส่ง'],
+            'delivered': ['ส่งมอบแล้ว', 'จัดส่งสำเร็จ'],
+            'cancelled': ['ยกเลิกแล้ว', 'ยกเลิก'],
+            'paid': ['ชำระเงินแล้ว'],
+            'unpaid': ['ยังไม่ชำระเงิน']
         };
-        return statusMap[status] || '';
+
+        const statusTexts = statusMap[statusFilter];
+        if (!statusTexts) return false;
+
+        // Check if order status matches any of the mapped status texts
+        return statusTexts.some(text => orderStatus.includes(text.toLowerCase()));
     }
 });
