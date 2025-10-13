@@ -93,7 +93,7 @@ class BookDetailView(View, LoginRequiredMixin):
             review.book = book
             review.user = request.user
             review.save()
-            return redirect('book_detail', book_id=book_id)
+            return redirect('/book_detail', book_id=book_id)
 
         return render(request, 'home/book_detail.html', {
             'book': book,
