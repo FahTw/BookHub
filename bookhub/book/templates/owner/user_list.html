@@ -1,0 +1,47 @@
+{% extends '../base_owner.html' %}
+{% load static %}
+
+{% block content %}
+<main class="p-6">
+    <h1 class="text-2xl font-bold mb-4">รายการผู้ใช้</h1>
+    <form method="get" class="mb-4">
+        <input type="text" name="q" value="{{ q }}" placeholder="ค้นหาชื่อ อีเมล หรือ username"
+            class="border p-2 rounded" />
+        <button type="submit" class="ml-2 bg-orange-600 text-white px-3 py-2 rounded">ค้นหา</button>
+    </form>
+    <div class="bg-white shadow rounded overflow-hidden">
+        <table class="w-full text-left">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="p-3">ID</th>
+                    <th class="p-3">ชื่อ</th>
+                    <th class="p-3">อีเมล</th>
+                    <th class="p-3">สมาชิกตั้งแต่</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr class="border-t">
+                    <td class="p-3">{{ u.id }}</td>
+                    <td class="p-3">{{ u.get_full_name }} ({{ u.username }})</td>
+                    <td class="p-3">{{ u.email }}</td>
+                    <td class="p-3">{{ u.date_joined|date:"Y-m-d" }}</td>
+                    <td class="p-3">
+                        <form method="post" action="{% url 'user_delete' u.id %}"
+                            onsubmit="return confirm('ยืนยันการลบผู้ใช้นี้หรือไม่?');">
+                            {% csrf_token %}
+                            <button type="submit" class="text-red-600 hover:underline">ลบ</button>
+                        </form>
+                    </td>
+
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="p-4 text-center text-gray-500">ไม่พบผู้ใช้</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</main>
+{% endblock %}

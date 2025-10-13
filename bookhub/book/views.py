@@ -400,3 +400,19 @@ class OrderHistoryOwnerDetailView(View, LoginRequiredMixin):
             return redirect('order_history_owner')
         except Order.DoesNotExist:
             return redirect('order_history_owner')
+
+class UserListView(LoginRequiredMixin, View):
+    # login_url = '/login/'
+
+    def get(self, request):
+        users = CustomUser.objects.all().order_by('-date_joined')
+        return render(request, 'owner/user_list.html', {'users': users})
+
+class DeleteUserView(LoginRequiredMixin, View):
+    # login_url = '/login/'
+
+    def post(self, request, user_id):
+        # ลบผู้ใช้
+        users = CustomUser.objects.filter(pk=user_id)
+        users.delete()
+        return redirect('user_list')
