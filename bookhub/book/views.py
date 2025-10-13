@@ -245,18 +245,9 @@ class OrderHistoryView(View):
         try:
             user_obj = CustomUser.objects.get(id=user)
             orders = Order.objects.filter(user=user_obj).order_by("-order_date").select_related('cart', 'cart__book')
-            
-            # Group orders by payment method and date for better display
-            order_groups = {}
-            for order in orders:
-                date_key = order.order_date.strftime('%Y-%m-%d %H:%M')
-                if date_key not in order_groups:
-                    order_groups[date_key] = []
-                order_groups[date_key].append(order)
-            
+
             context = {
                 "orders": orders,
-                "order_groups": order_groups,
                 "user_obj": user_obj,
                 "total_orders": orders.count(),
             }
@@ -269,16 +260,16 @@ class OrderHistoryDetailView(View):
         try:
             user_obj = CustomUser.objects.get(id=user)
             order_obj = Order.objects.get(id=order, user=user_obj)
-            
-            # Get cart details for this order
             cart_info = order_obj.cart
+            payment_info = Payment.objects.get(order=order_obj)
             
             context = {
+                "user_obj": user_obj,
                 "order": order_obj,
                 "cart_info": cart_info,
-                "user_obj": user_obj,
+                "payment_info": payment_info,
             }
-            return render(request, "orderhistorydetail.html", context)
+            return render(request, "home/orderhistory_detail.html", context)
         except (CustomUser.DoesNotExist, Order.DoesNotExist):
             return redirect('login')
 
@@ -298,62 +289,3 @@ class ManageBookView(View, LoginRequiredMixin):
         book = Book.objects.get(id=book_id)
         book.delete()
         return redirect('manage_book')
-
-class AddToCartView(View):
-    """View to add books to cart for testing multiple orders"""
-    def post(self, request, user_id, book_id):
-        try:
-            user_obj = CustomUser.objects.get(id=user_id)
-            book = Book.objects.get(id=book_id)
-            
-            # Check if item already exists in cart
-            existing_cart = Cart.objects.filter(
-                user=user_obj, 
-                book=book, 
-                status='in_cart'
-            ).first()
-            
-            if existing_cart:
-                # Update quantity
-                existing_cart.quantity += 1
-                existing_cart.total_price = existing_cart.price * existing_cart.quantity
-                existing_cart.save()
-            else:
-                # Create new cart item
-                Cart.objects.create(
-                    user=user_obj,
-                    book=book,
-                    quantity=1,
-                    price=book.price,
-                    total_price=book.price,
-                    status='in_cart'
-                )
-            
-            return redirect('cart', user=user_id)
-        except (CustomUser.DoesNotExist, Book.DoesNotExist):
-            return redirect('book')
-
-class CreateSampleCartView(View):
-    """View to create sample cart items for testing"""
-    def get(self, request, user_id):
-        try:
-            user_obj = CustomUser.objects.get(id=user_id)
-            books = Book.objects.all()[:3]  # Get first 3 books
-            
-            # Clear existing cart
-            Cart.objects.filter(user=user_obj, status='in_cart').delete()
-            
-            # Create sample cart items
-            for i, book in enumerate(books, 1):
-                Cart.objects.create(
-                    user=user_obj,
-                    book=book,
-                    quantity=i,  # Different quantities: 1, 2, 3
-                    price=book.price,
-                    total_price=book.price * i,
-                    status='in_cart'
-                )
-            
-            return redirect('cart', user=user_id)
-        except CustomUser.DoesNotExist:
-            return redirect('login')
