@@ -8,7 +8,6 @@ from .models import *
 from django.db.models import *
 from django.db.models.functions import *
 from book.forms import *
-from django.forms import modelformset_factory
 from django.db import transaction
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import logout, login
@@ -34,6 +33,11 @@ class LoginView(View):
             print(form.errors)
         return render(request,'login/login.html', {"form":form})
 
+class LogoutView(View):
+    def get(self, request):
+        logout(request)
+        return redirect('/login')
+
 class RegisterView(View):
     def get(self, request):
         form = UserRegistrationForm()
@@ -50,11 +54,6 @@ class RegisterView(View):
         else:
             print(form.errors)
         return render(request, 'login/register.html', {'form': form})
-
-class LogoutView(View):
-    def get(self, request):
-        logout(request)
-        return redirect('/login')
 
 class ProfileView(View, LoginRequiredMixin):
     def get(self, request):
@@ -102,6 +101,7 @@ class BookDetailView(View, LoginRequiredMixin):
             'reviews': reviews,
             'form': form
         })
+
 class CategoryView(View):
     def get(self, request, category_id):
         category = BookCategory.objects.get(id=category_id)
@@ -133,8 +133,6 @@ class CartView(View):
         try:
             user = CustomUser.objects.get(id=user)
             cart = Cart.objects.filter(user=user, status='in_cart').select_related('book')
-            CartFormSet = modelformset_factory(Cart, form=CartForm(), extra=0)
-            cartform = CartFormSet(queryset=cart)
 
             # Calculate totals
             total_amount = sum(item.total_price for item in cart)
@@ -142,9 +140,9 @@ class CartView(View):
 
             context = {
                 "user": user,
+                "cart": cart,
                 "total_amount": total_amount,
                 "total_items": total_items,
-                "cartform": cartform,
             }
             return render(request, "payment/cart.html", context)
         except CustomUser.DoesNotExist:
@@ -153,27 +151,29 @@ class CartView(View):
     def post(self, request, user):
         try:
             user_obj = CustomUser.objects.get(id=user)
-            form = CartForm(request.POST)
-            if form.is_valid():
-                cart_item = form.save(commit=False)
-                cart_item.user = user_obj
-                cart_item.total_price = cart_item.price * cart_item.quantity
-                cart_item.save()
+            action = request.POST.get('action')
+            cart_id = request.POST.get('cart_id')
+            
+            if action == 'remove' and cart_id:
+                # Remove item from cart
+                Cart.objects.filter(id=cart_id, user=user_obj).delete()
                 return redirect('cart', user=user)
             
-            cart_items = Cart.objects.filter(user=user_obj, status='in_cart').select_related('book')
-            total_amount = sum(item.total_price for item in cart_items)
-            total_items = sum(item.quantity for item in cart_items)
+            elif action == 'update' and cart_id:
+                # Update quantity
+                quantity_change = int(request.POST.get('quantity_change', 0))
+                cart_item = Cart.objects.get(id=cart_id, user=user_obj)
+                new_quantity = cart_item.quantity + quantity_change
+                
+                if new_quantity > 0 and new_quantity <= cart_item.book.stock:
+                    cart_item.quantity = new_quantity
+                    cart_item.total_price = cart_item.price * cart_item.quantity
+                    cart_item.save()
+                
+                return redirect('cart', user=user)
             
-            context = {
-                "cart_items": cart_items,
-                "user_obj": user_obj,
-                "total_amount": total_amount,
-                "total_items": total_items,
-                "cart_form": form,
-            }
-            return render(request, "payment/cart.html", context)
-        except CustomUser.DoesNotExist:
+            return redirect('cart', user=user)
+        except (CustomUser.DoesNotExist, Cart.DoesNotExist):
             return redirect('login')
 
 class PaymentView(View):
