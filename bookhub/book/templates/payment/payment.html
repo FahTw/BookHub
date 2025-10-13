@@ -90,12 +90,21 @@
                     </div>
 
                     <form id="paymentForm" method="post" enctype="multipart/form-data" class="p-6">
+                        {% csrf_token %}
+                        <!-- Hidden fields for form data -->
+                        <input type="hidden" name="order" value="{{ order.id }}">
+                        <input type="hidden" name="amount" value="{{ order.total_amount }}">
+                        <input type="hidden" name="payment_date" value="">
+                        <input type="hidden" name="status" value="pending">
+                        <script>
+                            document.querySelector('input[name="payment_date"]').value = new Date().toISOString();
+                        </script>
                         <!-- Payment Method Selection -->
                         <div class="mb-8">
                             <h3 class="text-lg font-semibold text-gray-900 mb-6">เลือกวิธีการชำระเงิน</h3>
                             <div class="grid md:grid-cols-3 gap-4">
                                 <label class="payment-method-option cursor-pointer">
-                                    <input type="radio" name="payment_method" value="promptpay" class="sr-only payment-method-radio" checked>
+                                    <input type="radio" name="method" value="promptpay" class="sr-only payment-method-radio" checked>
                                     <div class="border-2 border-gray-200 rounded-lg p-4 hover:border-orange-300 transition-colors payment-method-card active">
                                         <div class="flex items-center gap-3">
                                             <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
@@ -104,7 +113,7 @@
                                                 </svg>
                                             </div>
                                             <div>
-                                                <h4 class="font-medium text-gray-900">Promptpay</h4>
+                                                <h4 class="font-medium text-gray-900">พร้อมเพย์</h4>
                                                 <p class="text-sm text-gray-500">สแกน QR Code</p>
                                             </div>
                                         </div>
@@ -112,7 +121,7 @@
                                 </label>
 
                                 <label class="payment-method-option cursor-pointer">
-                                    <input type="radio" name="payment_method" value="bank_transfer" class="sr-only payment-method-radio">
+                                    <input type="radio" name="method" value="bank" class="sr-only payment-method-radio">
                                     <div class="border-2 border-gray-200 rounded-lg p-4 hover:border-orange-300 transition-colors payment-method-card">
                                         <div class="flex items-center gap-3">
                                             <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -121,20 +130,20 @@
                                                 </svg>
                                             </div>
                                             <div>
-                                                <h4 class="font-medium text-gray-900">Mobile Banking</h4>
-                                                <p class="text-sm text-gray-500">โอนเงินผ่านแอปธนาคาร</p>
+                                                <h4 class="font-medium text-gray-900">โอนเงินผ่านธนาคาร</h4>
+                                                <p class="text-sm text-gray-500">โอนเข้าบัญชีธนาคาร</p>
                                             </div>
                                         </div>
                                     </div>
                                 </label>
 
                                 <label class="payment-method-option cursor-pointer">
-                                    <input type="radio" name="payment_method" value="cash_on_delivery" class="sr-only payment-method-radio">
+                                    <input type="radio" name="method" value="cash" class="sr-only payment-method-radio">
                                     <div class="border-2 border-gray-200 rounded-lg p-4 hover:border-orange-300 transition-colors payment-method-card">
                                         <div class="flex items-center gap-3">
                                             <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                                                <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path d="M8 5a1 1 0 100 2h5.586l-1.293 1.293a1 1 0 101.414 1.414L16.414 7A1 1 0 0016 6V4a1 1 0 10-2 0v.586l-.293-.293A1 1 0 0012.293 5.5L14.586 8H9a1 1 0 000 2h5.586l-2.293 2.293a1 1 0 101.414 1.414L17.414 11A1 1 0 0018 10V8a1 1 0 10-2 0v.586l-.293-.293A1 1 0 0014.293 9.5L16.586 12H11a1 1 0 000 2h5.586l-1.293 1.293a1 1 0 101.414 1.414L19.414 13A1 1 0 0020 12V10a1 1 0 10-2 0v.586l-.293-.293A1 1 0 0016.293 11.5L18.586 14H13a1 1 0 100 2h1.586l-.293.293a1 1 0 101.414 1.414L17.414 16A1 1 0 0018 15V13a1 1 0 10-2 0v.586l-.293-.293A1 1 0 0014.293 14.5L16.586 17H3a1 1 0 100 2h11.586l-1.293 1.293a1 1 0 101.414 1.414L16.414 19A1 1 0 0016 18V16a1 1 0 10-2 0v.586l-.293-.293A1 1 0 0012.293 17.5L14.586 20H3a3 3 0 01-3-3V6a3 3 0 013-3h11a1 1 0 110 2H3a1 1 0 00-1 1v11a1 1 0 001 1z"/>
+                                                <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V16h-2.67v2.09c-2.84-.48-5.09-2.8-5.09-5.59s2.25-5.11 5.09-5.59V9h2.67v-1.91c2.84.48 5.09 2.8 5.09 5.59s-2.25 5.11-5.09 5.59z"/>
                                                 </svg>
                                             </div>
                                             <div>
@@ -198,45 +207,27 @@
                         </div>
 
                         <!-- File Upload Section -->
-                        <div class="mb-8">
+                        <div class="mb-8" id="file-upload-section">
                             <h3 class="text-lg font-semibold text-gray-900 mb-4">อัพโหลดหลักฐานการชำระเงิน</h3>
-                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-orange-400 transition-colors" id="file-drop-zone">
-                                <input type="file" id="payment-proof" name="image" accept="image/*,.pdf" class="hidden" onchange="handleFileSelect(this)">
-                                <div id="upload-placeholder">
-                                    <svg class="w-12 h-12 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 48 48">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" />
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-orange-400 transition-colors">
+                                <input type="file" id="payment_slip" name="payment_slip" accept="image/*,.pdf" class="hidden">
+                                <svg class="w-12 h-12 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 48 48">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" />
+                                </svg>
+                                <h4 class="text-lg font-medium text-gray-900 mb-2">อัพโหลดสลิปการโอนเงิน</h4>
+                                <p class="text-gray-500 mb-4">เลือกไฟล์รูปภาพสลิป</p>
+                                <button type="button" onclick="document.getElementById('payment_slip').click()" class="inline-flex items-center px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                                     </svg>
-                                    <h4 class="text-lg font-medium text-gray-900 mb-2">อัพโหลดสลิปการโอนเงิน</h4>
-                                    <p class="text-gray-500 mb-4">ลากไฟล์มาวางที่นี่ หรือ</p>
-                                    <button type="button" onclick="document.getElementById('payment-proof').click()" class="inline-flex items-center px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors">
-                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                        </svg>
-                                        เลือกไฟล์
-                                    </button>
-                                    <p class="text-xs text-gray-400 mt-2">รองรับ JPG, PNG, PDF (ขนาดไม่เกิน 5MB)</p>
-                                </div>
-                                
-                                <!-- File Preview -->
-                                <div id="file-preview" class="hidden">
-                                    <div class="flex items-center justify-center gap-4">
-                                        <div id="preview-content"></div>
-                                        <div class="text-left">
-                                            <p class="font-medium text-gray-900" id="file-name"></p>
-                                            <p class="text-sm text-gray-500" id="file-size"></p>
-                                            <button type="button" onclick="removeFile()" class="text-sm text-red-600 hover:text-red-800 mt-1">
-                                                ลบไฟล์
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
+                                    เลือกไฟล์
+                                </button>
+                                <p class="text-xs text-gray-400 mt-2">รองรับ JPG, PNG, PDF (ขนาดไม่เกิน 5MB)</p>
                             </div>
-                            <div id="upload-errors" class="hidden mt-2 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-600"></div>
                         </div>
 
                         <!-- Submit Button -->
                         <div class="text-center">
-                            <a href="{% url 'home' %}">
                             <button type="submit" class="w-full md:w-auto px-8 py-3 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" id="submit-payment" disabled>
                                 <span class="inline-flex items-center">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -245,7 +236,6 @@
                                     ยืนยันการชำระเงิน
                                 </span>
                             </button>
-                            </a>
                         </div>
                     </form>
                 </div>

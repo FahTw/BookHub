@@ -6,6 +6,9 @@
     <div class="text-center space-y-6">
         <h1 class="text-5xl font-bold text-orange-500">Product</h1>
         <p class="text-lg text-gray-600">เลือกหนังสือคุณภาพที่คุณชื่นชอบ</p>
+        <div class="flex justify-center gap-4 mt-4">
+            <a href="{% url 'cart' user.id %}" class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600">ดูตะกร้าสินค้า</a>
+        </div>
     </div>
 </section>
 <section class="max-w-7xl mx-auto py-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -16,8 +19,14 @@
         <div class="p-4">
             <h2 class="text-xl font-semibold text-gray-800">{{ book.title }}</h2>
             <p class="text-gray-600 mt-2">Author: {{ book.author }}</p>
-            <p class="text-gray-600 mt-1">Price: ${{ book.price }}</p>
-            <a href="{% url 'book_detail' book.id %}" class="mt-4 inline-block bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">View Details</a>
+            <p class="text-gray-600 mt-1">Price: ฿{{ book.price }}</p>
+            <div class="mt-4 space-y-2">
+                <a href="{% url 'book_detail' book.id %}" class="block w-full text-center bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">View Details</a>
+                <form method="post" action="{% url 'cart' user.id %}" class="inline-block w-full">
+                    {% csrf_token %}
+                    <button type="submit" class="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">เพิ่มลงตะกร้า</button>
+                </form>
+            </div>
         </div>
     </div>
     {% empty %}

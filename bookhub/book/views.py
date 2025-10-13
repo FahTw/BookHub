@@ -12,6 +12,7 @@ from django.db import transaction
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import logout, login
 from django.contrib.auth.mixins import LoginRequiredMixin
+from datetime import datetime
 
 class HomeView(View, LoginRequiredMixin):
     def get(self, request):
@@ -180,13 +181,15 @@ class PaymentView(View):
     def get(self, request, user):
         try:
             user_obj = CustomUser.objects.get(id=user)
-            # Get user's latest order or create new one from cart
-            latest_order = Order.objects.filter(user=user_obj).order_by('-order_date').first()
+            cart_items = Cart.objects.filter(user=user_obj, status='in_cart')
+            
+            # Calculate total amount from cart
+            total_amount = sum(item.total_price for item in cart_items)
             
             context = {
-                "order": latest_order,
                 "user_obj": user_obj,
-                "payment_form": PaymentForm(),
+                "cart_items": cart_items,
+                "total_amount": total_amount,
             }
             return render(request, "payment/payment.html", context)
         except CustomUser.DoesNotExist:
@@ -195,19 +198,45 @@ class PaymentView(View):
     def post(self, request, user):
         try:
             user_obj = CustomUser.objects.get(id=user)
-            form = PaymentForm(request.POST, request.FILES)
-            if form.is_valid():
-                payment = form.save(commit=False)
-                payment.save()
-                return redirect('order_history_user', user=user)
-            
-            latest_order = Order.objects.filter(user=user_obj).order_by('-order_date').first()
-            context = {
-                "order": latest_order,
-                "user_obj": user_obj,
-                "payment_form": form,
-            }
-            return render(request, "payment/payment.html", context)
+            cart_items = Cart.objects.filter(user=user_obj, status='in_cart')
+            payment_method = request.POST.get('method')
+
+            for cart_item in cart_items:
+                # Create Order for each cart item
+                order = Order.objects.create(
+                    user=user_obj,
+                    cart=cart_item,
+                    order_date=datetime.now(),
+                    total_amount=cart_item.total_price,
+                    status='unpaid'  # Start as unpaid, will update after payment
+                )
+                        
+                # Create Payment for each order
+                payment = Payment.objects.create(
+                    order=order,
+                    payment_date=datetime.now(),
+                    method=payment_method,
+                    amount=cart_item.total_price,
+                    status='pending'
+                )
+
+                # Add payment slip if uploaded and not cash on delivery
+                if payment_method != 'cash' and 'payment_slip' in request.FILES:
+                    payment.payment_slip = request.FILES['payment_slip']
+                    payment.save()
+
+                # Update order status based on payment method
+                if payment_method == 'cash':
+                    order.status = 'unpaid'  # Will be paid on delivery
+                else:
+                    order.status = 'paid'  # Assume paid if slip uploaded
+                order.save()
+                    
+                # Update cart status to mark as ordered
+                cart_items.update(status='notin_cart')
+
+                return redirect('home')
+
         except CustomUser.DoesNotExist:
             return redirect('login')
 
@@ -217,11 +246,21 @@ class OrderHistoryView(View):
             user_obj = CustomUser.objects.get(id=user)
             orders = Order.objects.filter(user=user_obj).order_by("-order_date").select_related('cart', 'cart__book')
             
+            # Group orders by payment method and date for better display
+            order_groups = {}
+            for order in orders:
+                date_key = order.order_date.strftime('%Y-%m-%d %H:%M')
+                if date_key not in order_groups:
+                    order_groups[date_key] = []
+                order_groups[date_key].append(order)
+            
             context = {
                 "orders": orders,
+                "order_groups": order_groups,
                 "user_obj": user_obj,
+                "total_orders": orders.count(),
             }
-            return render(request, "orderhistory.html", context)
+            return render(request, "home/orderhistory.html", context)
         except CustomUser.DoesNotExist:
             return redirect('login')
 
@@ -259,3 +298,62 @@ class ManageBookView(View, LoginRequiredMixin):
         book = Book.objects.get(id=book_id)
         book.delete()
         return redirect('manage_book')
+
+class AddToCartView(View):
+    """View to add books to cart for testing multiple orders"""
+    def post(self, request, user_id, book_id):
+        try:
+            user_obj = CustomUser.objects.get(id=user_id)
+            book = Book.objects.get(id=book_id)
+            
+            # Check if item already exists in cart
+            existing_cart = Cart.objects.filter(
+                user=user_obj, 
+                book=book, 
+                status='in_cart'
+            ).first()
+            
+            if existing_cart:
+                # Update quantity
+                existing_cart.quantity += 1
+                existing_cart.total_price = existing_cart.price * existing_cart.quantity
+                existing_cart.save()
+            else:
+                # Create new cart item
+                Cart.objects.create(
+                    user=user_obj,
+                    book=book,
+                    quantity=1,
+                    price=book.price,
+                    total_price=book.price,
+                    status='in_cart'
+                )
+            
+            return redirect('cart', user=user_id)
+        except (CustomUser.DoesNotExist, Book.DoesNotExist):
+            return redirect('book')
+
+class CreateSampleCartView(View):
+    """View to create sample cart items for testing"""
+    def get(self, request, user_id):
+        try:
+            user_obj = CustomUser.objects.get(id=user_id)
+            books = Book.objects.all()[:3]  # Get first 3 books
+            
+            # Clear existing cart
+            Cart.objects.filter(user=user_obj, status='in_cart').delete()
+            
+            # Create sample cart items
+            for i, book in enumerate(books, 1):
+                Cart.objects.create(
+                    user=user_obj,
+                    book=book,
+                    quantity=i,  # Different quantities: 1, 2, 3
+                    price=book.price,
+                    total_price=book.price * i,
+                    status='in_cart'
+                )
+            
+            return redirect('cart', user=user_id)
+        except CustomUser.DoesNotExist:
+            return redirect('login')

@@ -60,7 +60,7 @@ class Order(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     order_date = models.DateTimeField()
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    status = models.CharField(max_length=20, choices=orderstatus.choices, default=orderstatus.UNPAID)
+    status = models.CharField(max_length=20, choices=orderstatus.choices, default=orderstatus.PAID)
 
     def __str__(self):
         return f'Order {self.id} for {self.cart}'
