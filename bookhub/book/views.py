@@ -29,7 +29,10 @@ class LoginView(View):
         if form.is_valid():
             user = form.get_user() 
             login(request,user)
-            return redirect('/book/')
+            if user.is_staff:
+                return redirect('/dashboard')
+            else:
+                return redirect('/home')
         else:
             print(form.errors)
         return render(request,'login/login.html', {"form":form})
@@ -105,10 +108,10 @@ class BookDetailView(View, LoginRequiredMixin):
 
 class CategoryView(View):
     def get(self, request, category_id):
-        category = BookCategory.objects.get(id=category_id)
-        books = Book.objects.filter(category=category)
+        category = BookCategory.objects.get(pk=category_id)
+        books = Book.objects.filter(categories=category)
         categories = BookCategory.objects.all()
-        return render(request, 'home.html', {'category': category, 'books': books})
+        return render(request, 'home/category.html', {'category': category, 'books': books, 'categories': categories})
 
 # class ReviewView(View):
 #     def get(self, request, book_id):

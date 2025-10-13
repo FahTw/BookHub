@@ -1,0 +1,55 @@
+{% extends "base_user.html" %}
+{% load static %}
+
+{% block content %}
+<section class="py-16 px-6 bg-gray-50 min-h-screen">
+  <div class="max-w-7xl mx-auto">
+    <!-- Section title -->
+    <div class="text-center mb-12">
+      <h1 class="text-5xl font-bold text-[#df4300] mb-2">
+        หมวดหมู่: {{ category.category_name }}
+      </h1>
+      <p class="text-gray-600">หนังสือทั้งหมดในหมวดนี้</p>
+    </div>
+
+    <!-- Category buttons -->
+    <div class="flex flex-wrap justify-center gap-4 mb-10">
+      {% for cate in categories %}
+      <a href="{% url 'category' cate.id %}"
+         class="px-6 py-3 bg-[#ff2348] hover:bg-[#ff2348]/90 text-white rounded-full font-semibold transition">
+        {{ cate.name }}
+      </a>
+      {% endfor %}
+    </div>
+
+    <!-- Books grid -->
+    {% if books %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+      {% for book in books %}
+      <div class="bg-white rounded-2xl shadow-md hover:shadow-xl transition-shadow overflow-hidden">
+        {% if book.cover %}
+        <img src="{{ book.cover.url }}" alt="{{ book.title }}" class="w-full h-56 object-cover">
+        {% else %}
+        <div class="w-full h-56 bg-gray-200 flex items-center justify-center text-gray-400">
+          ไม่มีรูปภาพ
+        </div>
+        {% endif %}
+
+        <div class="p-4">
+          <h3 class="text-lg font-semibold text-gray-800 mb-2">{{ book.title }}</h3>
+          <p class="text-gray-500 mb-3 line-clamp-2">{{ book.description|truncatewords:15 }}</p>
+          <p class="text-[#df4300] font-bold mb-3">{{ book.price }} บาท</p>
+          <a href="{% url 'book_detail' book.id %}"
+             class="block w-full bg-[#ff2348] hover:bg-[#ff2348]/90 text-white text-center py-2 rounded-lg font-semibold">
+            ดูรายละเอียด
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-center text-gray-500 mt-10">ไม่มีหนังสือในหมวดนี้</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

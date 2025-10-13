@@ -91,7 +91,7 @@ class Review(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     rating = models.PositiveSmallIntegerField()
     comment = models.TextField(max_length=500, blank=True)
-    created_date = models.DateTimeField()
+    created_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f'Review by {self.user.first_name} for {self.book.title} ({self.rating} stars)'
