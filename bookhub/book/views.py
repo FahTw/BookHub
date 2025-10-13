@@ -11,8 +11,9 @@ from book.forms import *
 from django.db import transaction
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import logout, login
+from django.contrib.auth.mixins import LoginRequiredMixin
 
-class HomeView(View):
+class HomeView(View, LoginRequiredMixin):
     def get(self, request):
         categories = BookCategory.objects.all()
         return render(request, 'home/home.html', {'categories': categories})
@@ -53,26 +54,26 @@ class LogoutView(View):
         logout(request)
         return redirect('/login')
 
-class ProfileView(View):
+class ProfileView(View, LoginRequiredMixin):
     def get(self, request):
-        form = UserProfileForm()
+        form = UserProfileForm(instance=request.user)
         return render(request, 'home/profile.html', {'form': form})
 
-
     def post(self, request):
-        # Handle profile update logic here
         form = UserProfileForm(request.POST, instance=request.user)
         if form.is_valid():
-            form.save()
-            return redirect('/book/')
-        return redirect('home/profile', {'form': form})
+            form.save()  # บันทึกลง database จริง
+            return redirect('/profile')
+        else:
+            print(form.errors)  # ดูว่ามีปัญหาอะไร
+        return render(request, 'home/profile.html', {'form': form})
 
-class BookListView(View):
+class BookListView(View, LoginRequiredMixin):
     def get(self, request):
         books = Book.objects.all()
         return render(request, 'home/book_list.html', {'books': books})
-    
-class BookDetailView(View):
+
+class BookDetailView(View, LoginRequiredMixin):
     def get(self, request, book_id):
         book = Book.objects.get(pk=book_id)
         reviews = Review.objects.filter(book=book).order_by('-created_date')
@@ -167,15 +168,19 @@ class OrderHistoryDetailView(View):
         }
         return render(request, "orderhistorydetail.html", context)
 
-class ManageBookView(View):
+class ManageBookView(View, LoginRequiredMixin):
     def get(self, request):
         form = BookForm()
         books = Book.objects.all()
-        return render(request, 'book_manage.html', {'form': form, 'books': books})
+        return render(request, 'owner/book_manage.html', {'form': form, 'books': books})
     def post(self, request):
         form = BookForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             return redirect('manage_book')
         books = Book.objects.all()
-        return render(request, 'book_manage.html', {'form': form, 'books': books})
+        return render(request, 'owner/book_manage.html', {'form': form, 'books': books})
+    def delete(self, request, book_id):
+        book = Book.objects.get(id=book_id)
+        book.delete()
+        return redirect('manage_book')
