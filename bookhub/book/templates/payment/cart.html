@@ -42,10 +42,10 @@
             <!-- Cart Items Section -->
             <div class="lg:col-span-8">
                 <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-                    <!-- Desktop Header -->
+                    <!-- Header -->
                     <div class="hidden lg:grid lg:grid-cols-12 gap-4 px-6 py-4 bg-gray-50 border-b border-gray-200 font-semibold text-sm">
                         <div class="col-span-1 flex items-center justify-center">
-                            <input type="checkbox" id="select-all" class="w-4 h-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500" />
+                            <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500" />
                         </div>
                         <div class="col-span-5">สินค้า</div>
                         <div class="col-span-2 text-center">ราคา</div>
@@ -53,52 +53,65 @@
                         <div class="col-span-2 text-right">รวม</div>
                     </div>
 
-                    <!-- Cart Item -->
-                    <div class="cart-item border-b border-gray-100 last:border-b-0" data-price="350" data-book-id="1">
+                    <!-- Cart Items -->
+                    <form method="delete">
+                    {% csrf_token %}
+                    {% for item in cart %}
+                    <div class="border-b border-gray-100 last:border-b-0">
                         <div class="hidden lg:grid lg:grid-cols-12 gap-4 px-6 py-6 items-center">
                             <div class="col-span-1 flex items-center justify-center">
-                                <input type="checkbox" checked class="item-checkbox w-4 h-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500" />
+                                <input type="checkbox" checked class="w-4 h-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500" />
                             </div>
                             <div class="col-span-5 flex items-center gap-4">
                                 <div class="w-16 h-20 bg-gray-200 rounded flex-shrink-0 overflow-hidden">
-                                    <img src="/api/placeholder/64/80" alt="พอใจ" class="w-full h-full object-cover" />
+                                    <img src="{{ item.book.image.url }}" alt="{{ item.book.title }}" class="w-full h-full object-cover" />
                                 </div>
                                 <div class="min-w-0">
-                                    <h3 class="font-semibold text-gray-900 mb-1 truncate">พอใจ</h3>
-                                    <p class="text-sm text-gray-500 mb-1">ผู้เขียน: นิตยา เทวดา</p>
-                                    <p class="text-xs text-gray-400 mb-1">สำนักพิมพ์: นานมีบุ๊คส์</p>
+                                    <h3 class="font-semibold text-gray-900 mb-1 truncate">{{ item.book.title }}</h3>
+                                    <p class="text-sm text-gray-500 mb-1">ผู้เขียน: {{ item.book.author }}</p>
+                                    <p class="text-xs text-gray-400 mb-1">สำนักพิมพ์: {{ item.book.publisher }}</p>
                                     <div class="flex items-center gap-2 mb-2">
                                         <div class="flex text-yellow-400 text-xs">
-                                            <span>★★★★☆</span>
+                                            {% for i in "12345" %}
+                                                {% if i <= item.book.rating_average|floatformat:0 %}★{% else %}☆{% endif %}
+                                            {% endfor %}
                                         </div>
-                                        <span class="text-gray-500 text-xs">(4.2)</span>
-                                        <span class="text-green-600 text-xs">คงเหลือ 15 เล่ม</span>
+                                        <span class="text-gray-500 text-xs">({{ item.book.rating_average }})</span>
+                                        <span class="text-green-600 text-xs">คงเหลือ {{ item.book.stock }} เล่ม</span>
                                     </div>
-                                    <button class="text-sm text-red-500 hover:text-red-700 font-medium" data-remove>ลบออก</button>
+                                    <button class="text-sm text-red-500 hover:text-red-700 font-medium">ลบออก</button>
                                 </div>
                             </div>
-                            <div class="col-span-2 text-center text-gray-700 font-medium">฿350</div>
+                            <div class="col-span-2 text-center text-gray-700 font-medium">฿{{ item.price }}</div>
                             <div class="col-span-2 flex items-center justify-center gap-1">
-                                <button data-action="decrease">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
-                                    </svg>
-                                </button>
-                                <span class="w-8 text-center font-medium" data-quantity>1</span>
-                                <button data-action="increase">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                    </svg>
-                                </button>
+                                <span class="w-8 text-center font-medium">{{ item.quantity }}</span>
                             </div>
-                            <div class="col-span-2 text-right font-semibold text-gray-900">฿<span data-item-total>350</span>
+                            <div class="col-span-2 text-right font-semibold text-gray-900">฿{{ item.total_price }}
                             </div>
                         </div>
                     </div>
+                    {% endfor %}
+                    </form>
+
+                    <!-- Empty Cart State -->
+                    {% if cart %}
+                    <div class="text-center py-12">
+                        <div class="mb-6">
+                            <svg class="w-24 h-24 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17M17 13v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6M15 13v6M9 13v6" />
+                            </svg>
+                        </div>
+                        <h2 class="text-xl font-semibold text-gray-900 mb-2">ตะกร้าสินค้าว่างเปล่า</h2>
+                        <p class="text-gray-600 mb-6">เริ่มเลือกซื้อหนังสือที่คุณสนใจได้เลย</p>
+                        <a href="{% url 'book' %}" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-orange-600 hover:bg-orange-700 transition-colors">
+                            เลือกซื้อหนังสือ
+                        </a>
+                    </div>
+                    {% endif %}
 
                     <!-- Continue Shopping -->
                     <div class="p-6 border-t border-gray-200 bg-gray-50">
-                        <a href="/" class="inline-flex items-center text-orange-600 hover:text-orange-700 font-medium">
+                        <a href="{% url 'book' %}" class="inline-flex items-center text-orange-600 hover:text-orange-700 font-medium">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                             </svg>
@@ -115,8 +128,8 @@
 
                     <div class="space-y-3 mb-6">
                         <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">ยอดรวมสินค้า (<span data-item-count>1 รายการ</span>)</span>
-                            <span class="text-gray-900" data-subtotal>฿350</span>
+                            <span class="text-gray-600">ยอดรวมสินค้า ({{ total_items }} รายการ)</span>
+                            <span class="text-gray-900">฿{{ total_amount }}</span>
                         </div>
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-600">ค่าจัดส่ง</span>
@@ -125,38 +138,23 @@
                         <div class="border-t border-gray-200 pt-3">
                             <div class="flex justify-between">
                                 <span class="font-semibold text-gray-900">ยอดรวมทั้งหมด</span>
-                                <span class="font-semibold text-lg text-orange-600" data-total>฿350</span>
+                                <span class="font-semibold text-lg text-orange-600">฿{{ total_amount }}</span>
                             </div>
                         </div>
                     </div>
 
-                    <button class="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors mb-3">
-                        <a href="/payment">ดำเนินการชำระเงิน</a>
-                    </button>
-
+                    {% if cart %}
+                    <a href="{% url 'payment' user=user.id %}">
+                        <button class="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors mb-3">
+                            ดำเนินการชำระเงิน
+                        </button>
+                    </a>
                     <p class="text-xs text-gray-500 text-center">
                         การสั่งซื้อของคุณจะได้รับความคุ้มครองโดย BookHub
                     </p>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </main>
-
-    <!-- Empty Cart State (Hidden by default) -->
-    <div id="empty-cart" class="hidden max-w-md mx-auto text-center py-12">
-        <div class="mb-6">
-            <svg class="w-24 h-24 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17M17 13v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6M15 13v6M9 13v6" />
-            </svg>
-        </div>
-        <h2 class="text-xl font-semibold text-gray-900 mb-2">ตะกร้าสินค้าว่างเปล่า</h2>
-        <p class="text-gray-600 mb-6">เริ่มเลือกซื้อหนังสือที่คุณสนใจได้เลย</p>
-        <a href="/" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-orange-600 hover:bg-orange-700 transition-colors">
-            เลือกซื้อหนังสือ
-        </a>
-    </div>
-{% endblock %}
-
-{% block script2 %}
-    <script src="../../static/script/cart.js"></script>
 {% endblock %}

@@ -236,6 +236,7 @@
 
                         <!-- Submit Button -->
                         <div class="text-center">
+                            <a href="{% url 'home' %}">
                             <button type="submit" class="w-full md:w-auto px-8 py-3 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" id="submit-payment" disabled>
                                 <span class="inline-flex items-center">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -244,13 +245,14 @@
                                     ยืนยันการชำระเงิน
                                 </span>
                             </button>
+                            </a>
                         </div>
                     </form>
                 </div>
 
                 <!-- Back to Cart -->
                 <div class="mt-6">
-                    <a href="/cart" class="inline-flex items-center text-orange-600 hover:text-orange-700 font-medium">
+                    <a href="/cart/11" class="inline-flex items-center text-orange-600 hover:text-orange-700 font-medium">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                         </svg>
@@ -321,9 +323,11 @@
                         </div>
 
                         <!-- Cancel Order -->
+                        <a href="{% url 'home' %}">
                         <button data-cancel-order class="w-full border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium py-3 px-6 rounded-lg transition-colors mb-3">
                             ยกเลิกการสั่งซื้อ
                         </button>
+                        </a>
 
                         <p class="text-xs text-gray-500 text-center">
                             หากมีปัญหาในการชำระเงิน กรุณาติดต่อ BookHub
@@ -336,5 +340,5 @@
 {% endblock %}
 
 {% block script2 %}
-    <script src="../../static/payment.js"></script>
+    <script src="../../static/script/payment.js"></script>
 {% endblock %}
