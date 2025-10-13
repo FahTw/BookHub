@@ -1,44 +1,48 @@
-let currentOrderId = null;
-let sortColumn = null;
-let sortDirection = 'asc';
-
 document.addEventListener('DOMContentLoaded', function () {
-    // Search functionality
+    // Get search input and status select elements
     const searchInput = document.getElementById('searchInput');
     const statusFilter = document.getElementById('statusFilter');
-    const dateFilter = document.getElementById('dateFilter');
 
+    // Add event listener for search input
     if (searchInput) {
-        searchInput.addEventListener('input', filterOrders);
-    }
-    if (statusFilter) {
-        statusFilter.addEventListener('change', filterOrders);
-    }
-    if (dateFilter) {
-        dateFilter.addEventListener('change', filterOrders);
+        searchInput.addEventListener('input', function () {
+            const searchTerm = this.value.toLowerCase();
+            const selectedStatus = statusFilter ? statusFilter.value : '';
+            filterOrders(searchTerm, selectedStatus);
+        });
     }
 
-    // Initialize
-    updatePaginationInfo();
+    // Add event listener for status filter
+    if (statusFilter) {
+        statusFilter.addEventListener('change', function () {
+            const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+            const selectedStatus = this.value;
+            filterOrders(searchTerm, selectedStatus);
+        });
+    }
 });
 
-function filterOrders() {
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-    const statusFilter = document.getElementById('statusFilter').value;
-    const dateFilter = document.getElementById('dateFilter').value;
-
+function filterOrders(searchTerm, statusFilter) {
     const rows = document.querySelectorAll('#ordersTableBody tr');
     let visibleCount = 0;
 
     rows.forEach(row => {
-        const orderText = row.textContent.toLowerCase();
+        // Get order data from data attributes
+        const bookTitle = row.dataset.bookTitle ? row.dataset.bookTitle.toLowerCase() : '';
+        const customerName = row.dataset.customerName ? row.dataset.customerName.toLowerCase() : '';
+        const orderId = row.dataset.orderId ? row.dataset.orderId.toLowerCase() : '';
         const orderStatus = row.dataset.status;
 
-        const matchesSearch = !searchTerm || orderText.includes(searchTerm);
-        const matchesStatus = !statusFilter || orderStatus === statusFilter;
-        const matchesDate = !dateFilter || checkDateFilter(row, dateFilter);
+        // Check if order matches search term (search in book title, customer name, or order ID)
+        const matchesSearch = !searchTerm || 
+            bookTitle.includes(searchTerm) || 
+            customerName.includes(searchTerm) || 
+            orderId.includes(searchTerm);
 
-        if (matchesSearch && matchesStatus && matchesDate) {
+        // Check if order matches status filter
+        const matchesStatus = !statusFilter || orderStatus === statusFilter;
+
+        if (matchesSearch && matchesStatus) {
             row.style.display = '';
             visibleCount++;
         } else {
@@ -47,103 +51,32 @@ function filterOrders() {
     });
 
     // Show/hide empty state
-    const emptyState = document.getElementById('emptyState');
     const ordersTable = document.querySelector('.bg-white.rounded-lg.shadow-sm.overflow-hidden.border');
+    const emptyState = document.querySelector('.bg-white.rounded-lg.shadow-sm.p-12.text-center');
 
-    if (visibleCount === 0) {
-        emptyState.classList.remove('hidden');
-        ordersTable.style.display = 'none';
-    } else {
-        emptyState.classList.add('hidden');
-        ordersTable.style.display = 'block';
-    }
-
-    updatePaginationInfo(visibleCount);
-}
-
-function checkDateFilter(row, filter) {
-    // Implement date filtering logic based on the filter value
-    return true; // Simplified for now
-}
-
-function sortTable(column) {
-    // Implement sorting functionality
-    console.log('Sorting by:', column);
-}
-
-function viewOrder(orderId) {
-    // Redirect to order detail page
-    window.location.href = `/orderhistorydetail?id=${orderId}`;
-}
-
-function updateStatus(orderId) {
-    currentOrderId = orderId;
-    document.getElementById('modalOrderId').textContent = orderId;
-    document.getElementById('statusModal').classList.remove('hidden');
-}
-
-function closeStatusModal() {
-    document.getElementById('statusModal').classList.add('hidden');
-    currentOrderId = null;
-}
-
-function saveStatusUpdate() {
-    const newStatus = document.getElementById('newStatus').value;
-    const note = document.getElementById('statusNote').value;
-
-    // Here you would normally send the update to the server
-    console.log('Updating order', currentOrderId, 'to status:', newStatus, 'with note:', note);
-
-    // Update the UI
-    const row = document.querySelector(`tr[data-order-id="${currentOrderId}"]`);
-    if (row) {
-        row.dataset.status = newStatus;
-        const statusCell = row.querySelector('.px-2.inline-flex');
-        if (statusCell) {
-            statusCell.className = `px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClasses(newStatus)}`;
-            statusCell.textContent = getStatusText(newStatus);
+    if (visibleCount === 0 && (searchTerm || statusFilter)) {
+        // Show "no results found" state when filtering but no matches
+        if (ordersTable) ordersTable.style.display = 'none';
+        if (emptyState) {
+            emptyState.style.display = 'block';
+            const heading = emptyState.querySelector('h2');
+            const description = emptyState.querySelector('p');
+            if (heading) heading.textContent = 'ไม่พบผลลัพธ์ที่ค้นหา';
+            if (description) description.textContent = 'ลองค้นหาด้วยชื่อหนังสือ ชื่อลูกค้า หมายเลขคำสั่งซื้อ หรือสถานะที่แตกต่างกัน';
         }
-    }
-
-    alert('อัปเดตสถานะเรียบร้อยแล้ว');
-    closeStatusModal();
-}
-
-function getStatusClasses(status) {
-    const classes = {
-        'pending': 'bg-yellow-100 text-yellow-800',
-        'processing': 'bg-blue-100 text-blue-800',
-        'shipped': 'bg-orange-100 text-orange-800',
-        'delivered': 'bg-green-100 text-green-800',
-        'cancelled': 'bg-red-100 text-red-800'
-    };
-    return classes[status] || 'bg-gray-100 text-gray-800';
-}
-
-function getStatusText(status) {
-    const texts = {
-        'pending': 'รอดำเนินการ',
-        'processing': 'กำลังประมวลผล',
-        'shipped': 'กำลังจัดส่ง',
-        'delivered': 'จัดส่งสำเร็จ',
-        'cancelled': 'ยกเลิกแล้ว'
-    };
-    return texts[status] || 'ไม่ทราบสถานะ';
-}
-
-function clearFilters() {
-    document.getElementById('searchInput').value = '';
-    document.getElementById('statusFilter').value = '';
-    document.getElementById('dateFilter').value = '';
-    filterOrders();
-}
-
-function updatePaginationInfo(visibleCount = null) {
-    const totalItems = document.getElementById('totalItems');
-    const currentRange = document.getElementById('currentRange');
-
-    if (visibleCount !== null) {
-        totalItems.textContent = visibleCount;
-        currentRange.textContent = visibleCount > 0 ? `1-${Math.min(5, visibleCount)}` : '0-0';
+    } else if (visibleCount > 0) {
+        // Show table when there are visible orders
+        if (ordersTable) ordersTable.style.display = 'block';
+        if (emptyState) emptyState.style.display = 'none';
+    } else if (visibleCount === 0 && !searchTerm && !statusFilter) {
+        // Show original empty state when no orders exist (no filters applied)
+        if (ordersTable) ordersTable.style.display = 'none';
+        if (emptyState) {
+            emptyState.style.display = 'block';
+            const heading = emptyState.querySelector('h2');
+            const description = emptyState.querySelector('p');
+            if (heading) heading.textContent = 'ยังไม่มีคำสั่งซื้อ';
+            if (description) description.textContent = 'เมื่อมีลูกค้าสั่งซื้อหนังสือ คำสั่งซื้อจะแสดงที่นี่';
+        }
     }
 }

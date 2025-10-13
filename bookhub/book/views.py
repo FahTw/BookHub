@@ -336,9 +336,18 @@ class OrderHistoryOwnerView(View, LoginRequiredMixin):
                 Q(user__email__icontains=search_query)
             )
         
+        # Calculate statistics for cards
+        total_orders = Order.objects.count()
+        pending_orders = Order.objects.filter(status__in=['unpaid', 'paid']).count()
+        shipping_orders = Order.objects.filter(status__in=['processing', 'shipped']).count()
+        completed_orders = Order.objects.filter(status='delivered').count()
+        
         context = {
             'orders': orders,
-            'total_orders': orders.count(),
+            'total_orders': total_orders,
+            'pending_orders': pending_orders,
+            'shipping_orders': shipping_orders,
+            'completed_orders': completed_orders,
             'status_filter': status_filter,
             'search_query': search_query,
         }
@@ -370,30 +379,24 @@ class OrderHistoryOwnerDetailView(View, LoginRequiredMixin):
     def post(self, request, order):
         try:
             order_obj = Order.objects.get(id=order)
-            action = request.POST.get('action')
+            new_status = request.POST.get('status')
             
-            # Update order status
-            if action == 'update_status':
-                new_status = request.POST.get('status')
-                if new_status in dict(Order.orderstatus.choices):
-                    order_obj.status = new_status
-                    order_obj.save()
-            
-            # Update payment status
-            elif action == 'update_payment':
-                payment_status = request.POST.get('payment_status')
-                try:
-                    payment = Payment.objects.get(order=order_obj)
-                    if payment_status in dict(Payment.paymentstatus.choices):
-                        payment.status = payment_status
-                        if payment_status == 'approved':
-                            payment.verified_date = datetime.now()
-                            order_obj.status = 'paid'
-                            order_obj.save()
+            # Update order status directly from form
+            if new_status in ['unpaid', 'paid', 'processing', 'shipped', 'delivered', 'cancelled']:
+                order_obj.status = new_status
+                order_obj.save()
+                
+                # Also update payment status if changing to paid
+                if new_status == 'paid':
+                    try:
+                        payment = Payment.objects.get(order=order_obj)
+                        payment.status = 'approved'
+                        payment.verified_date = datetime.now()
                         payment.save()
-                except Payment.DoesNotExist:
-                    pass
+                    except Payment.DoesNotExist:
+                        pass
             
-            return redirect('order_history_owner_detail', order=order)
+            # Redirect back to order list after update
+            return redirect('order_history_owner')
         except Order.DoesNotExist:
             return redirect('order_history_owner')
