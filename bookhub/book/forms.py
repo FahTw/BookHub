@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 class UserRegistrationForm(UserCreationForm):
     class Meta:
         model = CustomUser
-        fields = ['username', 'first_name', 'last_name', 'email', 'password', 'phone', 'address', 'province', 'postal_code']
+        fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2', 'phone', 'address', 'province', 'postal_code']
         widgets = {"address": forms.Textarea(attrs={'rows': 3})}
 
     def clean(self):
@@ -22,13 +22,13 @@ class UserRegistrationForm(UserCreationForm):
 class UserProfileForm(ModelForm):
     class Meta:
         model = CustomUser
-        fields = ['username', 'first_name', 'last_name', 'email', 'phone', 'address', 'province', 'postal_code']
-
+        fields = ['first_name', 'last_name', 'email', 'address', 'phone', 'province', 'postal_code']
     def clean(self):
         cleaned_data = super().clean()
         email = cleaned_data.get("email")
+        user_id = self.instance.id
 
-        if CustomUser.objects.filter(email=email).exists():
+        if CustomUser.objects.filter(email=email).exclude(id=user_id).exists():
             raise ValidationError("อีเมลถูกใช้งานแล้ว กรุณาใช้อีเมลอื่น")
 
         return cleaned_data

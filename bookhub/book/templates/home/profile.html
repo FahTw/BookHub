@@ -12,37 +12,55 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Firstname -->
                 <div>
-                    <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium mb-2">
                         Firstname
                     </label>
-                    {{ form.first_name }}
+                    <div class="border rounded-lg p-2">
+                        {{ form.first_name }}
+                    </div>
                 </div>
 
                 <!-- Lastname -->
                 <div>
-                    <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium mb-2">
                         Lastname
                     </label>
-                    {{ form.last_name }}
+                    <div class="border rounded-lg p-2">
+                        {{ form.last_name }}
+                    </div>
                 </div>
             </div>
 
-            <!-- Email Field -->
-            <div>
-                <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                    Email
-                </label>
-                {{ form.email }}
+            <!-- Email Phone Field -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium mb-2">
+                        Email
+                    </label>
+                    <div class="border rounded-lg p-2">
+                        {{ form.email }}
+                    </div>
+                </div>
+                <div>
+                    <label for="{{ form.phone.id_for_label }}" class="block text-sm font-medium mb-2">
+                        Phone
+                    </label>
+                    <div class="border rounded-lg p-2">
+                        {{ form.phone }}
+                    </div>
+                </div>
+
             </div>
 
             <!-- Address Field -->
             <div>
-                <label for="{{ form.address.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                <label for="{{ form.address.id_for_label }}" class="block text-sm font-medium mb-2">
                     Address
                 </label>
-                {{ form.address }}
+                <div class="border rounded-lg p-2">
+                    {{ form.address }}
+                </div>
             </div>
-
             <!-- Submit Button -->
             <div class="flex justify-end">
                 <button type="submit"
