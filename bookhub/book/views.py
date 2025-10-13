@@ -104,19 +104,19 @@ class CartView(View):
     def get(self, request, user):
         try:
             user = CustomUser.objects.get(id=user)
-            CartFormSet = modelformset_factory(Cart, form=CartForm)
-            cart = CartFormSet(Cart.objects.filter(user=user, status='in_cart').select_related('book'))
-            
+            cart = Cart.objects.filter(user=user, status='in_cart').select_related('book')
+            CartFormSet = modelformset_factory(Cart, form=CartForm(), extra=0)
+            cartform = CartFormSet(queryset=cart)
+
             # Calculate totals
             total_amount = sum(item.total_price for item in cart)
             total_items = sum(item.quantity for item in cart)
 
             context = {
-                "cart": cart,
                 "user": user,
                 "total_amount": total_amount,
                 "total_items": total_items,
-                "cart_form": CartForm(),
+                "cartform": cartform,
             }
             return render(request, "payment/cart.html", context)
         except CustomUser.DoesNotExist:
