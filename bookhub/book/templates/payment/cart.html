@@ -1,11 +1,11 @@
-<!DOCTYPE html>
-<html lang="th">
+{% extends "../base_user.html" %}
+{% load static %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ตะกร้าสินค้า</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+{% block title %}
+ตะกร้าสินค้า
+{% endblock %}
+
+{% block script1 %}
     <script>
         tailwind.config = {
             theme: {
@@ -28,52 +28,9 @@
             }
         }
     </script>
-</head>
+{% endblock %}
 
-<body class="bg-gray-50">
-
-    <header class="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 py-4 lg:py-0 lg:h-16">
-                <!-- Logo and Navigation -->
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-4 lg:gap-8">
-                        <a href="/" class="text-2xl font-bold text-orange-600 hover:text-orange-700 transition-colors">BookHub</a>
-                        <nav class="hidden sm:block">
-                            <a href="#" class="text-gray-700 hover:text-gray-900 font-medium">หมวดหมู่หนังสือ</a>
-                        </nav>
-                    </div>
-                </div>
-
-                <!-- Search Bar -->
-                <div class="flex-1 max-w-md lg:max-w-2xl lg:mx-8">
-                    <div class="relative">
-                        <input type="search" placeholder="ค้นหาหนังสือ..." class="w-full px-4 py-2 pl-12 border-2 border-gray-300 rounded-full focus:outline-none focus:border-orange-600 focus:ring-2 focus:ring-orange-100 transition-all" />
-                        <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                    </div>
-                </div>
-
-                <!-- User Actions -->
-                <div class="flex items-center justify-end gap-4 lg:gap-6">
-                    <a href="/cart" class="relative p-2 text-gray-700 hover:text-orange-600 transition-colors">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" />
-                        </svg>
-                        <span class="absolute -top-1 -right-1 bg-orange-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">1</span>
-                    </a>
-                    <button class="p-2 text-gray-700 hover:text-orange-600 transition-colors">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </header>
-
-
+{% block content %}
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-12">
         <!-- Page Header -->
         <div class="mb-8">
@@ -198,99 +155,8 @@
             เลือกซื้อหนังสือ
         </a>
     </div>
+{% endblock %}
 
-    <script>
-        // Quantity controls
-        document.addEventListener('DOMContentLoaded', function () {
-            // Quantity increase/decrease functionality
-            const quantityControls = document.querySelectorAll('[data-action]');
-
-            quantityControls.forEach(button => {
-                button.addEventListener('click', function () {
-                    const action = this.dataset.action;
-                    const quantitySpan = action === 'increase' ?
-                        this.previousElementSibling :
-                        this.nextElementSibling;
-
-                    let currentQuantity = parseInt(quantitySpan.textContent);
-
-                    if (action === 'increase') {
-                        currentQuantity++;
-                    } else if (action === 'decrease' && currentQuantity > 1) {
-                        currentQuantity--;
-                    }
-
-                    quantitySpan.textContent = currentQuantity;
-                    updateTotal();
-                });
-            });
-
-            // Remove item functionality
-            const removeButtons = document.querySelectorAll('[data-remove]');
-            removeButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    if (confirm('คุณต้องการลบสินค้านี้ออกจากตะกร้าหรือไม่?')) {
-                        this.closest('.cart-item').remove();
-                        updateTotal();
-                        checkEmptyCart();
-                    }
-                });
-            });
-
-            // Select all checkbox functionality
-            const selectAllCheckbox = document.querySelector('#select-all');
-            const itemCheckboxes = document.querySelectorAll('.item-checkbox');
-
-            if (selectAllCheckbox) {
-                selectAllCheckbox.addEventListener('change', function () {
-                    itemCheckboxes.forEach(checkbox => {
-                        checkbox.checked = this.checked;
-                    });
-                    updateTotal();
-                });
-            }
-
-            itemCheckboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', updateTotal);
-            });
-
-            function updateTotal() {
-                let total = 0;
-                let itemCount = 0;
-
-                itemCheckboxes.forEach(checkbox => {
-                    if (checkbox.checked) {
-                        const price = parseFloat(checkbox.closest('.cart-item').dataset.price || 350);
-                        const quantity = parseInt(checkbox.closest('.cart-item').querySelector('[data-quantity]')?.textContent || 1);
-                        total += price * quantity;
-                        itemCount += quantity;
-                    }
-                });
-
-                // Update summary
-                const subtotalElement = document.querySelector('[data-subtotal]');
-                const totalElement = document.querySelector('[data-total]');
-                const itemCountElement = document.querySelector('[data-item-count]');
-                const dataItemTotal = document.querySelector('[data-item-total]');
-
-                if (subtotalElement) subtotalElement.textContent = `฿${total}`;
-                if (totalElement) totalElement.textContent = `฿${total}`;
-                if (itemCountElement) itemCountElement.textContent = `${itemCount} รายการ`;
-                if (dataItemTotal) dataItemTotal.textContent = `${total}`;
-            }
-
-            function checkEmptyCart() {
-                const cartItems = document.querySelectorAll('.cart-item');
-                const emptyCartState = document.getElementById('empty-cart');
-                const cartContent = document.querySelector('main');
-
-                if (cartItems.length === 0) {
-                    cartContent.classList.add('hidden');
-                    emptyCartState.classList.remove('hidden');
-                }
-            }
-        });
-    </script>
-</body>
-
-</html>
+{% block script2 %}
+    <script src="../../static/script/cart.js"></script>
+{% endblock %}

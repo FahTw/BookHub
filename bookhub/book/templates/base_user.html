@@ -10,6 +10,10 @@
         {% endblock %}
     </title>
     <script src="https://cdn.tailwindcss.com"></script>
+    {% block script1 %}
+    {% endblock %}
+    {% block sytle %}
+    {% endblock %}
 </head>
 
 <body>
@@ -20,8 +24,7 @@
 
     {% include 'footer.html' %}
 
-    {% block script %}
-    <script src="/"></script>
+    {% block script2 %}
     {% endblock %}
 </body>
 
