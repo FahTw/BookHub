@@ -1,11 +1,11 @@
-<!DOCTYPE html>
-<html lang="th">
+{% extends "../base_user.html" %}
+{% load static %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ชำระเงิน</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+{% block title %}
+ชำระเงิน
+{% endblock %}
+
+{% block script1 %}
     <script>
         tailwind.config = {
             theme: {
@@ -28,6 +28,9 @@
             }
         }
     </script>
+{% endblock %}
+
+{% block sytle %}
     <style>
         .payment-method-card.active {
             border-color: #ea580c !important;
@@ -68,50 +71,9 @@
             border: 0;
         }
     </style>
-</head>
+{% endblock %}
 
-<body class="bg-gray-50">
-    <header class="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 py-4 lg:py-0 lg:h-16">
-                <!-- Logo and Navigation -->
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-4 lg:gap-8">
-                        <a href="/" class="text-2xl font-bold text-orange-600 hover:text-orange-700 transition-colors">BookHub</a>
-                        <nav class="hidden sm:block">
-                            <a href="#" class="text-gray-700 hover:text-gray-900 font-medium">หมวดหมู่หนังสือ</a>
-                        </nav>
-                    </div>
-                </div>
-
-                <!-- Search Bar -->
-                <div class="flex-1 max-w-md lg:max-w-2xl lg:mx-8">
-                    <div class="relative">
-                        <input type="search" placeholder="ค้นหาหนังสือ..." class="w-full px-4 py-2 pl-12 border-2 border-gray-300 rounded-full focus:outline-none focus:border-orange-600 focus:ring-2 focus:ring-orange-100 transition-all" />
-                        <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                    </div>
-                </div>
-
-                <!-- User Actions -->
-                <div class="flex items-center justify-end gap-4 lg:gap-6">
-                    <a href="/cart" class="relative p-2 text-gray-700 hover:text-orange-600 transition-colors">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" />
-                        </svg>
-                        <span class="absolute -top-1 -right-1 bg-orange-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">1</span>
-                    </a>
-                    <button class="p-2 text-gray-700 hover:text-orange-600 transition-colors">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </header>
-
+{% block content %}
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-12">
         <!-- Page Header -->
         <div class="mb-8">
@@ -371,218 +333,8 @@
             </div>
         </div>
     </main>
+{% endblock %}
 
-    <script>
-        let selectedFile = null;
-
-        document.addEventListener('DOMContentLoaded', function () {
-            // Payment method selection
-            const paymentRadios = document.querySelectorAll('.payment-method-radio');
-            const paymentSections = document.querySelectorAll('.payment-section');
-            
-            paymentRadios.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    // Update card styling
-                    document.querySelectorAll('.payment-method-card').forEach(card => {
-                        card.classList.remove('active');
-                        card.classList.remove('border-orange-500');
-                        card.classList.add('border-gray-200');
-                    });
-                    
-                    const selectedCard = this.closest('.payment-method-option').querySelector('.payment-method-card');
-                    selectedCard.classList.add('active');
-                    selectedCard.classList.remove('border-gray-200');
-                    selectedCard.classList.add('border-orange-500');
-                    
-                    // Show/hide payment sections
-                    paymentSections.forEach(section => {
-                        section.classList.add('hidden');
-                        section.classList.remove('active');
-                    });
-                    
-                    if (this.value === 'promptpay') {
-                        document.getElementById('qr-section').classList.remove('hidden');
-                        document.getElementById('qr-section').classList.add('active');
-                        document.querySelector('.mb-8:has(#file-drop-zone)').style.display = 'block';
-                    } else if (this.value === 'bank_transfer') {
-                        document.getElementById('bank-transfer-section').classList.remove('hidden');
-                        document.getElementById('bank-transfer-section').classList.add('active');
-                        document.querySelector('.mb-8:has(#file-drop-zone)').style.display = 'block';
-                    } else if (this.value === 'cash_on_delivery') {
-                        // Hide file upload section for cash on delivery
-                        document.querySelector('.mb-8:has(#file-drop-zone)').style.display = 'none';
-                    }
-
-                    updateSubmitButton();
-                });
-            });
-
-            // File drop zone
-            const dropZone = document.getElementById('file-drop-zone');
-            
-            dropZone.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                this.classList.add('border-orange-400', 'bg-orange-50');
-            });
-            
-            dropZone.addEventListener('dragleave', function(e) {
-                e.preventDefault();
-                this.classList.remove('border-orange-400', 'bg-orange-50');
-            });
-            
-            dropZone.addEventListener('drop', function(e) {
-                e.preventDefault();
-                this.classList.remove('border-orange-400', 'bg-orange-50');
-                
-                const files = e.dataTransfer.files;
-                if (files.length > 0) {
-                    handleFileSelect({ files: files });
-                }
-            });
-
-            // Form submission
-            document.getElementById('paymentForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const selectedMethod = document.querySelector('.payment-method-radio:checked');
-                
-                // Check if file is required (not required for cash_on_delivery)
-                if (selectedMethod.value !== 'cash_on_delivery' && !selectedFile) {
-                    showError('กรุณาอัพโหลดหลักฐานการชำระเงิน');
-                    return;
-                }
-                
-                // Simulate form submission
-                const submitButton = document.getElementById('submit-payment');
-                const originalText = submitButton.innerHTML;
-                
-                submitButton.disabled = true;
-                submitButton.innerHTML = `
-                    <span class="inline-flex items-center">
-                        <svg class="animate-spin w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        กำลังประมวลผล...
-                    </span>
-                `;
-                
-                setTimeout(() => {
-                    alert('ชำระเงินสำเร็จ! เราจะตรวจสอบการชำระเงินและยืนยันคำสั่งซื้อในไม่ช้า');
-                    window.location.href = '/order-confirmation';
-                }, 2000);
-            });
-
-            // Cancel order
-            const cancelButton = document.querySelector('[data-cancel-order]');
-            if (cancelButton) {
-                cancelButton.addEventListener('click', function () {
-                    if (confirm('คุณต้องการยกเลิกการสั่งซื้อนี้หรือไม่?')) {
-                        window.location.href = '/cart';
-                    }
-                });
-            }
-        });
-
-        function handleFileSelect(input) {
-            const file = input.files[0];
-            if (!file) return;
-            
-            // Validate file
-            const maxSize = 5 * 1024 * 1024; // 5MB
-            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
-            
-            if (file.size > maxSize) {
-                showError('ขนาดไฟล์ต้องไม่เกิน 5MB');
-                return;
-            }
-            
-            if (!allowedTypes.includes(file.type)) {
-                showError('รองรับเฉพาะไฟล์ JPG, PNG, และ PDF เท่านั้น');
-                return;
-            }
-            
-            selectedFile = file;
-            showFilePreview(file);
-            hideError();
-            updateSubmitButton();
-        }
-
-        function showFilePreview(file) {
-            const placeholder = document.getElementById('upload-placeholder');
-            const preview = document.getElementById('file-preview');
-            const previewContent = document.getElementById('preview-content');
-            const fileName = document.getElementById('file-name');
-            const fileSize = document.getElementById('file-size');
-            
-            placeholder.classList.add('hidden');
-            preview.classList.remove('hidden');
-            
-            fileName.textContent = file.name;
-            fileSize.textContent = formatFileSize(file.size);
-            
-            if (file.type.startsWith('image/')) {
-                const img = document.createElement('img');
-                img.className = 'w-20 h-20 object-cover rounded-lg border';
-                img.src = URL.createObjectURL(file);
-                previewContent.innerHTML = '';
-                previewContent.appendChild(img);
-            } else {
-                previewContent.innerHTML = `
-                    <div class="w-20 h-20 bg-red-100 rounded-lg border flex items-center justify-center">
-                        <svg class="w-8 h-8 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                `;
-            }
-        }
-
-        function removeFile() {
-            selectedFile = null;
-            document.getElementById('payment-proof').value = '';
-            document.getElementById('upload-placeholder').classList.remove('hidden');
-            document.getElementById('file-preview').classList.add('hidden');
-            hideError();
-            updateSubmitButton();
-        }
-
-        function showError(message) {
-            const errorDiv = document.getElementById('upload-errors');
-            errorDiv.textContent = message;
-            errorDiv.classList.remove('hidden');
-        }
-
-        function hideError() {
-            document.getElementById('upload-errors').classList.add('hidden');
-        }
-
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        function updateSubmitButton() {
-            const submitButton = document.getElementById('submit-payment');
-            const hasFile = selectedFile !== null;
-            const selectedMethod = document.querySelector('.payment-method-radio:checked');
-            
-            // For cash on delivery, no file upload is required
-            if (selectedMethod && selectedMethod.value === 'cash_on_delivery') {
-                submitButton.disabled = false;
-                submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
-            } else if (hasFile && selectedMethod) {
-                submitButton.disabled = false;
-                submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
-            } else {
-                submitButton.disabled = true;
-                submitButton.classList.add('opacity-50', 'cursor-not-allowed');
-            }
-        }
-    </script>
-</body>
-
-</html>
+{% block script2 %}
+    <script src="../../static/payment.js"></script>
+{% endblock %}
