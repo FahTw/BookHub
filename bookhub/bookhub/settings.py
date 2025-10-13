@@ -79,7 +79,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'bookhub',
         'USER': 'postgres',
-        'PASSWORD': 'fahnoipost',
+        'PASSWORD': '1234',
         'HOST': 'localhost',
         'PORT': '5432',
     }

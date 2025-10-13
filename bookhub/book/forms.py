@@ -1,179 +1,114 @@
 from django import forms
+from django.forms import ModelForm
 from .models import *
-from django.contrib.auth.models import User
-from django.contrib.auth.forms import AuthenticationForm
-from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import UserCreationForm
-class CustomUserCreationForm(UserCreationForm):
+from django.core.exceptions import ValidationError
+ 
+class UserRegistrationForm(UserCreationForm):
+    phone = forms.CharField(max_length=20, required=False)
+    address = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 3}))
+    province = forms.CharField(max_length=100, required=False)
+    postal_code = forms.CharField(max_length=10, required=False)
+
     class Meta:
         model = CustomUser
-        fields = [
-            'username', 'first_name', 'last_name', 'email', 'phone', 
-            'address', 'province', 'postal_code', 'password1', 'password2'
-        ]
+        fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2', 'phone', 'address', 'province', 'postal_code']
+        widgets = {"address": forms.Textarea(attrs={'rows': 3})}
 
-    def clean_email(self):
-        email = self.cleaned_data.get('email')
+    def clean(self):
+        cleaned_data = super().clean()
+        email = cleaned_data.get("email")
+
         if CustomUser.objects.filter(email=email).exists():
             raise ValidationError("อีเมลถูกใช้งานแล้ว กรุณาใช้อีเมลอื่น")
-        return email
 
+        return cleaned_data
 
-# class RegisterForm(forms.ModelForm):
-#     confirm_password = forms.CharField()
-#     class Meta:
-#         model = User
-#         fields = [
-#             'first_name', 
-#             'last_name', 
-#             'email', 
-#             'password',
-#         ]
-#     def clean(self):
-#         cleaned_data = super().clean()
-#         email = cleaned_data.get('email')
-#         password = cleaned_data.get('password')
-#         confirm_password = cleaned_data.get('confirm_password')
-#         if User.objects.filter(email=email).exists():
-#             raise ValidationError(
-#                 "Email นี้ถูกใช้งานแล้ว กรุณาใช้อีเมลอื่น"
-#             )
-#         if confirm_password != password:
-#             raise ValidationError(
-#                 "รหัสผ่านไม่ตรงกัน กรุณากรอกใหม่"
-#             )
-#         return cleaned_data
-
-class ProfileForm(forms.ModelForm):
+class UserProfileForm(ModelForm):
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name', 'email', 'address']
-        widgets = {
-            'first_name': forms.TextInput(attrs={'class': 'form-input'}),
-            'last_name': forms.TextInput(attrs={'class': 'form-input'}),
-            'email': forms.EmailInput(attrs={'class': 'form-input'}),
-            'address': forms.Textarea(attrs={'class': 'form-textarea', 'rows': 4}),
-        }
+        fields = ['username', 'first_name', 'last_name', 'email', 'phone', 'address', 'province', 'postal_code']
 
-    def clean_email(self):
-        email = self.cleaned_data.get('email')
-        if CustomUser.objects.exclude(pk=self.instance.pk).filter(email=email).exists():
-            raise ValidationError("This email is already in use.")
-        return email
+    def clean(self):
+        cleaned_data = super().clean()
+        email = cleaned_data.get("email")
 
-class ReviewForm(forms.ModelForm):
+        if CustomUser.objects.filter(email=email).exists():
+            raise ValidationError("อีเมลถูกใช้งานแล้ว กรุณาใช้อีเมลอื่น")
+
+        return cleaned_data
+
+class CartForm(ModelForm):
     class Meta:
-        model = Review
-        fields = ['comment', 'rating', 'user']
-        widgets = {
-            'comment': forms.Textarea(attrs={'class': 'form-textarea', 'rows': 4}),
-            'rating': forms.NumberInput(attrs={'class': 'form-input', 'min': 1, 'max': 5}),
-        }
+        model = Cart
+        fields = ['user', 'book', 'quantity', 'price', 'total_price', 'status']
 
-class PaymentForm(forms.ModelForm):
-    class Meta:
-        model = Payment
-        fields = ['method', 'amount', 'image']
+    def clean(self):
+        cleaned_data = super().clean()
+        quantity = cleaned_data.get("quantity")
         
-    method = forms.ChoiceField(
-        choices=[
-            ('qr_code', 'QR Code Payment'),
-            ('bank_transfer', 'Bank Transfer'),
-        ],
-        widget=forms.RadioSelect(attrs={
-            'class': 'payment-method-radio'
-        }),
-        label='วิธีการชำระเงิน',
-        initial='qr_code'
-    )
-    
-    amount = forms.DecimalField(
-        widget=forms.NumberInput(attrs={
-            'class': 'w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-500',
-            'placeholder': '0.00',
-            'readonly': True
-        }),
-        label='จำนวนเงินที่ชำระ',
-        help_text='จำนวนเงินจะถูกกำหนดอัตโนมัติตามยอดสั่งซื้อ'
-    )
-    
-    image = forms.FileField(
-        widget=forms.ClearableFileInput(attrs={
-            'class': 'hidden',
-            'id': 'payment-proof',
-            'accept': 'image/*,.pdf',
-            'onchange': 'handleFileSelect(this)'
-        }),
-        label='หลักฐานการชำระเงิน',
-        help_text='อัพโหลดสลิปการโอนเงิน หรือหลักฐานการชำระเงิน (รองรับ JPG, PNG, PDF)',
-        required=False
-    )
+        if quantity and quantity <= 0:
+            raise ValidationError("จำนวนต้องมากกว่า 0")
 
-    def clean_amount(self):
-        amount = self.cleaned_data['amount']
-        if self.order and amount != self.order.total_amount:
-            raise forms.ValidationError('จำนวนเงินไม่ตรงกับยอดสั่งซื้อ')
-        return amount
+        return cleaned_data
 
-    def clean_image(self):
-        image = self.cleaned_data.get('image')
-        if image:
-            # Check file size (max 5MB)
-            if image.size > 5 * 1024 * 1024:
-                raise forms.ValidationError('ขนาดไฟล์ต้องไม่เกิน 5 MB')
-            
-            # Check file extension
-            allowed_extensions = ['.jpg', '.jpeg', '.png', '.pdf']
-            file_extension = image.name.lower().split('.')[-1]
-            if f'.{file_extension}' not in allowed_extensions:
-                raise forms.ValidationError('รองรับเฉพาะไฟล์ JPG, PNG, และ PDF เท่านั้น')
-        
-        return image
-
-class OrderForm(forms.ModelForm):
-
+class OrderForm(ModelForm):
     class Meta:
         model = Order
-        fields = ['status']
-        
-    status = forms.ChoiceField(
-        choices=[
-            ('unpaid', 'รอการชำระเงิน'),
-            ('paid', 'ชำระเงินแล้ว'),
-            ('processing', 'กำลังเตรียมสินค้า'),
-            ('shipped', 'จัดส่งแล้ว'),
-            ('delivered', 'ส่งมอบแล้ว'),
-            ('cancelled', 'ยกเลิกแล้ว'),
-        ],
-        widget=forms.Select(attrs={
-            'class': 'w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-500'
-        }),
-        label='สถานะคำสั่งซื้อ'
-    )
+        fields = ['user', 'cart', 'order_date', 'total_amount', 'status']
 
-class ManageBookForm(forms.ModelForm):
+    def clean(self):
+        cleaned_data = super().clean()
+        quantity = cleaned_data.get("quantity")
+        
+        if quantity and quantity <= 0:
+            raise ValidationError("จำนวนต้องมากกว่า 0")
+
+        return cleaned_data
+
+class PaymentForm(ModelForm):
+    class Meta:
+        model = Payment
+        fields = ['order', 'payment_slip', 'payment_date', 'method', 'amount', 'status', 'verified_date']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        payment_slip = cleaned_data.get("payment_slip")
+        method = cleaned_data.get("method")
+        amount = cleaned_data.get("amount")
+
+        # Payment slip is not required for cash on delivery
+        if method != 'cash' and not payment_slip:
+            raise ValidationError("กรุณาอัพโหลดหลักฐานการชำระเงิน")
+
+        if amount and amount <= 0:
+            raise ValidationError("จำนวนเงินต้องมากกว่า 0")
+
+        return cleaned_data
+
+class ReviewForm(ModelForm):
+    class Meta:
+        model = Review
+        fields = ['comment', 'rating']
+        widgets = {
+            'comment': forms.Textarea(attrs={'rows': 4}),
+            'rating': forms.NumberInput(attrs={'min': 1, 'max': 5}),
+        }
+
+class BookForm(ModelForm):
     class Meta:
         model = Book
-        fields = [
-            'title', 'image', 'author', 'detail', 'price', 'stock', 'categories'
-        ]
-        widgets = {
-            'title': forms.TextInput(attrs={'class': 'form-input'}),
-            'image': forms.ClearableFileInput(attrs={'class': 'form-input'}),
-            'author': forms.TextInput(attrs={'class': 'form-input'}),
-            'detail': forms.Textarea(attrs={'class': 'form-textarea', 'rows': 4}),
-            'price': forms.NumberInput(attrs={'class': 'form-input', 'step': '0.01'}),
-            'stock': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
-            'categories': forms.SelectMultiple(attrs={'class': 'form-multiselect'}),
-        }
-    def clean_price(self):     
-        price = self.cleaned_data.get('price')
-        if price <= 0:
-            raise forms.ValidationError("ราคาต้องมากกว่า 0")
-        return price
-    
-    def clean_stock(self):
-        stock = self.cleaned_data.get('stock')
-        if stock < 0:
-            raise forms.ValidationError("Stock ต้องเป็นจำนวนเต็มบวก")
-        return stock
+        fields = ["title", "image", "author", "publisher", "detail", "price", "stock"]
+
+    def clean(self):
+        cleaned_data = super().clean()
+        price = cleaned_data.get("price")
+        stock = cleaned_data.get("stock")
+
+        if price and price <= 0:
+            raise ValidationError("ราคาต้องมากกว่า 0")
+
+        if stock and stock < 0:
+            raise ValidationError("จำนวนสต็อกต้องเป็นจำนวนเต็มบวก")
+
+        return cleaned_data
