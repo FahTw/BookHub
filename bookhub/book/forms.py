@@ -33,6 +33,24 @@ class UserProfileForm(ModelForm):
 
         return cleaned_data
 
+class BookCategoryForm(ModelForm):
+    class Meta:
+        model = BookCategory
+        fields = ["category_name", "description"]
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 3}),
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        category_name = cleaned_data.get("category_name")
+
+        # Check for duplicate category name (for new categories)
+        if not self.instance.pk and BookCategory.objects.filter(category_name=category_name).exists():
+            raise ValidationError("ประเภทหนังสือนี้มีอยู่แล้ว")
+
+        return cleaned_data
+
 class CartForm(ModelForm):
     class Meta:
         model = Cart
@@ -93,7 +111,7 @@ class ReviewForm(ModelForm):
 class BookForm(ModelForm):
     class Meta:
         model = Book
-        fields = ["title", "image", "author", "publisher", "publication_date", "page", "detail", "price", "stock", "categories"]
+        fields = ["title", "image", "author", "publisher", "publication_date", "pages", "detail", "price", "stock", "categories"]
         widgets = {
             'categories': forms.CheckboxSelectMultiple(),
             'detail': forms.Textarea(attrs={'rows': 3}),
@@ -109,23 +127,5 @@ class BookForm(ModelForm):
 
         if stock and stock < 0:
             raise ValidationError("จำนวนสต็อกต้องเป็นจำนวนเต็มบวก")
-
-        return cleaned_data
-
-class BookCategoryForm(ModelForm):
-    class Meta:
-        model = BookCategory
-        fields = ["category_name", "description"]
-        widgets = {
-            'description': forms.Textarea(attrs={'rows': 3}),
-        }
-
-    def clean(self):
-        cleaned_data = super().clean()
-        category_name = cleaned_data.get("category_name")
-
-        # Check for duplicate category name (for new categories)
-        if not self.instance.pk and BookCategory.objects.filter(category_name=category_name).exists():
-            raise ValidationError("ประเภทหนังสือนี้มีอยู่แล้ว")
 
         return cleaned_data

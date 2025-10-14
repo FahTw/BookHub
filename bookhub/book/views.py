@@ -348,7 +348,15 @@ class ManageBookListView(View, LoginRequiredMixin):
         # Otherwise, handle book creation
         form = BookForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            book = form.save(commit=False)
+            # Handle additional fields not in the form
+            if request.POST.get('publication_date'):
+                book.publication_date = request.POST.get('publication_date')
+            if request.POST.get('pages'):
+                book.pages = request.POST.get('pages')
+            book.save()
+            # Save many-to-many relationships
+            form.save_m2m()
             return redirect('managelist_book')
         
         # If form is invalid, return with errors
@@ -383,7 +391,19 @@ class ManageBookView(View, LoginRequiredMixin):
         book = Book.objects.get(pk=book_id)
         form = BookForm(request.POST, request.FILES, instance=book)
         if form.is_valid():
-            form.save()
+            book = form.save(commit=False)
+            # Handle additional fields not in the form
+            if request.POST.get('publication_date'):
+                book.publication_date = request.POST.get('publication_date')
+            else:
+                book.publication_date = None
+            if request.POST.get('pages'):
+                book.pages = request.POST.get('pages')
+            else:
+                book.pages = None
+            book.save()
+            # Save many-to-many relationships
+            form.save_m2m()
             return redirect('managelist_book')
         return render(request, 'owner/edit_book.html', {'form': form, 'book': book})
 
