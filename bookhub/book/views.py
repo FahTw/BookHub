@@ -12,6 +12,7 @@ from django.db import transaction
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import logout, login
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
 from datetime import datetime
 
 class HomeView(View, LoginRequiredMixin):
@@ -281,17 +282,33 @@ class ManageBookView(View, LoginRequiredMixin):
         form = BookForm()
         books = Book.objects.all()
         return render(request, 'owner/book_manage.html', {'form': form, 'books': books})
+class CreateBookView(View, LoginRequiredMixin):
     def post(self, request):
         form = BookForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             return redirect('manage_book')
-        books = Book.objects.all()
-        return render(request, 'owner/book_manage.html', {'form': form, 'books': books})
-    def delete(self, request, book_id):
-        book = Book.objects.get(id=book_id)
+        return render(request, 'owner/book_manage.html', {'form': form})
+
+class DeleteBookView(View, LoginRequiredMixin):
+    def post(self, request, book_id):
+        # ลบหนังสือ (ปลอดภัย)
+        book = Book.objects.get(pk=book_id)
         book.delete()
         return redirect('manage_book')
+    
+class EditBookView(View, LoginRequiredMixin):
+    def get(self, request, book_id):
+        book = Book.objects.get(pk=book_id)
+        form = BookForm(instance=book)
+        return render(request, 'owner/edit_book.html', {'form': form, 'book': book})
+    def post(self, request, book_id):
+        book = Book.objects.get(pk=book_id)
+        form = BookForm(request.POST, request.FILES, instance=book)
+        if form.is_valid():
+            form.save()
+            return redirect('manage_book')
+        return render(request, 'owner/edit_book.html', {'form': form, 'book': book})
 
 class DashboardView(View, LoginRequiredMixin):
     def get(self, request):
@@ -416,3 +433,4 @@ class DeleteUserView(LoginRequiredMixin, View):
         users = CustomUser.objects.filter(pk=user_id)
         users.delete()
         return redirect('user_list')
+    

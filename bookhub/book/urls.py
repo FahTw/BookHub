@@ -22,4 +22,7 @@ urlpatterns = [
     path('managebooks/', ManageBookView.as_view(), name='manage_book'),
     path('dashboard/users/', UserListView.as_view(), name='user_list'),
     path('dashboard/users/<int:user_id>/', DeleteUserView.as_view(), name='user_delete'),
+    path('dashboard/create/', CreateBookView.as_view(), name='create_book'),
+    path('dashboard/delete/<int:book_id>/', DeleteBookView.as_view(), name='delete_book'),
+    path('dashboard/edit/<int:book_id>/', EditBookView.as_view(), name='edit_book'),
 ]
