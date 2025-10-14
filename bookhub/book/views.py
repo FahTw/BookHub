@@ -272,10 +272,11 @@ class AddToPaymentView(View):
 
         user = CustomUser.objects.get(id=user)
         cart_items = Cart.objects.filter(user=user, status='in_cart')
+        total_amount = sum(item.total_price for item in cart_items)
+
         if not cart_items.exists():
             return redirect('cart', user=user.id)
-
-        total_amount = sum(item.total_price for item in cart_items)
+        
         context = {
             "user": user,
             "cart_items": cart_items,

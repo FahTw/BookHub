@@ -52,12 +52,6 @@
                         หยิบใส่ตะกร้า
                     </button>
                 </form>
-                <form action="{% url 'add_to_payment' user.id %}" method="post">
-                    {% csrf_token %}
-                    <button type="submit"
-                        class="flex-1 max-w-xs inline-flex items-center justify-center px-6 py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition duration-150">ซื้อเลย
-                    </button>
-                </form>
             </div>
         </div>
     </div>
@@ -121,7 +115,7 @@
         const minus = document.getElementById('cart-minus');
         const quantityInput = document.querySelector('input[type="number"]');
         let quantity = parseInt(quantityInput.value);
-        
+
         plus.addEventListener('click', () => {
             quantity += 1;
             quantityInput.value = quantity;
