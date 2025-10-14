@@ -224,8 +224,7 @@ class PaymentView(
         return redirect('home')
 
 
-class OrderHistoryView(
-    View):
+class OrderHistoryView(View):
     def get(self, request, user):
         user_obj = CustomUser.objects.get(id=user)
         orders = Order.objects.filter(user=user_obj).order_by('-order_date').select_related('cart', 'cart__book')
@@ -237,8 +236,7 @@ class OrderHistoryView(
         }
         return render(request, 'home/orderhistory.html', context)
 
-class OrderHistoryDetailView(
-    View):
+class OrderHistoryDetailView(View):
     def get(self, request, user, order):
         user_obj = CustomUser.objects.get(id=user)
         order_obj = Order.objects.get(id=order, user=user_obj)
