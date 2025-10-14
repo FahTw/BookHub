@@ -1,18 +1,23 @@
 import re
+
 from urllib import request
 
 from django.shortcuts import render, redirect
 from django.views import View
-
-from .models import *
 from django.db.models import *
 from django.db.models.functions import *
-from book.forms import *
 from django.db import transaction
+from django.utils import timezone
+from datetime import timedelta
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import logout, login
+from django.contrib.auth import login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
-from datetime import datetime
+
+from .models import *
+from book.forms import *
+from datetime import datetime, timedelta
+from django.utils import timezone
+
 
 class HomeView(View, LoginRequiredMixin):
     def get(self, request):
@@ -416,3 +421,43 @@ class DeleteUserView(LoginRequiredMixin, View):
         users = CustomUser.objects.filter(pk=user_id)
         users.delete()
         return redirect('user_list')
+
+class StatView(View, LoginRequiredMixin):
+    def get(self, request):
+        # Overall statistics
+        total_books = Book.objects.count()
+        total_revenue = Order.objects.filter(status__in=['paid', 'processing', 'shipped', 'delivered']).aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+        total_orders = Order.objects.filter(status__in=['paid', 'processing', 'shipped', 'delivered']).count()
+        total_books_sold = Book.objects.aggregate(Sum('sold'))['sold__sum'] or 0
+        
+        # Top selling books
+        top_selling_books = Book.objects.all().order_by('-sold')[:10]
+        
+        # Books by category with sales
+        category_stats = BookCategory.objects.annotate(
+            total_books=Count('book'),
+            total_sold=Sum('book__sold'),
+            total_revenue=Sum(
+                Case(
+                    When(book__cart__order__status__in=['paid', 'processing', 'shipped', 'delivered'], 
+                         then=F('book__cart__total_price')),
+                    default=0,
+                    output_field=models.DecimalField()
+                )
+            )
+        ).order_by('-total_sold')
+        
+        # Low stock books (stock < 10)
+        low_stock_books = Book.objects.filter(stock__lt=10).order_by('stock')[:10]
+        
+        context = {
+            'total_books': total_books,
+            'total_revenue': total_revenue,
+            'total_orders': total_orders,
+            'total_books_sold': total_books_sold,
+            'top_selling_books': top_selling_books,
+            'category_stats': category_stats,
+            'low_stock_books': low_stock_books,
+        }
+        
+        return render(request, 'owner/stat.html', context)
