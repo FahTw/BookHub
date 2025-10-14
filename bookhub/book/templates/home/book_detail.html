@@ -38,16 +38,16 @@
                 <span class="text-3xl font-bold text-red-600">{{ book.price }} บาท</span>
 
                 <div class="flex items-center border border-gray-300 rounded-md">
-                    <button class="px-3 py-2 text-gray-600 hover:bg-gray-100 border-r">-</button>
+                    <button id="cart-minus" class="px-3 py-2 text-gray-600 hover:bg-gray-100 border-r">-</button>
                     <input type="number" value="1" min="1" class="w-12 text-center py-2 focus:outline-none" />
-                    <button class="px-3 py-2 text-gray-600 hover:bg-gray-100 border-l">+</button>
+                    <button id="cart-plus" class="px-3 py-2 text-gray-600 hover:bg-gray-100 border-l">+</button>
                 </div>
             </div>
 
             <div class="flex space-x-4 pt-2">
                 <form method="post" action="{% url 'add_to_cart' book.id %}">
                     {% csrf_token %}
-                    <button onclick="" type="submit"
+                    <button type="submit"
                         class="flex-1 max-w-xs px-6 py-3 border border-red-600 text-red-600 rounded-lg font-semibold hover:bg-red-50 transition duration-150">
                         หยิบใส่ตะกร้า
                     </button>
@@ -116,6 +116,23 @@
     </div>
 </main>
 <script>
+    function handleCart() {
+        const plus = document.getElementById('cart-plus');
+        const minus = document.getElementById('cart-minus');
+        const quantityInput = document.querySelector('input[type="number"]');
+        let quantity = parseInt(quantityInput.value);
+        
+        plus.addEventListener('click', () => {
+            quantity += 1;
+            quantityInput.value = quantity;
+        });
+        minus.addEventListener('click', () => {
+            if (quantity > 1) {
+                quantity -= 1;
+                quantityInput.value = quantity;
+            }
+        });
 
+    }
 </script>
 {% endblock %}

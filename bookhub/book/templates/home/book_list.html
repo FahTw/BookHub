@@ -22,7 +22,7 @@
             <p class="text-gray-600 mt-1">Price: ฿{{ book.price }}</p>
             <div class="mt-4 space-y-2">
                 <a href="{% url 'book_detail' book.id %}" class="block w-full text-center bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">View Details</a>
-                <form method="post" action="{% url 'cart' user.id %}" class="inline-block w-full">
+                <form method="post" action="{% url 'add_to_cart' book.id %}" class="inline-block w-full">
                     {% csrf_token %}
                     <button type="submit" class="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">เพิ่มลงตะกร้า</button>
                 </form>

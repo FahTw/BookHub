@@ -260,7 +260,7 @@
 
                     <div class="p-6">
                         <!-- Order Items -->
-                        { for item in  %}
+                        {% for item in cart_items %}
                         <div class="space-y-4 mb-6">
                             <div class="flex items-center gap-4 pb-4 border-b border-gray-100">
                                 <div class="w-16 h-20 bg-gray-200 rounded flex-shrink-0 overflow-hidden">
@@ -268,35 +268,31 @@
                                         class="w-full h-full object-cover" />
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <h3 class="font-semibold text-gray-900 mb-1 truncate">จิตวิทยาสายดาร์ก</h3>
-                                    <p class="text-sm text-gray-500 mb-1">โดย Taneaw</p>
-                                    <p class="text-sm text-gray-500">จำนวน: 1 เล่ม</p>
+                                    <h3 class="font-semibold text-gray-900 mb-1 truncate">{{ item.book.title }}</h3>
+                                    <p class="text-sm text-gray-500 mb-1">โดย {{ item.book.author }}</p>
+                                    <p class="text-sm text-gray-500">จำนวน: {{ item.quantity }} เล่ม</p>
                                 </div>
                                 <div class="text-right">
-                                    <span class="font-semibold text-gray-900">฿77</span>
+                                    <span class="font-semibold text-gray-900">฿{{ item.total_price }}</span>
                                 </div>
                             </div>
                         </div>
-                        { endfor %}
+                        {% endfor %}
 
                         <!-- Order Totals -->
                         <div class="space-y-3 mb-6">
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">ยอดรวมสินค้า</span>
-                                <span class="text-gray-900">฿127</span>
+                                <span class="text-gray-900">฿{{ total_amount }}</span>
                             </div>
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">ค่าจัดส่ง</span>
                                 <span class="text-green-600">ฟรี</span>
                             </div>
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-600">ส่วนลด</span>
-                                <span class="text-red-500">-฿50</span>
-                            </div>
                             <div class="border-t border-gray-200 pt-3">
                                 <div class="flex justify-between">
                                     <span class="font-semibold text-gray-900">ยอดรวมทั้งหมด</span>
-                                    <span class="font-semibold text-lg text-orange-600">฿77</span>
+                                    <span class="font-semibold text-lg text-orange-600">฿{{ total_amount }}</span>
                                 </div>
                             </div>
                         </div>

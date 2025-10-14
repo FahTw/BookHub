@@ -260,11 +260,10 @@ class PaymentView(View):
                 else:
                     order.status = 'paid'  # Assume paid if slip uploaded
                 order.save()
-                    
-                # Update cart status to mark as ordered
-                cart_items.update(status='notin_cart')
-
-                return redirect('home')
+            
+            # Update cart status AFTER all orders are created successfully
+            cart_items.update(status='notin_cart')
+            return redirect('home')
 
         except CustomUser.DoesNotExist:
             return redirect('login')
