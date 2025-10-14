@@ -22,6 +22,7 @@ urlpatterns = [
     path("orderhistoryowner/", OrderHistoryOwnerView.as_view(), name="order_history_owner"),
     path("orderhistoryowner/<int:order>/", OrderHistoryOwnerDetailView.as_view(), name="order_history_owner_detail"),
     path('users/', UserListView.as_view(), name='user_list'),
-    path('users/<int:user_id>/', UserView.as_view(), name='user_delete'),
+    path('users/<int:user_id>/', UserDetailView.as_view(), name='user_detail'),
+    path('users/delete/<int:user_id>/', UserView.as_view(), name='user_delete'),
     path('stat/', StatView.as_view(), name='stat'),
 ]

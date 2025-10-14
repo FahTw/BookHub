@@ -1,0 +1,185 @@
+{% extends '../base_owner.html' %}
+{% load static %}
+
+{% block title %}ข้อมูลผู้ใช้ - {{ user_detail.get_full_name|default:user_detail.username }} - BookHub{% endblock %}
+
+{% block content %}
+<!-- Main Content -->
+<main class="flex-1 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-12">
+        <!-- Back Button -->
+        <div class="mb-6">
+            <a href="{% url 'user_list' %}" class="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                กลับไปรายการผู้ใช้
+            </a>
+        </div>
+
+        <!-- Page Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">ข้อมูลผู้ใช้</h1>
+            <p class="text-gray-600">รายละเอียดและประวัติการใช้งานของผู้ใช้</p>
+        </div>
+
+        <!-- User Info Card -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+            <div class="flex items-start justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ user_detail.get_full_name|default:user_detail.username }}</h2>
+                    <p class="text-gray-600">@{{ user_detail.username }}</p>
+                </div>
+                {% if user_detail.is_staff %}
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                    ผู้ดูแลระบบ
+                </span>
+                {% else %}
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                    สมาชิก
+                </span>
+                {% endif %}
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 mb-4">ข้อมูลส่วนตัว</h3>
+                    <dl class="space-y-3">
+                        <div class="flex items-start">
+                            <dt class="w-32 text-sm font-medium text-gray-700">ID:</dt>
+                            <dd class="text-sm text-gray-900">{{ user_detail.id }}</dd>
+                        </div>
+                        <div class="flex items-start">
+                            <dt class="w-32 text-sm font-medium text-gray-700">อีเมล:</dt>
+                            <dd class="text-sm text-gray-900">{{ user_detail.email }}</dd>
+                        </div>
+                        <div class="flex items-start">
+                            <dt class="w-32 text-sm font-medium text-gray-700">เบอร์โทร:</dt>
+                            <dd class="text-sm text-gray-900">{{ user_detail.phone|default:"-" }}</dd>
+                        </div>
+                        <div class="flex items-start">
+                            <dt class="w-32 text-sm font-medium text-gray-700">สมาชิกตั้งแต่:</dt>
+                            <dd class="text-sm text-gray-900">{{ user_detail.date_joined|date:"d/m/Y H:i" }} น.</dd>
+                        </div>
+                    </dl>
+                </div>
+
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 mb-4">ที่อยู่</h3>
+                    <dl class="space-y-3">
+                        <div class="flex items-start">
+                            <dt class="w-32 text-sm font-medium text-gray-700">ที่อยู่:</dt>
+                            <dd class="text-sm text-gray-900">{{ user_detail.address|default:"-" }}</dd>
+                        </div>
+                        <div class="flex items-start">
+                            <dt class="w-32 text-sm font-medium text-gray-700">จังหวัด:</dt>
+                            <dd class="text-sm text-gray-900">{{ user_detail.province|default:"-" }}</dd>
+                        </div>
+                        <div class="flex items-start">
+                            <dt class="w-32 text-sm font-medium text-gray-700">รหัสไปรษณีย์:</dt>
+                            <dd class="text-sm text-gray-900">{{ user_detail.postal_code|default:"-" }}</dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm font-medium mb-1">คำสั่งซื้อทั้งหมด</p>
+                        <p class="text-3xl font-bold text-gray-900">{{ total_orders }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm font-medium mb-1">ยอดซื้อรวม</p>
+                        <p class="text-3xl font-bold text-green-600">฿{{ total_spent|floatformat:2 }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Orders -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900">ประวัติคำสั่งซื้อล่าสุด</h2>
+            </div>
+            
+            {% if recent_orders %}
+            <div class="overflow-x-auto">
+                <table class="w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">รหัสคำสั่งซื้อ</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">หนังสือ</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">จำนวน</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">ราคา</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">สถานะ</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">วันที่สั่งซื้อ</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for order in recent_orders %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="text-sm font-medium text-gray-900">#{{ order.id }}</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="text-sm text-gray-900">{{ order.cart.book.title }}</span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="text-sm text-gray-900">{{ order.cart.quantity }} เล่ม</span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="text-sm font-medium text-gray-900">฿{{ order.total_amount|floatformat:2 }}</span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium 
+                                    {% if order.status == 'unpaid' %}bg-red-100 text-red-800
+                                    {% elif order.status == 'paid' %}bg-yellow-100 text-yellow-800
+                                    {% elif order.status == 'processing' %}bg-blue-100 text-blue-800
+                                    {% elif order.status == 'shipped' %}bg-purple-100 text-purple-800
+                                    {% elif order.status == 'delivered' %}bg-green-100 text-green-800
+                                    {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                    {{ order.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="text-sm text-gray-700">{{ order.order_date|date:"d/m/Y H:i" }}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="p-8 text-center">
+                <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                <p class="text-gray-500">ยังไม่มีประวัติคำสั่งซื้อ</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</main>
+{% endblock %}

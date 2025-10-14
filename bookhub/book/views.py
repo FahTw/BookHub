@@ -9,6 +9,7 @@ from django.db.models.functions import *
 from book.models import *
 from book.forms import *
 from datetime import datetime
+from django.utils import timezone
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -448,16 +449,65 @@ class UserListView(LoginRequiredMixin, View):
 
     def get(self, request):
         users = CustomUser.objects.all().order_by('-date_joined')
-        return render(request, 'owner/user_list.html', {'users': users})
+        
+        # Get search query
+        search_query = request.GET.get('search', '')
+        
+        # Apply search filter
+        if search_query:
+            users = users.filter(
+                Q(first_name__icontains=search_query) |
+                Q(last_name__icontains=search_query) |
+                Q(username__icontains=search_query) |
+                Q(email__icontains=search_query)
+            )
+        
+        # Calculate statistics
+        total_users = CustomUser.objects.count()
+        regular_users = CustomUser.objects.filter(is_staff=False).count()
+        admin_users = CustomUser.objects.filter(is_staff=True).count()
+        
+        # New users this month
+        first_day_of_month = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        new_users_this_month = CustomUser.objects.filter(date_joined__gte=first_day_of_month).count()
+        
+        context = {
+            'users': users,
+            'total_users': total_users,
+            'regular_users': regular_users,
+            'admin_users': admin_users,
+            'new_users_this_month': new_users_this_month,
+            'search_query': search_query,
+        }
+        return render(request, 'owner/user_list.html', context)
 
 class UserView(LoginRequiredMixin, View):
     # login_url = '/login/'
 
-    def post(self, request, user_id):
+    def get(self, request, user_id):
         # ลบผู้ใช้
-        users = CustomUser.objects.filter(pk=user_id)
-        users.delete()
+        user = CustomUser.objects.get(pk=user_id)
+        # Prevent deleting admin users
+        if not user.is_staff:
+            user.delete()
         return redirect('user_list')
+
+class UserDetailView(LoginRequiredMixin, View):
+    def get(self, request, user_id):
+        user = CustomUser.objects.get(pk=user_id)
+        # Get user's order statistics
+        user_orders = Order.objects.filter(user=user)
+        total_orders = user_orders.count()
+        total_spent = user_orders.filter(status__in=['paid', 'processing', 'shipped', 'delivered']).aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+        recent_orders = user_orders.order_by('-order_date')[:5]
+        
+        context = {
+            'user_detail': user,
+            'total_orders': total_orders,
+            'total_spent': total_spent,
+            'recent_orders': recent_orders,
+        }
+        return render(request, 'owner/user_detail.html', context)
 
 class StatView(View, LoginRequiredMixin):
     def get(self, request):
