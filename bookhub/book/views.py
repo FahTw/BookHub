@@ -146,7 +146,7 @@ class CartView(View, LoginRequiredMixin):
         except (CustomUser.DoesNotExist, Cart.DoesNotExist):
             return redirect('login')
 
-class AddToCartView(View):
+class AddToCartView(View, LoginRequiredMixin):
     def post(self, request, book_id):        
         try:
             book = Book.objects.get(id=book_id)

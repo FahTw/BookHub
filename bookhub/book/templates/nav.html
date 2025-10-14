@@ -10,7 +10,7 @@
             BookHub
           </a>
           <nav class="hidden sm:block">
-            <a href="#" class="text-gray-700 hover:text-gray-900 font-medium">หมวดหมู่หนังสือ</a>
+            <a href="{% url 'book' %}" class="text-gray-700 hover:text-gray-900 font-medium">หนังสือ</a>
           </nav>
         </div>
       </div>
@@ -30,7 +30,6 @@
 
       <!-- User Actions -->
       <div class="flex items-center justify-end gap-4 lg:gap-6 w-full lg:w-auto">
-        {% if user.is_authenticated %}
         <a href="{% url 'cart' user=user.id %}"
           class="relative p-2 text-gray-700 hover:text-orange-600 transition-colors">
           <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -42,7 +41,6 @@
             {{ cart_item_count|default:0 }}
           </span>
         </a>
-        {% endif %}
         <div class="dropdown relative">
           <button onclick="myToggle()" class="p-2 text-gray-700 hover:text-orange-600 transition-colors">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -52,15 +50,9 @@
           </button>
           <div id="user-menu"
             class="hidden flex flex-col absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-2">
-            {% if user.is_authenticated %}
             <a href="{% url 'profile' %}" class="px-4 py-2 hover:bg-gray-100">โปรไฟล์</a>
-            <a href="{% url 'order_history_user' user=user.id %}"
-              class="px-4 py-2 hover:bg-gray-100">ประวัติการสั่งซื้อ</a>
+            <a href="{% url 'order_history_user' user=user.id %}" class="px-4 py-2 hover:bg-gray-100">ประวัติการสั่งซื้อ</a>
             <a href="{% url 'login' %}" class="px-4 py-2 hover:bg-gray-100">ออกจากระบบ</a>
-            {% else %}
-            <a href="{% url 'login' %}" class="px-4 py-2 hover:bg-gray-100">เข้าสู่ระบบ</a>
-            <a href="{% url 'register' %}" class="px-4 py-2 hover:bg-gray-100">สมัครสมาชิก</a>
-            {% endif %}
           </div>
         </div>
       </div>
