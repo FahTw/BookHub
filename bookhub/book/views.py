@@ -180,6 +180,32 @@ class CartView(View):
         except (CustomUser.DoesNotExist, Cart.DoesNotExist):
             return redirect('login')
 
+class AddToCartView(View):
+    def post(self, request, book_id):        
+        try:
+            book = Book.objects.get(id=book_id)
+            user = request.user
+            
+            # Check if the book is already in the cart
+            cart_item, created = Cart.objects.get_or_create(
+                user=user,
+                book=book,
+                status='in_cart',
+                defaults={'quantity': 1, 'price': book.price, 'total_price': book.price}
+            )
+            
+            if not created:
+                # If it already exists, increase the quantity
+                if cart_item.quantity < book.stock:
+                    cart_item.quantity += 1
+                    cart_item.total_price = cart_item.price * cart_item.quantity
+                    cart_item.save()
+            
+            return redirect('cart', user=user.id)
+        except Book.DoesNotExist:
+            return redirect('home')
+
+
 class PaymentView(View):
     def get(self, request, user):
         try:
@@ -242,7 +268,21 @@ class PaymentView(View):
 
         except CustomUser.DoesNotExist:
             return redirect('login')
+class AddToPaymentView(View):
+    def post(self, request, user):
 
+        user = CustomUser.objects.get(id=user)
+        cart_items = Cart.objects.filter(user=user, status='in_cart')
+        if not cart_items.exists():
+            return redirect('cart', user=user.id)
+
+        total_amount = sum(item.total_price for item in cart_items)
+        context = {
+            "user": user,
+            "cart_items": cart_items,
+            "total_amount": total_amount,
+        }
+        return redirect('payment', user=user.id)
 class OrderHistoryView(View):
     def get(self, request, user):
         try:
