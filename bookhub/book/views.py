@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views import View
 from django.db.models import *
-from django.db.models import models
 from book.models import *
 from book.forms import *
 from datetime import datetime
