@@ -74,7 +74,15 @@ class BookListView(View, LoginRequiredMixin):
 class BookDetailView(View, LoginRequiredMixin):
     def get(self, request, book_id):
         book = Book.objects.get(pk=book_id)
-        reviews = Review.objects.filter(book=book).order_by('-created_date')
+        reviews = Review.objects.filter(book=book).select_related('user').order_by('-created_date')
+        review_stats = reviews.aggregate(
+            avg_rating=Avg('rating'),
+            review_count=Count('id')
+        )
+        book.rating = round(review_stats['avg_rating'], 1) if review_stats['avg_rating'] else 0.0
+        book.comment_count = review_stats['review_count']
+        book.sold_count = book.sold
+
         form = ReviewForm()
         return render(request, 'home/book_detail.html', {
             'book': book,
@@ -85,13 +93,23 @@ class BookDetailView(View, LoginRequiredMixin):
     def post(self, request, book_id):
         book = Book.objects.get(pk=book_id)
         form = ReviewForm(request.POST)
-        reviews = Review.objects.filter(book=book).order_by('-created_date')
+        reviews = Review.objects.filter(book=book).select_related('user').order_by('-created_date')
         
         if form.is_valid():
             review = form.save(commit=False)
             review.book = book
             review.user = request.user
             review.save()
+            
+            # Update book rating
+            review_stats = reviews.aggregate(
+                avg_rating=Avg('rating'),
+                review_count=Count('id')
+            )
+            book.rating_average = review_stats['avg_rating'] or 0
+            book.rating_count = review_stats['review_count']
+            book.save(update_fields=['rating_average', 'rating_count'])
+            
             return redirect('book_detail', book_id=book_id)
 
         return render(request, 'home/book_detail.html', {

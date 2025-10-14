@@ -5,50 +5,99 @@
     <div class="flex flex-col lg:flex-row gap-8">
 
         <!-- รูปภาพหนังสือ -->
-        <div class="w-full lg:w-1/3 p-4">
-            <div class="border border-gray-200 shadow-lg rounded-lg overflow-hidden">
-                <div class="aspect-[2/3] bg-gray-100 flex items-center justify-center p-4">
-                    <img src="{{ book.image.url }}" alt="ปกหนังสือ"
-                        class="object-contain h-full w-full max-h-96" />
+        <div class="w-full lg:w-1/3">
+            <div class="sticky top-8">
+                <div class="border border-gray-200 shadow-lg rounded-xl overflow-hidden bg-white">
+                    <div class="aspect-[2/3] bg-gray-50 flex items-center justify-center p-8">
+                        {% if book.image %}
+                        <img src="{{ book.image.url }}" alt="ปกหนังสือ"
+                            class="object-contain h-full w-full max-h-96 rounded-lg shadow-md" />
+                        {% else %}
+                        <svg class="w-32 h-32 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
+                        </svg>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- รายละเอียดหนังสือ -->
         <div class="w-full lg:w-2/3 space-y-6">
-            <h1 class="text-3xl font-bold">{{ book.title }}</h1>
-
-            <div class="flex items-center space-x-4 text-gray-600">
-                <div class="flex items-center space-x-1">
-                    <span class="text-2xl font-semibold text-red-600">{{ book.rating }}</span>
-                    <div class="text-xl text-yellow-400">★★★★★</div>
-                    <span class="text-sm ml-1 text-gray-500">{{ book.comment_count }} รีวิว</span>
-                </div>
-                <span class="text-sm">{{ book.sold_count }} ขายแล้ว</span>
+            <div>
+                <h1 class="text-4xl font-bold text-gray-800 mb-3">{{ book.title }}</h1>
+                <p class="text-lg text-gray-600">โดย <span class="font-semibold text-gray-700">{{ book.author }}</span></p>
             </div>
 
-            <div class="space-y-2 text-lg">
-                <p class="text-gray-500">ผู้แต่ง: {{ book.author }}</p>
-                <p class="text-gray-500">สำนักพิมพ์: {{ book.publisher }}</p>
+            <!-- Rating & Stats -->
+            <div class="flex flex-wrap items-center gap-4">
+                <div class="flex items-center gap-2 bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm">
+                    <div class="flex text-orange-400">
+                        {% for i in "12345" %}
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                        {% endfor %}
+                    </div>
+                    <span class="text-lg font-bold text-gray-800">{{ book.rating }}</span>
+                    <span class="text-sm text-gray-500">({{ book.comment_count }} รีวิว)</span>
+                </div>
+                <div class="bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm">
+                    <span class="text-sm text-gray-600">ขายแล้ว <span class="font-semibold text-gray-800">{{ book.sold_count }}</span> เล่ม</span>
+                </div>
+            </div>
+
+            <!-- Book Details -->
+            <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">รายละเอียด</h3>
+                <div class="space-y-3">
+                    <div class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-gray-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                        </svg>
+                        <div class="flex-1">
+                            <p class="text-sm text-gray-500">ผู้แต่ง</p>
+                            <p class="font-medium text-gray-800">{{ book.author }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-gray-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z" />
+                        </svg>
+                        <div class="flex-1">
+                            <p class="text-sm text-gray-500">สำนักพิมพ์</p>
+                            <p class="font-medium text-gray-800">{{ book.publisher }}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <hr class="border-gray-200">
 
-            <div class="flex items-center space-x-8">
-                <span class="text-3xl font-bold text-red-600">{{ book.price }} บาท</span>
-
-                <div class="flex items-center border border-gray-300 rounded-md">
-                    <button id="cart-minus" class="px-3 py-2 text-gray-600 hover:bg-gray-100 border-r">-</button>
-                    <input type="number" value="1" min="1" class="w-12 text-center py-2 focus:outline-none" />
-                    <button id="cart-plus" class="px-3 py-2 text-gray-600 hover:bg-gray-100 border-l">+</button>
+            <!-- Price & Add to Cart -->
+            <div class="bg-white p-6 rounded-xl border-2 border-orange-200 shadow-md">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">ราคา</p>
+                        <span class="text-4xl font-bold text-orange-600">฿{{ book.price }}</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm text-gray-600">จำนวน</span>
+                        <div class="flex items-center border border-gray-300 rounded-lg bg-white">
+                            <button id="cart-minus" class="px-3 py-2 text-gray-600 hover:bg-gray-50 border-r border-gray-300 font-bold transition-colors">-</button>
+                            <input type="number" value="1" min="1" class="w-14 text-center py-2 focus:outline-none font-semibold text-gray-800" />
+                            <button id="cart-plus" class="px-3 py-2 text-gray-600 hover:bg-gray-50 border-l border-gray-300 font-bold transition-colors">+</button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-
-            <div class="flex space-x-4 pt-2">
-                <form method="post" action="{% url 'add_to_cart' book.id %}">
+                
+                <form method="post" action="{% url 'add_to_cart' book.id %}" class="w-full">
                     {% csrf_token %}
                     <button type="submit"
-                        class="flex-1 max-w-xs px-6 py-3 border border-red-600 text-red-600 rounded-lg font-semibold hover:bg-red-50 transition duration-150">
+                        class="w-full px-8 py-4 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-semibold text-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-3">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+                        </svg>
                         หยิบใส่ตะกร้า
                     </button>
                 </form>
@@ -59,143 +108,112 @@
     <hr class="my-8 border-gray-200">
 
     <!-- รายละเอียดเพิ่มเติม -->
-    <div class="mt-8">
-        <p class="text-gray-700 leading-relaxed">
+    <div class="mt-8 bg-white p-8 rounded-xl shadow-sm border border-gray-200">
+        <h2 class="text-2xl font-bold mb-4 text-gray-800 flex items-center gap-2">
+            <svg class="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+            </svg>
+            รายละเอียดหนังสือ
+        </h2>
+        <div class="text-gray-700 leading-relaxed prose max-w-none">
             {{ book.detail }}
-        </p>
+        </div>
     </div>
 
     <hr class="my-8 border-gray-200">
 
     <!-- รีวิว -->
     <div class="mt-8">
-        <h2 class="text-2xl font-bold mb-4">รีวิวจากลูกค้า</h2>
+        <h2 class="text-3xl font-bold mb-6 text-gray-800 flex items-center gap-3">
+            <svg class="w-8 h-8 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+            รีวิวจากลูกค้า
+        </h2>
 
 
-        <form method="POST">
+        <form method="POST" class="bg-gray-50 p-6 rounded-xl shadow-sm border border-gray-200 mb-8">
             {% csrf_token %}
-            <div class="mb-6">
-                <div class="mb-4">
-                    <label for="rating" class="block text-sm font-medium text-gray-700 mb-2">ให้คะแนน</label>
-                    <div class="flex items-center space-x-1">
-                        <div id="star-rating" class="flex space-x-1 text-3xl cursor-pointer">
-                            <span class="star text-gray-300 hover:text-yellow-400" data-rating="1">★</span>
-                            <span class="star text-gray-300 hover:text-yellow-400" data-rating="2">★</span>
-                            <span class="star text-gray-300 hover:text-yellow-400" data-rating="3">★</span>
-                            <span class="star text-gray-300 hover:text-yellow-400" data-rating="4">★</span>
-                            <span class="star text-gray-300 hover:text-yellow-400" data-rating="5">★</span>
+            <div class="space-y-6">
+                <div>
+                    <label for="rating" class="block text-sm font-semibold text-gray-700 mb-3">ให้คะแนน</label>
+                    <div class="flex items-center gap-4">
+                        <div id="star-rating" class="flex gap-1 text-4xl cursor-pointer">
+                            <span class="star text-gray-300 hover:text-orange-400 transition-colors duration-150" data-rating="1">★</span>
+                            <span class="star text-gray-300 hover:text-orange-400 transition-colors duration-150" data-rating="2">★</span>
+                            <span class="star text-gray-300 hover:text-orange-400 transition-colors duration-150" data-rating="3">★</span>
+                            <span class="star text-gray-300 hover:text-orange-400 transition-colors duration-150" data-rating="4">★</span>
+                            <span class="star text-gray-300 hover:text-orange-400 transition-colors duration-150" data-rating="5">★</span>
                         </div>
-                        <span id="rating-text" class="ml-2 text-sm text-gray-600">เลือกคะแนน</span>
+                        <span id="rating-text" class="text-sm font-medium text-gray-600 bg-white px-4 py-2 rounded-lg border border-gray-200">เลือกคะแนน</span>
                     </div>
                     <input type="hidden" id="rating" name="rating" value="0" required>
                 </div>
-                <div class="mb-4 flex items-start space-x-4">
-                    <div class="flex-1">
-                        <label for="comment" class="block text-sm font-medium text-gray-700 mb-2">เขียนรีวิวของคุณ</label>
-                        <input type="text" id="comment" name="comment"
-                            class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-red-500"
-                            placeholder="แสดงความคิดเห็น" required>
-                    </div>
-                    <button type="submit"
-                        class="px-6 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition duration-150 mt-6">
-                        ส่งรีวิว
-                    </button>
+                
+                <div>
+                    <label for="comment" class="block text-sm font-semibold text-gray-700 mb-2">เขียนรีวิวของคุณ</label>
+                    <textarea id="comment" name="comment" rows="4"
+                        class="w-full border border-gray-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
+                        placeholder="แสดงความคิดเห็นของคุณเกี่ยวกับหนังสือเล่มนี้..." required></textarea>
                 </div>
+                
+                <button type="submit"
+                    class="px-8 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-300 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" />
+                    </svg>
+                    ส่งรีวิว
+                </button>
             </div>
+        </form>
 
-
+        <!-- Reviews List -->
+        <div class="space-y-4">
             {% for review in reviews %}
-            <div class="border border-gray-200 p-4 rounded-lg shadow-sm mb-4">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-                        <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                        </svg>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center shadow-sm">
+                            <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-800">{{ review.user.first_name }} {{ review.user.last_name }}</p>
+                            <p class="text-xs text-gray-500">{{ review.created_date|date:"d M Y" }}</p>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-sm text-gray-400">พบรีวิวทั้งหมด {{ reviews|length }} รายการ</p>
-                        <p class="font-semibold">{{ review.user.username }}</p>
-                        <div class="text-sm text-yellow-400"> {{ review.rating }} คะแนน</div>
+                    <div class="flex items-center gap-1">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= review.rating %}
+                            <svg class="w-5 h-5 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                            {% else %}
+                            <svg class="w-5 h-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                            {% endif %}
+                        {% endfor %}
+                        <span class="ml-2 text-sm font-semibold text-gray-700">{{ review.rating }}/5</span>
                     </div>
                 </div>
-                <p class="mt-2 text-sm text-gray-600">{{ review.comment }}</p>
+                <p class="text-gray-700 leading-relaxed">{{ review.comment }}</p>
             </div>
             {% empty %}
-            <p class="text-gray-500">ยังไม่มีรีวิว</p>
+            <div class="text-center py-16 bg-gray-50 rounded-xl border border-gray-200">
+                <svg class="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                </svg>
+                <p class="text-gray-600 text-lg font-semibold mb-2">ยังไม่มีรีวิว</p>
+                <p class="text-gray-500 text-sm">เป็นคนแรกที่รีวิวหนังสือเล่มนี้!</p>
+            </div>
             {% endfor %}
+        </div>
     </div>
 </main>
-<script>
-    function handleCart() {
-        const plus = document.getElementById('cart-plus');
-        const minus = document.getElementById('cart-minus');
-        const quantityInput = document.querySelector('input[type="number"]');
-        let quantity = parseInt(quantityInput.value);
+{% endblock %}
 
-        plus.addEventListener('click', () => {
-            quantity += 1;
-            quantityInput.value = quantity;
-        });
-        minus.addEventListener('click', () => {
-            if (quantity > 1) {
-                quantity -= 1;
-                quantityInput.value = quantity;
-            }
-        });
-    }
-
-    function handleStarRating() {
-        const stars = document.querySelectorAll('.star');
-        const ratingInput = document.getElementById('rating');
-        const ratingText = document.getElementById('rating-text');
-        let selectedRating = 0;
-
-        stars.forEach((star, index) => {
-            // Click to select rating
-            star.addEventListener('click', () => {
-                selectedRating = parseInt(star.getAttribute('data-rating'));
-                ratingInput.value = selectedRating;
-                updateStars(selectedRating);
-                updateRatingText(selectedRating);
-            });
-
-            // Hover effect
-            star.addEventListener('mouseenter', () => {
-                const hoverRating = parseInt(star.getAttribute('data-rating'));
-                updateStars(hoverRating);
-            });
-        });
-
-        // Reset to selected rating on mouse leave
-        const starContainer = document.getElementById('star-rating');
-        starContainer.addEventListener('mouseleave', () => {
-            updateStars(selectedRating);
-        });
-
-        function updateStars(rating) {
-            stars.forEach((star, index) => {
-                if (index < rating) {
-                    star.classList.remove('text-gray-300');
-                    star.classList.add('text-yellow-400');
-                } else {
-                    star.classList.remove('text-yellow-400');
-                    star.classList.add('text-gray-300');
-                }
-            });
-        }
-
-        function updateRatingText(rating) {
-            const ratingLabels = ['', 'แย่มาก', 'ไม่ดี', 'ปานกลาง', 'ดี', 'ดีมาก'];
-            ratingText.textContent = `${rating} ดาว - ${ratingLabels[rating]}`;
-        }
-    }
-
-    // Initialize on page load
-    document.addEventListener('DOMContentLoaded', () => {
-        handleCart();
-        handleStarRating();
-    });
-</script>
+{% block scripts %}
+<script src="../../static/script/book_detail.js"></script>
 {% endblock %}
