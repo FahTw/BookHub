@@ -302,6 +302,9 @@ class ManageBookListView(View, LoginRequiredMixin):
             total=Sum(F('stock') * F('price'), output_field=models.DecimalField())
         )['total'] or 0
         
+        # Get all categories for the form
+        categories = BookCategory.objects.all().order_by('category_name')
+        
         context = {
             'books': books,
             'total_books': total_books,
@@ -309,10 +312,40 @@ class ManageBookListView(View, LoginRequiredMixin):
             'out_of_stock_count': out_of_stock_count,
             'total_value': total_value,
             'search_query': search_query,
+            'categories': categories,
         }
         return render(request, 'owner/book_manage.html', context)
     
     def post(self, request):
+        # Check if this is a category creation request
+        if 'category_name' in request.POST:
+            category_form = BookCategoryForm(request.POST)
+            if category_form.is_valid():
+                category_form.save()
+                return redirect('managelist_book')
+            
+            # If category form is invalid, return with errors
+            books = Book.objects.all().order_by('-id')
+            categories = BookCategory.objects.all().order_by('category_name')
+            total_books = Book.objects.count()
+            low_stock_count = Book.objects.filter(stock__lt=10).count()
+            out_of_stock_count = Book.objects.filter(stock=0).count()
+            total_value = Book.objects.aggregate(
+                total=Sum(F('stock') * F('price'), output_field=models.DecimalField())
+            )['total'] or 0
+            
+            context = {
+                'books': books,
+                'categories': categories,
+                'category_form': category_form,
+                'total_books': total_books,
+                'low_stock_count': low_stock_count,
+                'out_of_stock_count': out_of_stock_count,
+                'total_value': total_value,
+            }
+            return render(request, 'owner/book_manage.html', context)
+        
+        # Otherwise, handle book creation
         form = BookForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
@@ -320,6 +353,7 @@ class ManageBookListView(View, LoginRequiredMixin):
         
         # If form is invalid, return with errors
         books = Book.objects.all().order_by('-id')
+        categories = BookCategory.objects.all().order_by('category_name')
         total_books = Book.objects.count()
         low_stock_count = Book.objects.filter(stock__lt=10).count()
         out_of_stock_count = Book.objects.filter(stock=0).count()
@@ -329,6 +363,7 @@ class ManageBookListView(View, LoginRequiredMixin):
         
         context = {
             'books': books,
+            'categories': categories,
             'form': form,
             'total_books': total_books,
             'low_stock_count': low_stock_count,
