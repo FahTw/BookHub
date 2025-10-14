@@ -3,11 +3,10 @@ from django.urls import path
 from book.views import *
 
 urlpatterns = [
-    path('', HomeView.as_view(), name='home'),  # Home page
-    path('login/', LoginView.as_view(), name='login'),
+    path('', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('register/', RegisterView.as_view(), name='register'),
-    path('home/', HomeView.as_view(), name='home'),
+    path('home/', HomeView.as_view(), name='home'), # Home page
     path('profile/', ProfileView.as_view(), name='profile'),
     path('book/', BookListView.as_view(), name='book'),
     path('book/<int:book_id>/', BookDetailView.as_view(), name='book_detail'),
