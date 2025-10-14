@@ -1,45 +1,181 @@
 {% extends 'base_owner.html' %}
+{% load static %}
+
+{% block title %}แก้ไขหนังสือ - BookHub{% endblock %}
 
 {% block content %}
-<div class="container mx-auto py-8 px-4">
-    <h1 class="font-bold text-xl mb-4">Edit Book - {{ book.title }}</h1>
+<main class="flex-1 bg-gray-50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-12">
+        <!-- Page Header -->
+        <div class="mb-8">
+            <div class="flex items-center gap-3 mb-4">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">แก้ไขหนังสือ</h1>
+                    <p class="text-gray-600 mt-1">{{ book.title }}</p>
+                </div>
+            </div>
+        </div>
 
-    <form method="post" action="{% url 'edit_book' book.id %}" enctype="multipart/form-data" class="bg-white p-6 rounded shadow">
-        {% csrf_token %}
-        <div class="mb-4">
-            <label for="id_title" class="block text-sm font-medium text-gray-700">Title</label>
-            {{ form.title }}
+        <!-- Edit Form -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <h2 class="text-lg font-semibold text-gray-900">ข้อมูลหนังสือ</h2>
+            </div>
+            
+            <div class="p-6">
+                <form method="POST" action="{% url 'manage_book' book.id %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                    <div class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-5 h-5 text-red-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                            </svg>
+                            <div class="flex-1">
+                                <h3 class="text-sm font-medium text-red-800 mb-1">เกิดข้อผิดพลาด</h3>
+                                <ul class="text-sm text-red-700 space-y-1">
+                                    {% for field, errors in form.errors.items %}
+                                        {% for error in errors %}
+                                        <li>{{ field }}: {{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="space-y-6">
+                        <!-- Title -->
+                        <div>
+                            <label for="id_title" class="block text-sm font-medium text-gray-700 mb-2">
+                                ชื่อหนังสือ <span class="text-red-500">*</span>
+                            </label>
+                            {{ form.title }}
+                        </div>
+
+                        <!-- Author & Publisher -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="id_author" class="block text-sm font-medium text-gray-700 mb-2">
+                                    ผู้แต่ง <span class="text-red-500">*</span>
+                                </label>
+                                {{ form.author }}
+                            </div>
+                            <div>
+                                <label for="id_publisher" class="block text-sm font-medium text-gray-700 mb-2">
+                                    สำนักพิมพ์
+                                </label>
+                                {{ form.publisher }}
+                            </div>
+                        </div>
+
+                        <!-- Detail -->
+                        <div>
+                            <label for="id_detail" class="block text-sm font-medium text-gray-700 mb-2">
+                                รายละเอียด
+                            </label>
+                            {{ form.detail }}
+                        </div>
+
+                        <!-- Image -->
+                        <div>
+                            <label for="id_image" class="block text-sm font-medium text-gray-700 mb-2">
+                                รูปปก
+                            </label>
+                            {% if book.image %}
+                            <div class="mb-4">
+                                <p class="text-sm text-gray-600 mb-2">รูปภาพปัจจุบัน:</p>
+                                <img src="{{ book.image.url }}" alt="{{ book.title }}" class="w-32 h-48 object-cover rounded-lg shadow-sm border border-gray-200">
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Price & Stock -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="id_price" class="block text-sm font-medium text-gray-700 mb-2">
+                                    ราคา (บาท) <span class="text-red-500">*</span>
+                                </label>
+                                {{ form.price }}
+                            </div>
+                            <div>
+                                <label for="id_stock" class="block text-sm font-medium text-gray-700 mb-2">
+                                    จำนวนสต็อก <span class="text-red-500">*</span>
+                                </label>
+                                {{ form.stock }}
+                            </div>
+                        </div>
+
+                        <!-- Book Stats (Read-only) -->
+                        <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                            <h3 class="text-sm font-medium text-gray-700 mb-3">สถิติการขาย</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                <div>
+                                    <p class="text-xs text-gray-600">ขายแล้ว</p>
+                                    <p class="text-lg font-semibold text-gray-900">{{ book.sold }} เล่ม</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-600">คะแนนเฉลี่ย</p>
+                                    <p class="text-lg font-semibold text-gray-900">{{ book.rating_average }} ⭐</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-600">จำนวนรีวิว</p>
+                                    <p class="text-lg font-semibold text-gray-900">{{ book.rating_count }} รีวิว</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="mt-8 flex gap-3 justify-end border-t pt-6">
+                        <a href="{% url 'managelist_book' %}" class="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+                            ยกเลิก
+                        </a>
+                        <button type="submit" class="px-6 py-2.5 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-medium shadow-sm">
+                            บันทึกการแก้ไข
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-        <div class="mb-4">
-            <label for="id_author" class="block text-sm font-medium text-gray-700">Author</label>
-            {{ form.author }}
-        </div>
-        <div class="mb-4">
-            <label for="id_publisher" class="block text-sm font-medium text-gray-700">Publisher</label>
-            {{ form.publisher }}
-        </div>
-        <div class="mb-4">
-            <label for="id_detail" class="block text-sm font-medium text-gray-700">Detail</label>
-            {{ form.detail }}
-        </div>
-        <div class="mb-4">
-            <label for="id_image" class="block text-sm font-medium text-gray-700">Cover Image</label>
-            {% if book.image %}
-                <div class="mb-2"><img src="{{ book.image.url }}" alt="cover" class="w-32 h-auto"></div>
-            {% endif %}
-            {{ form.image }}
-        </div>
-        <div class="mb-4">
-            <label for="id_price" class="block text-sm font-medium text-gray-700">Price</label>
-            {{ form.price }}
-        </div>
-        <div class="mb-4">
-            <label for="id_stock" class="block text-sm font-medium text-gray-700">Stock</label>
-            {{ form.stock }}
-        </div>
-        <div class="flex justify-end">
-            <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Save</button>
-        </div>
-    </form>
-</div>
+    </div>
+</main>
+{% endblock %}
+
+{% block script2 %}
+<style>
+    /* Style for Django form fields */
+    input[type="text"],
+    input[type="number"],
+    input[type="file"],
+    textarea,
+    select {
+        width: 100%;
+        padding: 0.5rem 1rem;
+        border: 1px solid #D1D5DB;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+    }
+    
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    textarea:focus,
+    select:focus {
+        outline: none;
+        border-color: #EA580C;
+        box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.2);
+    }
+    
+    textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+    
+    input[type="file"] {
+        padding: 0.5rem 0.5rem;
+    }
+</style>
 {% endblock %}

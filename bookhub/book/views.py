@@ -280,16 +280,61 @@ class DashboardView(View, LoginRequiredMixin):
 
 class ManageBookListView(View, LoginRequiredMixin):
     def get(self, request):
-        form = BookForm()
-        books = Book.objects.all()
-        return render(request, 'owner/book_manage.html', {'form': form, 'books': books})
+        books = Book.objects.all().order_by('-id')
+        
+        # Get search query
+        search_query = request.GET.get('search', '')
+        
+        # Apply search filter
+        if search_query:
+            books = books.filter(
+                Q(title__icontains=search_query) |
+                Q(author__icontains=search_query) |
+                Q(publisher__icontains=search_query)
+            )
+        
+        # Calculate statistics
+        total_books = Book.objects.count()
+        low_stock_count = Book.objects.filter(stock__lt=10).count()
+        out_of_stock_count = Book.objects.filter(stock=0).count()
+        total_value = Book.objects.aggregate(
+            total=Sum(F('stock') * F('price'), output_field=models.DecimalField())
+        )['total'] or 0
+        
+        context = {
+            'books': books,
+            'total_books': total_books,
+            'low_stock_count': low_stock_count,
+            'out_of_stock_count': out_of_stock_count,
+            'total_value': total_value,
+            'search_query': search_query,
+        }
+        return render(request, 'owner/book_manage.html', context)
     
     def post(self, request):
         form = BookForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            return redirect('manage_book')
-        return render(request, 'owner/book_manage.html', {'form': form})
+            return redirect('managelist_book')
+        
+        # If form is invalid, return with errors
+        books = Book.objects.all().order_by('-id')
+        total_books = Book.objects.count()
+        low_stock_count = Book.objects.filter(stock__lt=10).count()
+        out_of_stock_count = Book.objects.filter(stock=0).count()
+        total_value = Book.objects.aggregate(
+            total=Sum(F('stock') * F('price'), output_field=models.DecimalField())
+        )['total'] or 0
+        
+        context = {
+            'books': books,
+            'form': form,
+            'total_books': total_books,
+            'low_stock_count': low_stock_count,
+            'out_of_stock_count': out_of_stock_count,
+            'total_value': total_value,
+        }
+        return render(request, 'owner/book_manage.html', context)
 
 class ManageBookView(View, LoginRequiredMixin):
     def get(self, request, book_id):
@@ -298,18 +343,19 @@ class ManageBookView(View, LoginRequiredMixin):
         return render(request, 'owner/edit_book.html', {'form': form, 'book': book})
 
     def post(self, request, book_id):
+        # Otherwise, handle as update
         book = Book.objects.get(pk=book_id)
         form = BookForm(request.POST, request.FILES, instance=book)
         if form.is_valid():
             form.save()
-            return redirect('manage_book')
+            return redirect('managelist_book')
         return render(request, 'owner/edit_book.html', {'form': form, 'book': book})
 
-    def delete(self, request, book_id):
-        # ลบหนังสือ (ปลอดภัย)
+class ManageBookDeleteView(View, LoginRequiredMixin):
+    def get(self, request, book_id):
         book = Book.objects.get(pk=book_id)
         book.delete()
-        return redirect('manage_book')
+        return redirect('managelist_book')
 
 class OrderHistoryOwnerView(View, LoginRequiredMixin):
     def get(self, request):
