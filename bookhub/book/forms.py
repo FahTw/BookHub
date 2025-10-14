@@ -12,10 +12,18 @@ class UserRegistrationForm(UserCreationForm):
 
     def clean(self):
         cleaned_data = super().clean()
+        phone = cleaned_data.get("phone")
         email = cleaned_data.get("email")
+        postal_code = cleaned_data.get("postal_code")
 
-        if CustomUser.objects.filter(email=email).exists():
-            raise ValidationError("อีเมลถูกใช้งานแล้ว กรุณาใช้อีเมลอื่น")
+        if phone and not phone.isdigit():
+            self.add_error('phone', "เบอร์โทรศัพท์ต้องเป็นตัวเลขเท่านั้น")
+
+        if email and CustomUser.objects.filter(email=email).exists():
+            self.add_error('email', "อีเมลถูกใช้งานแล้ว กรุณาใช้อีเมลอื่น")
+        
+        if postal_code and not postal_code.isdigit():
+            self.add_error('postal_code', "รหัสไปรษณีย์ต้องเป็นตัวเลขเท่านั้น")
 
         return cleaned_data
 
@@ -23,6 +31,7 @@ class UserProfileForm(ModelForm):
     class Meta:
         model = CustomUser
         fields = ['first_name', 'last_name', 'email', 'address', 'phone', 'province', 'postal_code']
+
     def clean(self):
         cleaned_data = super().clean()
         email = cleaned_data.get("email")
@@ -32,7 +41,6 @@ class UserProfileForm(ModelForm):
             raise ValidationError("อีเมลถูกใช้งานแล้ว กรุณาใช้อีเมลอื่น")
 
         return cleaned_data
-
 
 class BookForm(ModelForm):
     class Meta:
@@ -55,7 +63,6 @@ class BookForm(ModelForm):
             raise ValidationError("จำนวนสต็อกต้องเป็นจำนวนเต็มบวก")
 
         return cleaned_data
-
 
 class BookCategoryForm(ModelForm):
     class Meta:

@@ -36,7 +36,6 @@ class RegisterView(View):
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.username = user.email
             user.set_password(form.cleaned_data['password1'])
             user.save()
             return redirect('login')
