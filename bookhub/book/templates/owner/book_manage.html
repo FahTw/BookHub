@@ -1,25 +1,19 @@
 {% extends 'base_owner.html' %}
 
 {% block content %}
-<div class="container mx-auto py-8">
+<div class="container mx-auto py-8 px-4">
     <div>
         <h1 class="font-bold text-xl">Book Management</h1>
     </div>
-    <div>
-        <button class="modal-dialog" onclick="">crete</button>
-    </div>
 
     <!-- Modal Dialog for Create Form -->
-    <div id="createBookModal" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+    <div id="createBookModal" class="้hidden fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
         <div class="bg-white rounded-lg shadow-lg w-1/2">
             <div class="border-b px-4 py-2 flex justify-between items-center">
                 <h5 class="text-lg font-bold">Create New Book</h5>
-                <button type="button" class="text-gray-500 hover:text-gray-700" onclick="document.getElementById('createBookModal').classList.add('hidden')">
-                    &times;
-                </button>
             </div>
             <div class="p-4">
-                <form method="post" action="{% url 'manage_book' %}">
+                <form method="post" action="{% url 'create_book' %}" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="mb-4">
                         <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
@@ -28,6 +22,18 @@
                     <div class="mb-4">
                         <label for="author" class="block text-sm font-medium text-gray-700">Author</label>
                         <input type="text" id="author" name="author" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="publisher" class="block text-sm font-medium text-gray-700">Publisher</label>
+                        <input type="text" id="publisher" name="publisher" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    </div>
+                    <div class="mb-4">
+                        <label for="detail" class="block text-sm font-medium text-gray-700">Detail</label>
+                        <textarea id="detail" name="detail" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label for="image" class="block text-sm font-medium text-gray-700">Cover Image</label>
+                        <input type="file" id="image" name="image" class="mt-1 block w-full" accept="image/*">
                     </div>
                     <div class="mb-4">
                         <label for="price" class="block text-sm font-medium text-gray-700">Price</label>
@@ -52,5 +58,30 @@
     <button type="button" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600" onclick="document.getElementById('createBookModal').classList.remove('hidden')">
         Create New Book
     </button>
+    <table class="w-full mt-6 bg-white shadow rounded overflow-hidden text-center">
+        <tbody>
+            {% for book in books %}
+            <tr class="border-b">
+                <td class="p-3">{{ book.id }}</td>
+                <td class="p-3">{{ book.title }}</td>
+                <td class="p-3">{{ book.author }}</td>
+                <td class="p-3">{{ book.price }}</td>
+                <td class="p-3">{{ book.stock }}</td>
+                <td class="p-3">
+                    <form method="post" action="{% url 'delete_book' book.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="text-red-600 hover:underline">Delete</button>
+                    </form>
+                    <a href="{% url 'edit_book' book.id %}" class="mt-2 inline-block text-blue-600 hover:underline">Edit</a>
+                    <a href="{% url 'book_detail' book.id %}" class="mt-2 inline-block text-green-600 hover:underline">View</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="p-4 text-center text-gray-500">No books available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'base_owner.html' %}
+
+{% block content %}
+<div class="container mx-auto py-8 px-4">
+    <h1 class="font-bold text-xl mb-4">Edit Book - {{ book.title }}</h1>
+
+    <form method="post" action="{% url 'edit_book' book.id %}" enctype="multipart/form-data" class="bg-white p-6 rounded shadow">
+        {% csrf_token %}
+        <div class="mb-4">
+            <label for="id_title" class="block text-sm font-medium text-gray-700">Title</label>
+            {{ form.title }}
+        </div>
+        <div class="mb-4">
+            <label for="id_author" class="block text-sm font-medium text-gray-700">Author</label>
+            {{ form.author }}
+        </div>
+        <div class="mb-4">
+            <label for="id_publisher" class="block text-sm font-medium text-gray-700">Publisher</label>
+            {{ form.publisher }}
+        </div>
+        <div class="mb-4">
+            <label for="id_detail" class="block text-sm font-medium text-gray-700">Detail</label>
+            {{ form.detail }}
+        </div>
+        <div class="mb-4">
+            <label for="id_image" class="block text-sm font-medium text-gray-700">Cover Image</label>
+            {% if book.image %}
+                <div class="mb-2"><img src="{{ book.image.url }}" alt="cover" class="w-32 h-auto"></div>
+            {% endif %}
+            {{ form.image }}
+        </div>
+        <div class="mb-4">
+            <label for="id_price" class="block text-sm font-medium text-gray-700">Price</label>
+            {{ form.price }}
+        </div>
+        <div class="mb-4">
+            <label for="id_stock" class="block text-sm font-medium text-gray-700">Stock</label>
+            {{ form.stock }}
+        </div>
+        <div class="flex justify-end">
+            <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Save</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
