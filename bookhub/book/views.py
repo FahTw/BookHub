@@ -217,34 +217,21 @@ class PaymentView(View):
                 total_amount=cart_item.total_price,
                 status=order_status
             )
-                        
+
             # Create Payment
-            payment = Payment.objects.create(
+            Payment.objects.create(
                 order=order,
                 payment_date=datetime.now(),
-                payment_method=payment_method,
+                method=payment_method,
                 amount=cart_item.total_price,
                 status='pending',
                 payment_slip=payment_slip if payment_method != 'cash' and payment_slip else None
             )
 
-            # Add payment slip if uploaded
-            if payment_method != 'cash' and 'payment_slip' in request.FILES:
-                payment.payment_slip = request.FILES['payment_slip']
-                payment.save()
-
-            # Update order status based on payment method
-            if payment_method == 'cash':
-                order.status = 'unpaid'  # Will be paid on delivery
-            else:
-                order.status = 'paid'  # Assume paid if slip uploaded
-            order.save()
-            
-            # Update cart status AFTER all orders are created successfully
-            cart_items.update(status='notin_cart')
-
+        # Update all cart items to notin_cart
+        cart_items.update(status='notin_cart')
+        
         return redirect('home')
-
 
 class OrderHistoryView(View):
     def get(self, request, user):
@@ -257,6 +244,24 @@ class OrderHistoryView(View):
             'total_orders': orders.count(),
         }
         return render(request, 'home/orderhistory.html', context)
+
+    def post(self, request, user):
+        user_obj = CustomUser.objects.get(id=user)
+        order_id = request.POST.get('order_id')
+        
+        if order_id:
+            order_obj = Order.objects.get(id=order_id, user=user_obj)
+            # Only allow cancellation for paid or processing orders
+            if order_obj.status in ['paid', 'processing']:
+                order_obj.status = 'cancelled'
+                order_obj.save()
+                # Update payment status
+                payment = Payment.objects.filter(order=order_obj).first()
+                if payment:
+                    payment.status = 'cancelled'
+                    payment.save()
+        
+        return redirect('order_history_user', user=user)
 
 class OrderHistoryDetailView(View):
     def get(self, request, user, order):

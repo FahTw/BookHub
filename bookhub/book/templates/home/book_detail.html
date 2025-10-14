@@ -89,13 +89,11 @@
                     <div class="flex items-center gap-3">
                         <span class="text-sm text-gray-600">จำนวน</span>
                         <div class="flex items-center border border-gray-300 rounded-lg bg-white">
-                            <button id="cart-minus" class="px-3 py-2 text-gray-600 hover:bg-gray-50 border-r border-gray-300 font-bold transition-colors">-</button>
-                            <input type="number" value="1" min="1" class="w-14 text-center py-2 focus:outline-none font-semibold text-gray-800" />
-                            <button id="cart-plus" class="px-3 py-2 text-gray-600 hover:bg-gray-50 border-l border-gray-300 font-bold transition-colors">+</button>
+                            <input type="number" value="1" min="1" class="w-14 text-center py-2 focus:outline-none font-semibold text-gray-800" disabled/>
                         </div>
                     </div>
                 </div>
-                
+
                 <form method="post" action="{% url 'add_to_cart' book.id %}" class="w-full">
                     {% csrf_token %}
                     <button type="submit"
@@ -142,17 +140,15 @@
             <div class="space-y-6">
                 <div>
                     <label for="rating" class="block text-sm font-semibold text-gray-700 mb-3">ให้คะแนน</label>
-                    <div class="flex items-center gap-4">
-                        <div id="star-rating" class="flex gap-1 text-4xl cursor-pointer">
-                            <span class="star text-gray-300 hover:text-orange-400 transition-colors duration-150" data-rating="1">★</span>
-                            <span class="star text-gray-300 hover:text-orange-400 transition-colors duration-150" data-rating="2">★</span>
-                            <span class="star text-gray-300 hover:text-orange-400 transition-colors duration-150" data-rating="3">★</span>
-                            <span class="star text-gray-300 hover:text-orange-400 transition-colors duration-150" data-rating="4">★</span>
-                            <span class="star text-gray-300 hover:text-orange-400 transition-colors duration-150" data-rating="5">★</span>
-                        </div>
-                        <span id="rating-text" class="text-sm font-medium text-gray-600 bg-white px-4 py-2 rounded-lg border border-gray-200">เลือกคะแนน</span>
-                    </div>
-                    <input type="hidden" id="rating" name="rating" value="0" required>
+                    <select id="rating" name="rating" required
+                        class="w-full md:w-64 border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-800 font-medium">
+                        <option value="">-- เลือกคะแนน --</option>
+                        <option value="1">⭐ 1 - แย่มาก</option>
+                        <option value="2">⭐⭐ 2 - แย่</option>
+                        <option value="3">⭐⭐⭐ 3 - ปานกลาง</option>
+                        <option value="4">⭐⭐⭐⭐ 4 - ดี</option>
+                        <option value="5">⭐⭐⭐⭐⭐ 5 - ดีมาก</option>
+                    </select>
                 </div>
                 
                 <div>

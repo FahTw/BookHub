@@ -171,8 +171,9 @@
                                     รีวิว & ให้คะแนน
                                 </a>
                             {% elif order.status == 'paid' or order.status == 'processing' %}
-                                <form method="post" action="{% url 'order_history_detail' user_obj.id order.id %}" class="inline">
+                                <form method="post" action="{% url 'order_history_user' user_obj.id %}" class="inline">
                                     {% csrf_token %}
+                                    <input type="hidden" name="order_id" value="{{ order.id }}">
                                     <button type="submit" class="px-6 py-3 border-2 border-red-300 text-red-700 hover:bg-red-50 hover:border-red-400 font-medium rounded-lg transition-all flex items-center">
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
