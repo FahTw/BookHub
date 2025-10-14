@@ -98,7 +98,7 @@ class BookDetailView(View, LoginRequiredMixin):
             review.book = book
             review.user = request.user
             review.save()
-            return redirect('/book_detail', book_id=book_id)
+            return redirect(f'/book/{book_id}')
 
         return render(request, 'home/book_detail.html', {
             'book': book,
@@ -267,22 +267,7 @@ class PaymentView(View):
 
         except CustomUser.DoesNotExist:
             return redirect('login')
-class AddToPaymentView(View):
-    def post(self, request, user):
 
-        user = CustomUser.objects.get(id=user)
-        cart_items = Cart.objects.filter(user=user, status='in_cart')
-        total_amount = sum(item.total_price for item in cart_items)
-
-        if not cart_items.exists():
-            return redirect('cart', user=user.id)
-        
-        context = {
-            "user": user,
-            "cart_items": cart_items,
-            "total_amount": total_amount,
-        }
-        return redirect('payment', user=user.id)
 class OrderHistoryView(View):
     def get(self, request, user):
         try:

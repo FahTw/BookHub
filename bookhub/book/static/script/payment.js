@@ -4,6 +4,35 @@ document.addEventListener('DOMContentLoaded', function () {
     const paymentSections = document.querySelectorAll('.payment-section');
     const fileUploadSection = document.getElementById('file-upload-section');
     const fileInput = document.getElementById('payment_slip');
+    const placeholder = document.getElementById('preview-placeholder');
+    const previewContainer = document.getElementById('preview-container');
+
+
+    if (fileInput) {
+        fileInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (!file) {
+                placeholder.style.display = 'block';
+                previewContainer.innerHTML = '';
+                return;
+            }
+
+            // ซ่อน placeholder
+            if (placeholder) placeholder.style.display = 'none';
+            previewContainer.innerHTML = '';
+
+            if (file.type.startsWith('image/')) {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.className = "mx-auto mb-2 rounded-lg shadow-sm w-40 h-40 object-cover";
+                previewContainer.appendChild(img);
+            } else if (file.type === 'application/pdf') {
+                previewContainer.innerHTML = `<p class="text-gray-500 text-sm">ไฟล์ PDF: ${file.name}</p>`;
+            }
+
+            updateSubmitButton(); // อัปเดตปุ่ม submit
+        });
+    }
 
     paymentRadios.forEach(radio => {
         radio.addEventListener('change', function () {

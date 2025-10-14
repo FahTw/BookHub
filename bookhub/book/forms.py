@@ -94,6 +94,7 @@ class BookForm(ModelForm):
     class Meta:
         model = Book
         fields = ["title", "image", "author", "publisher", "detail", "price", "stock"]
+        
 
     def clean(self):
         cleaned_data = super().clean()
