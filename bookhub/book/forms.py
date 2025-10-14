@@ -33,6 +33,30 @@ class UserProfileForm(ModelForm):
 
         return cleaned_data
 
+
+class BookForm(ModelForm):
+    class Meta:
+        model = Book
+        fields = ["title", "image", "author", "publisher", "publication_date", "pages", "language", "detail", "price", "stock", "categories"]
+        widgets = {
+            'categories': forms.CheckboxSelectMultiple(),
+            'detail': forms.Textarea(attrs={'rows': 3}),
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        price = cleaned_data.get("price")
+        stock = cleaned_data.get("stock")
+
+        if price and price <= 0:
+            raise ValidationError("ราคาต้องมากกว่า 0")
+
+        if stock and stock < 0:
+            raise ValidationError("จำนวนสต็อกต้องเป็นจำนวนเต็มบวก")
+
+        return cleaned_data
+
+
 class BookCategoryForm(ModelForm):
     class Meta:
         model = BookCategory
@@ -107,25 +131,3 @@ class ReviewForm(ModelForm):
             'comment': forms.Textarea(attrs={'rows': 4}),
             'rating': forms.NumberInput(attrs={'min': 1, 'max': 5}),
         }
-
-class BookForm(ModelForm):
-    class Meta:
-        model = Book
-        fields = ["title", "image", "author", "publisher", "publication_date", "pages", "detail", "price", "stock", "categories"]
-        widgets = {
-            'categories': forms.CheckboxSelectMultiple(),
-            'detail': forms.Textarea(attrs={'rows': 3}),
-        }
-
-    def clean(self):
-        cleaned_data = super().clean()
-        price = cleaned_data.get("price")
-        stock = cleaned_data.get("stock")
-
-        if price and price <= 0:
-            raise ValidationError("ราคาต้องมากกว่า 0")
-
-        if stock and stock < 0:
-            raise ValidationError("จำนวนสต็อกต้องเป็นจำนวนเต็มบวก")
-
-        return cleaned_data
