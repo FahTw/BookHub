@@ -1,6 +1,10 @@
 {% extends "base_user.html" %}
 {% load static %}
 
+{% block title %}
+{{ category.category_name }}
+{% endblock %}
+
 {% block content %}
 <!-- Hero Section -->
 <section class="bg-gradient-to-br from-orange-50 to-amber-50 py-16 px-6">

@@ -1,4 +1,9 @@
 {% extends 'base_user.html' %}
+{% load static %}
+
+{% block title %}
+รายละเอียดหนังสือ
+{% endblock %}
 
 {% block content %}
 <main class="container mx-auto px-4 py-8">
@@ -215,5 +220,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="../../static/script/book_detail.js"></script>
+<script src="{% static 'script/book_detail.js' %}"></script>
 {% endblock %}

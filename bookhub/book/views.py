@@ -289,6 +289,18 @@ class OrderHistoryDetailView(View, LoginRequiredMixin):
             return render(request, 'home/orderhistory_detail.html', context)
         except (CustomUser.DoesNotExist, Order.DoesNotExist):
             return redirect('login')
+        
+    def post(self, request, user, order):
+        user_obj = CustomUser.objects.get(id=user)
+        order_obj = Order.objects.get(id=order, user=user_obj)
+            # Only allow cancellation for paid or processing orders
+        if order_obj.status in ['paid', 'processing']:
+            order_obj.status = 'cancelled'
+            order_obj.save()
+            payment = Payment.objects.get(order=order_obj)
+            payment.status = 'cancelled'
+            payment.save()
+        return redirect('order_history_user', user=user)
 
 class DashboardView(View, LoginRequiredMixin):
     def get(self, request):

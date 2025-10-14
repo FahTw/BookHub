@@ -34,11 +34,19 @@ class UserProfileForm(ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
+        phone = cleaned_data.get("phone")
         email = cleaned_data.get("email")
+        postal_code = cleaned_data.get("postal_code")
         user_id = self.instance.id
 
-        if CustomUser.objects.filter(email=email).exclude(id=user_id).exists():
-            raise ValidationError("อีเมลถูกใช้งานแล้ว กรุณาใช้อีเมลอื่น")
+        if phone and not phone.isdigit():
+            self.add_error('phone', "เบอร์โทรศัพท์ต้องเป็นตัวเลขเท่านั้น")
+
+        if email and CustomUser.objects.filter(email=email).exclude(id=user_id).exists():
+            self.add_error('email', "อีเมลถูกใช้งานแล้ว กรุณาใช้อีเมลอื่น")
+        
+        if postal_code and not postal_code.isdigit():
+            self.add_error('postal_code', "รหัสไปรษณีย์ต้องเป็นตัวเลขเท่านั้น")
 
         return cleaned_data
 
@@ -76,57 +84,8 @@ class BookCategoryForm(ModelForm):
         cleaned_data = super().clean()
         category_name = cleaned_data.get("category_name")
 
-        # Check for duplicate category name (for new categories)
         if not self.instance.pk and BookCategory.objects.filter(category_name=category_name).exists():
             raise ValidationError("ประเภทหนังสือนี้มีอยู่แล้ว")
-
-        return cleaned_data
-
-class CartForm(ModelForm):
-    class Meta:
-        model = Cart
-        fields = ['user', 'book', 'quantity', 'price', 'total_price', 'status']
-
-    def clean(self):
-        cleaned_data = super().clean()
-        quantity = cleaned_data.get("quantity")
-        
-        if quantity and quantity <= 0:
-            raise ValidationError("จำนวนต้องมากกว่า 0")
-
-        return cleaned_data
-
-class OrderForm(ModelForm):
-    class Meta:
-        model = Order
-        fields = ['user', 'cart', 'order_date', 'total_amount', 'status']
-
-    def clean(self):
-        cleaned_data = super().clean()
-        quantity = cleaned_data.get("quantity")
-        
-        if quantity and quantity <= 0:
-            raise ValidationError("จำนวนต้องมากกว่า 0")
-
-        return cleaned_data
-
-class PaymentForm(ModelForm):
-    class Meta:
-        model = Payment
-        fields = ['order', 'payment_slip', 'payment_date', 'method', 'amount', 'status', 'verified_date']
-
-    def clean(self):
-        cleaned_data = super().clean()
-        payment_slip = cleaned_data.get("payment_slip")
-        method = cleaned_data.get("method")
-        amount = cleaned_data.get("amount")
-
-        # Payment slip is not required for cash on delivery
-        if method != 'cash' and not payment_slip:
-            raise ValidationError("กรุณาอัพโหลดหลักฐานการชำระเงิน")
-
-        if amount and amount <= 0:
-            raise ValidationError("จำนวนเงินต้องมากกว่า 0")
 
         return cleaned_data
 
