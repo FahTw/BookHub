@@ -44,7 +44,15 @@ class RegisterView(View):
 class HomeView(View, LoginRequiredMixin):
     def get(self, request):
         categories = BookCategory.objects.all()
-        return render(request, 'home/home.html', {'categories': categories})
+        best_sellers = Book.objects.all().order_by('-sold')[:5]
+        best_reviews = Review.objects.select_related('book', 'user').order_by('-rating', '-created_date')[:5]
+        
+        context = {
+            'categories': categories,
+            'best_sellers': best_sellers,
+            'best_reviews': best_reviews,
+        }
+        return render(request, 'home/home.html', context)
 
 class ProfileView(View, LoginRequiredMixin):
     def get(self, request):
