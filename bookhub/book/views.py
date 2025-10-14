@@ -13,12 +13,6 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-
-class HomeView(View, LoginRequiredMixin):
-    def get(self, request):
-        categories = BookCategory.objects.all()
-        return render(request, 'home/home.html', {'categories': categories})
-
 class LoginView(View):
     def get(self, request):
         form = AuthenticationForm()
@@ -30,17 +24,17 @@ class LoginView(View):
             user = form.get_user() 
             login(request,user)
             if user.is_staff:
-                return redirect('/dashboard')
+                return redirect('dashboard')
             else:
-                return redirect('/home')
+                return redirect('home')
         else:
-            print(form.errors)
+            print(form.errors) ###
         return render(request,'login/login.html', {"form":form})
 
 class LogoutView(View):
     def get(self, request):
         logout(request)
-        return redirect('/login')
+        return redirect('login')
 
 class RegisterView(View):
     def get(self, request):
@@ -56,8 +50,13 @@ class RegisterView(View):
             user.save()
             return redirect('login')
         else:
-            print(form.errors)
+            print(form.errors) ###
         return render(request, 'login/register.html', {'form': form})
+
+class HomeView(View, LoginRequiredMixin):
+    def get(self, request):
+        categories = BookCategory.objects.all()
+        return render(request, 'home/home.html', {'categories': categories})
 
 class ProfileView(View, LoginRequiredMixin):
     def get(self, request):
@@ -112,25 +111,6 @@ class CategoryView(View):
         books = Book.objects.filter(categories=category)
         categories = BookCategory.objects.all()
         return render(request, 'home/category.html', {'category': category, 'books': books, 'categories': categories})
-
-# class ReviewView(View):
-#     def get(self, request, book_id):
-#         form = ReviewForm()
-#         book = Book.objects.get(pk=book_id)
-#         reviews = Review.objects.filter(book=book)
-#         return render(request, 'home/book_detail.html', {'form': form, "book": book, "reviews": reviews})
-#     def post(self, request, book_id):
-#         form = ReviewForm(request.POST)
-#         book = Book.objects.get(pk=book_id)
-#         reviews = Review.objects.filter(book=book)
-#         if form.is_valid():
-#             review = form.save(commit=False)
-#             review.book = book
-#             review.user = request.user
-#             review.save()
-#             return redirect('book_detail', book_id=book_id)
-
-#         return render(request, 'home/book_detail.html', {'form': form, 'book': book, 'reviews': reviews})
 
 class CartView(View):
     def get(self, request, user):
@@ -276,39 +256,6 @@ class OrderHistoryDetailView(View):
         except (CustomUser.DoesNotExist, Order.DoesNotExist):
             return redirect('login')
 
-class ManageBookView(View, LoginRequiredMixin):
-    def get(self, request):
-        form = BookForm()
-        books = Book.objects.all()
-        return render(request, 'owner/book_manage.html', {'form': form, 'books': books})
-class CreateBookView(View, LoginRequiredMixin):
-    def post(self, request):
-        form = BookForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('manage_book')
-        return render(request, 'owner/book_manage.html', {'form': form})
-
-class DeleteBookView(View, LoginRequiredMixin):
-    def post(self, request, book_id):
-        # ลบหนังสือ (ปลอดภัย)
-        book = Book.objects.get(pk=book_id)
-        book.delete()
-        return redirect('manage_book')
-    
-class EditBookView(View, LoginRequiredMixin):
-    def get(self, request, book_id):
-        book = Book.objects.get(pk=book_id)
-        form = BookForm(instance=book)
-        return render(request, 'owner/edit_book.html', {'form': form, 'book': book})
-    def post(self, request, book_id):
-        book = Book.objects.get(pk=book_id)
-        form = BookForm(request.POST, request.FILES, instance=book)
-        if form.is_valid():
-            form.save()
-            return redirect('manage_book')
-        return render(request, 'owner/edit_book.html', {'form': form, 'book': book})
-
 class DashboardView(View, LoginRequiredMixin):
     def get(self, request):
         # Get statistics for dashboard
@@ -330,6 +277,39 @@ class DashboardView(View, LoginRequiredMixin):
             'popular_books': popular_books,
         }
         return render(request, 'owner/dashboard.html', context)
+
+class ManageBookListView(View, LoginRequiredMixin):
+    def get(self, request):
+        form = BookForm()
+        books = Book.objects.all()
+        return render(request, 'owner/book_manage.html', {'form': form, 'books': books})
+    
+    def post(self, request):
+        form = BookForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('manage_book')
+        return render(request, 'owner/book_manage.html', {'form': form})
+
+class ManageBookView(View, LoginRequiredMixin):
+    def get(self, request, book_id):
+        book = Book.objects.get(pk=book_id)
+        form = BookForm(instance=book)
+        return render(request, 'owner/edit_book.html', {'form': form, 'book': book})
+
+    def post(self, request, book_id):
+        book = Book.objects.get(pk=book_id)
+        form = BookForm(request.POST, request.FILES, instance=book)
+        if form.is_valid():
+            form.save()
+            return redirect('manage_book')
+        return render(request, 'owner/edit_book.html', {'form': form, 'book': book})
+
+    def delete(self, request, book_id):
+        # ลบหนังสือ (ปลอดภัย)
+        book = Book.objects.get(pk=book_id)
+        book.delete()
+        return redirect('manage_book')
 
 class OrderHistoryOwnerView(View, LoginRequiredMixin):
     def get(self, request):
@@ -424,7 +404,7 @@ class UserListView(LoginRequiredMixin, View):
         users = CustomUser.objects.all().order_by('-date_joined')
         return render(request, 'owner/user_list.html', {'users': users})
 
-class DeleteUserView(LoginRequiredMixin, View):
+class UserView(LoginRequiredMixin, View):
     # login_url = '/login/'
 
     def post(self, request, user_id):
