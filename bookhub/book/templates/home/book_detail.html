@@ -38,24 +38,20 @@
                 <span class="text-3xl font-bold text-red-600">{{ book.price }} บาท</span>
 
                 <div class="flex items-center border border-gray-300 rounded-md">
-                    <button class="px-3 py-2 text-gray-600 hover:bg-gray-100 border-r">-</button>
+                    <button id="cart-minus" class="px-3 py-2 text-gray-600 hover:bg-gray-100 border-r">-</button>
                     <input type="number" value="1" min="1" class="w-12 text-center py-2 focus:outline-none" />
-                    <button class="px-3 py-2 text-gray-600 hover:bg-gray-100 border-l">+</button>
+                    <button id="cart-plus" class="px-3 py-2 text-gray-600 hover:bg-gray-100 border-l">+</button>
                 </div>
             </div>
 
             <div class="flex space-x-4 pt-2">
-                <form method="post" action="{% url 'cart' book.id %}">
+                <form method="post" action="{% url 'add_to_cart' book.id %}">
                     {% csrf_token %}
                     <button type="submit"
                         class="flex-1 max-w-xs px-6 py-3 border border-red-600 text-red-600 rounded-lg font-semibold hover:bg-red-50 transition duration-150">
                         หยิบใส่ตะกร้า
                     </button>
                 </form>
-                <button
-                    class="flex-1 max-w-xs px-6 py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition duration-150">
-                    ซื้อเลย
-                </button>
             </div>
         </div>
     </div>
@@ -75,7 +71,7 @@
     <div class="mt-8">
         <h2 class="text-2xl font-bold mb-4">รีวิวจากลูกค้า</h2>
 
-    
+
         <form action="POST">
             {% csrf_token %}
             <div class="mb-4">
@@ -83,34 +79,54 @@
                 <input type="text" id="comment" name="comment" rows="4"
                     class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-red-500"
                     placeholder="แสดงความคิดเห็น">
-                
+
             </div>
             <button type="submit"
                 class="px-6 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition duration-150">
                 ส่งรีวิว
             </button>
 
-        {% for review in reviews %}
-        <div class="border border-gray-200 p-4 rounded-lg shadow-sm mb-4">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-                    <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                    </svg>
+            {% for review in reviews %}
+            <div class="border border-gray-200 p-4 rounded-lg shadow-sm mb-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-400">พบรีวิวทั้งหมด {{ reviews|length }} รายการ</p>
+                        <p class="font-semibold">{{ review.user.username }}</p>
+                        <div class="text-xl text-yellow-400">★★★★★</div>
+                    </div>
                 </div>
-                <div>
-                    <p class="text-sm text-gray-400">พบรีวิวทั้งหมด {{ reviews|length }} รายการ</p>
-                    <p class="font-semibold">{{ review.user.username }}</p>
-                    <div class="text-xl text-yellow-400">★★★★★</div>
-                </div>
+                <p class="mt-2 text-sm text-gray-600">{{ review.comment }}</p>
             </div>
-            <p class="mt-2 text-sm text-gray-600">{{ review.comment }}</p>
-        </div>
-        {% empty %}
-        <p class="text-gray-500">ยังไม่มีรีวิว</p>
-        {% endfor %}
+            {% empty %}
+            <p class="text-gray-500">ยังไม่มีรีวิว</p>
+            {% endfor %}
     </div>
 </main>
+<script>
+    function handleCart() {
+        const plus = document.getElementById('cart-plus');
+        const minus = document.getElementById('cart-minus');
+        const quantityInput = document.querySelector('input[type="number"]');
+        let quantity = parseInt(quantityInput.value);
+
+        plus.addEventListener('click', () => {
+            quantity += 1;
+            quantityInput.value = quantity;
+        });
+        minus.addEventListener('click', () => {
+            if (quantity > 1) {
+                quantity -= 1;
+                quantityInput.value = quantity;
+            }
+        });
+
+    }
+</script>
 {% endblock %}

@@ -148,6 +148,31 @@ class CartView(View, LoginRequiredMixin):
         except (CustomUser.DoesNotExist, Cart.DoesNotExist):
             return redirect('login')
 
+class AddToCartView(View):
+    def post(self, request, book_id):        
+        try:
+            book = Book.objects.get(id=book_id)
+            user = request.user
+            
+            # Check if the book is already in the cart
+            cart_item, created = Cart.objects.get_or_create(
+                user=user,
+                book=book,
+                status='in_cart',
+                defaults={'quantity': 1, 'price': book.price, 'total_price': book.price}
+            )
+            
+            if not created:
+                # If it already exists, increase the quantity
+                if cart_item.quantity < book.stock:
+                    cart_item.quantity += 1
+                    cart_item.total_price = cart_item.price * cart_item.quantity
+                    cart_item.save()
+            
+            return redirect('cart', user=user.id)
+        except Book.DoesNotExist:
+            return redirect('home')
+
 class PaymentView(View, LoginRequiredMixin):
     def get(self, request, user):
         try:
@@ -193,11 +218,16 @@ class PaymentView(View, LoginRequiredMixin):
                 if payment_method != 'cash' and 'payment_slip' in request.FILES:
                     payment.payment_slip = request.FILES['payment_slip']
                     payment.save()
-                    
-                # Update cart status
-                cart_item.status = 'notin_cart'
-                cart_item.save()
 
+                # Update order status based on payment method
+                if payment_method == 'cash':
+                    order.status = 'unpaid'  # Will be paid on delivery
+                else:
+                    order.status = 'paid'  # Assume paid if slip uploaded
+                order.save()
+            
+            # Update cart status AFTER all orders are created successfully
+            cart_items.update(status='notin_cart')
             return redirect('home')
 
         except CustomUser.DoesNotExist:
