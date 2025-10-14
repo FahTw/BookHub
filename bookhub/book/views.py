@@ -7,8 +7,6 @@ from datetime import datetime
 from django.utils import timezone
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, logout
-from django.contrib.auth.mixins import LoginRequiredMixin
-
 class LoginView(View):
     def get(self, request):
         form = AuthenticationForm()
@@ -41,7 +39,7 @@ class RegisterView(View):
             return redirect('login')
         return render(request, 'login/register.html', {'form': form})
 
-class HomeView(View, LoginRequiredMixin):
+class HomeView(View):
     def get(self, request):
         categories = BookCategory.objects.all()
         best_sellers = Book.objects.all().order_by('-sold')[:5]
@@ -54,7 +52,7 @@ class HomeView(View, LoginRequiredMixin):
         }
         return render(request, 'home/home.html', context)
 
-class ProfileView(View, LoginRequiredMixin):
+class ProfileView(View):
     def get(self, request):
         form = UserProfileForm(instance=request.user)
         return render(request, 'home/profile.html', {'form': form})
@@ -66,12 +64,14 @@ class ProfileView(View, LoginRequiredMixin):
             return redirect('profile')
         return render(request, 'home/profile.html', {'form': form})
 
-class BookListView(View, LoginRequiredMixin):
+class BookListView(
+    View):
     def get(self, request):
         books = Book.objects.all()
         return render(request, 'home/book_list.html', {'books': books})
 
-class BookDetailView(View, LoginRequiredMixin):
+class BookDetailView(
+    View):
     def get(self, request, book_id):
         book = Book.objects.get(pk=book_id)
         reviews = Review.objects.filter(book=book).select_related('user').order_by('-created_date')
@@ -118,7 +118,8 @@ class BookDetailView(View, LoginRequiredMixin):
             'form': form
         })
 
-class CategoryView(View, LoginRequiredMixin):
+class CategoryView(
+    View):
     def get(self, request, category_id):
         category = BookCategory.objects.get(pk=category_id)
         books = Book.objects.filter(categories=category)
@@ -129,180 +130,156 @@ class CategoryView(View, LoginRequiredMixin):
             'categories': categories
         })
 
-class CartView(View, LoginRequiredMixin):
+class CartView(
+    View):
     def get(self, request, user):
-        try:
-            user = CustomUser.objects.get(id=user)
-            cart = Cart.objects.filter(user=user, status='in_cart').select_related('book')
+        user = CustomUser.objects.get(id=user)
+        cart = Cart.objects.filter(user=user, status='in_cart').select_related('book')
 
-            # Calculate totals
-            total_amount = sum(item.total_price for item in cart)
-            total_items = sum(item.quantity for item in cart)
+        # Calculate totals
+        total_amount = sum(item.total_price for item in cart)
+        total_items = sum(item.quantity for item in cart)
 
-            context = {
-                'user': user,
-                'cart': cart,
-                'total_amount': total_amount,
-                'total_items': total_items,
-            }
-            return render(request, 'payment/cart.html', context)
-        except CustomUser.DoesNotExist:
-            return redirect('login')
+        context = {
+            'user': user,
+            'cart': cart,
+            'total_amount': total_amount,
+            'total_items': total_items,
+        }
+        return render(request, 'payment/cart.html', context)
+
 
     def post(self, request, user):
-        try:
-            user_obj = CustomUser.objects.get(id=user)
-            action = request.POST.get('action')
-            cart_id = request.POST.get('cart_id')
+        user_obj = CustomUser.objects.get(id=user)
+        action = request.POST.get('action')
+        cart_id = request.POST.get('cart_id')
             
-            if action == 'remove' and cart_id:
-                Cart.objects.filter(id=cart_id, user=user_obj).delete()
+        if action == 'remove' and cart_id:
+            Cart.objects.filter(id=cart_id, user=user_obj).delete()
             
-            elif action == 'update' and cart_id:
-                quantity_change = int(request.POST.get('quantity_change', 0))
-                cart_item = Cart.objects.get(id=cart_id, user=user_obj)
-                new_quantity = cart_item.quantity + quantity_change
+        elif action == 'update' and cart_id:
+            quantity_change = int(request.POST.get('quantity_change', 0))
+            cart_item = Cart.objects.get(id=cart_id, user=user_obj)
+            new_quantity = cart_item.quantity + quantity_change
                 
-                if 0 < new_quantity <= cart_item.book.stock:
-                    cart_item.quantity = new_quantity
-                    cart_item.total_price = cart_item.price * cart_item.quantity
-                    cart_item.save()
+            if 0 < new_quantity <= cart_item.book.stock:
+                cart_item.quantity = new_quantity
+                cart_item.total_price = cart_item.price * cart_item.quantity
+                cart_item.save()
             
-            return redirect('cart', user=user)
-        except (CustomUser.DoesNotExist, Cart.DoesNotExist):
-            return redirect('login')
+        return redirect('cart', user=user)
 
-class AddToCartView(View, LoginRequiredMixin):
-    def post(self, request, book_id):        
-        try:
-            book = Book.objects.get(id=book_id)
-            user = request.user
-            
-            # Check if the book is already in the cart
-            cart_item, created = Cart.objects.get_or_create(
-                user=user,
-                book=book,
-                status='in_cart',
-                defaults={'quantity': 1, 'price': book.price, 'total_price': book.price}
-            )
-            
-            if not created:
-                # If it already exists, increase the quantity
-                if cart_item.quantity < book.stock:
-                    cart_item.quantity += 1
-                    cart_item.total_price = cart_item.price * cart_item.quantity
-                    cart_item.save()
-            
-            return redirect('cart', user=user.id)
-        except Book.DoesNotExist:
-            return redirect('home')
 
-class PaymentView(View, LoginRequiredMixin):
+class AddToCartView(
+    View):
+    def post(self, request, book_id):
+        book = Book.objects.get(id=book_id)
+        user = request.user
+            
+        # Check if the book is already in the cart
+        cart_item, created = Cart.objects.get_or_create(
+            user=user,
+            book=book,
+            status='in_cart',
+            defaults={'quantity': 1, 'price': book.price, 'total_price': book.price}
+        )
+            
+
+            # If it already exists, increase the quantity
+        if cart_item.quantity < book.stock:
+            cart_item.quantity += 1
+            cart_item.total_price = cart_item.price * cart_item.quantity
+            cart_item.save()
+
+        return redirect('cart', user=user.id)
+
+class PaymentView(
+    View):
     def get(self, request, user):
-        try:
-            user_obj = CustomUser.objects.get(id=user)
-            cart_items = Cart.objects.filter(user=user_obj, status='in_cart')
-            total_amount = sum(item.total_price for item in cart_items)
+
+        user_obj = CustomUser.objects.get(id=user)
+        cart_items = Cart.objects.filter(user=user_obj, status='in_cart')
+        total_amount = sum(item.total_price for item in cart_items)
             
-            context = {
-                'user_obj': user_obj,
-                'cart_items': cart_items,
-                'total_amount': total_amount,
-            }
-            return render(request, 'payment/payment.html', context)
-        except CustomUser.DoesNotExist:
-            return redirect('login')
+        context = {
+            'user_obj': user_obj,
+            'cart_items': cart_items,
+            'total_amount': total_amount,
+        }
+        return render(request, 'payment/payment.html', context)
+
     
     def post(self, request, user):
-        try:
-            user_obj = CustomUser.objects.get(id=user)
-            cart_items = Cart.objects.filter(user=user_obj, status='in_cart')
-            payment_method = request.POST.get('method')
+        user_obj = CustomUser.objects.get(id=user)
+        cart_items = Cart.objects.filter(user=user_obj, status='in_cart')
+        payment_method = request.POST.get('method')
 
-            for cart_item in cart_items:
-                # Create Order
-                order = Order.objects.create(
-                    user=user_obj,
-                    cart=cart_item,
-                    order_date=datetime.now(),
-                    total_amount=cart_item.total_price,
-                    status='unpaid' if payment_method == 'cash' else 'paid'
-                )
+        for cart_item in cart_items:
+            # Create Order
+            order = Order.objects.create(
+                user=user_obj,
+                cart=cart_item,
+                order_date=datetime.now(),
+                total_amount=cart_item.total_price,
+                status='unpaid' if payment_method == 'cash' else 'paid'
+            )
                         
-                # Create Payment
-                payment = Payment.objects.create(
-                    order=order,
-                    payment_date=datetime.now(),
-                    method=payment_method,
-                    amount=cart_item.total_price,
-                    status='pending'
-                )
+            # Create Payment
+            payment = Payment.objects.create(
+                order=order,
+                payment_date=datetime.now(),
+                method=payment_method,
+                amount=cart_item.total_price,
+                status='pending'
+            )
 
-                # Add payment slip if uploaded
-                if payment_method != 'cash' and 'payment_slip' in request.FILES:
-                    payment.payment_slip = request.FILES['payment_slip']
-                    payment.save()
+            # Add payment slip if uploaded
+            if payment_method != 'cash' and 'payment_slip' in request.FILES:
+                payment.payment_slip = request.FILES['payment_slip']
+                payment.save()
 
-                # Update order status based on payment method
-                if payment_method == 'cash':
-                    order.status = 'unpaid'  # Will be paid on delivery
-                else:
-                    order.status = 'paid'  # Assume paid if slip uploaded
-                order.save()
+            # Update order status based on payment method
+            if payment_method == 'cash':
+                order.status = 'unpaid'  # Will be paid on delivery
+            else:
+                order.status = 'paid'  # Assume paid if slip uploaded
+            order.save()
             
             # Update cart status AFTER all orders are created successfully
             cart_items.update(status='notin_cart')
-            return redirect('home')
+        return redirect('home')
 
-        except CustomUser.DoesNotExist:
-            return redirect('login')
 
-class OrderHistoryView(View, LoginRequiredMixin):
+class OrderHistoryView(View):
     def get(self, request, user):
-        try:
-            user_obj = CustomUser.objects.get(id=user)
-            orders = Order.objects.filter(user=user_obj).order_by('-order_date').select_related('cart', 'cart__book')
+        user_obj = CustomUser.objects.get(id=user)
+        orders = Order.objects.filter(user=user_obj).order_by('-order_date').select_related('cart', 'cart__book')
 
-            context = {
-                'orders': orders,
-                'user_obj': user_obj,
-                'total_orders': orders.count(),
-            }
-            return render(request, 'home/orderhistory.html', context)
-        except CustomUser.DoesNotExist:
-            return redirect('login')
+        context = {
+            'orders': orders,
+            'user_obj': user_obj,
+            'total_orders': orders.count(),
+        }
+        return render(request, 'home/orderhistory.html', context)
 
-class OrderHistoryDetailView(View, LoginRequiredMixin):
+class OrderHistoryDetailView(View):
     def get(self, request, user, order):
-        try:
-            user_obj = CustomUser.objects.get(id=user)
-            order_obj = Order.objects.get(id=order, user=user_obj)
-            cart_info = order_obj.cart
-            payment_info = Payment.objects.get(order=order_obj)
-            
-            context = {
-                'user_obj': user_obj,
-                'order': order_obj,
-                'cart_info': cart_info,
-                'payment_info': payment_info,
-            }
-            return render(request, 'home/orderhistory_detail.html', context)
-        except (CustomUser.DoesNotExist, Order.DoesNotExist):
-            return redirect('login')
-        
-    def post(self, request, user, order):
         user_obj = CustomUser.objects.get(id=user)
         order_obj = Order.objects.get(id=order, user=user_obj)
-            # Only allow cancellation for paid or processing orders
-        if order_obj.status in ['paid', 'processing']:
-            order_obj.status = 'cancelled'
-            order_obj.save()
-            payment = Payment.objects.get(order=order_obj)
-            payment.status = 'cancelled'
-            payment.save()
-        return redirect('order_history_user', user=user)
+        cart_info = order_obj.cart
+        payment_info = Payment.objects.get(order=order_obj)
+            
+        context = {
+            'user_obj': user_obj,
+            'order': order_obj,
+            'cart_info': cart_info,
+            'payment_info': payment_info,
+        }
+        return render(request, 'home/orderhistory_detail.html', context)
 
-class DashboardView(View, LoginRequiredMixin):
+
+class DashboardView(
+    View):
     def get(self, request):
         # Get statistics for dashboard
         total_orders = Order.objects.count()
@@ -324,7 +301,8 @@ class DashboardView(View, LoginRequiredMixin):
         }
         return render(request, 'owner/dashboard.html', context)
 
-class ManageBookListView(View, LoginRequiredMixin):
+class ManageBookListView(
+    View):
     def get(self, request):
         books = Book.objects.all().order_by('-id')
         search_query = request.GET.get('search', '')
@@ -389,7 +367,8 @@ class ManageBookListView(View, LoginRequiredMixin):
         }
         return render(request, 'owner/book_manage.html', context)
 
-class ManageBookView(View, LoginRequiredMixin):
+class ManageBookView(
+    View):
     def get(self, request, book_id):
         book = Book.objects.get(pk=book_id)
         form = BookForm(instance=book)
@@ -403,13 +382,15 @@ class ManageBookView(View, LoginRequiredMixin):
             return redirect('managelist_book')
         return render(request, 'owner/edit_book.html', {'form': form, 'book': book})
 
-class ManageBookDeleteView(View, LoginRequiredMixin):
+class ManageBookDeleteView(
+    View):
     def get(self, request, book_id):
         book = Book.objects.get(pk=book_id)
         book.delete()
         return redirect('managelist_book')
 
-class OrderHistoryOwnerView(View, LoginRequiredMixin):
+class OrderHistoryOwnerView(
+    View):
     def get(self, request):
         orders = Order.objects.all().order_by('-order_date').select_related('user', 'cart', 'cart__book')
         
@@ -441,52 +422,42 @@ class OrderHistoryOwnerView(View, LoginRequiredMixin):
         }
         return render(request, 'owner/orderhistory_owner.html', context)
 
-class OrderHistoryOwnerDetailView(View, LoginRequiredMixin):
+class OrderHistoryOwnerDetailView(
+    View):
     def get(self, request, order):
-        try:
-            order_obj = Order.objects.get(id=order)
-            payment_info = None
-            
-            try:
-                payment_info = Payment.objects.get(order=order_obj)
-            except Payment.DoesNotExist:
-                pass
-            
-            context = {
-                'order': order_obj,
-                'cart_info': order_obj.cart,
-                'user_info': order_obj.user,
-                'payment_info': payment_info,
-            }
-            return render(request, 'owner/orderhistory_detail_owner.html', context)
-        except Order.DoesNotExist:
-            return redirect('order_history_owner')
+        order_obj = Order.objects.get(id=order)
+        payment_info = None
+        payment_info = Payment.objects.get(order=order_obj)
+
+        context = {
+            'order': order_obj,
+            'cart_info': order_obj.cart,
+            'user_info': order_obj.user,
+            'payment_info': payment_info,
+        }
+        return render(request, 'owner/orderhistory_detail_owner.html', context)
+
     
     def post(self, request, order):
-        try:
-            order_obj = Order.objects.get(id=order)
-            new_status = request.POST.get('status')
+        order_obj = Order.objects.get(id=order)
+        new_status = request.POST.get('status')
             
             # Update order status
-            if new_status in ['unpaid', 'paid', 'processing', 'shipped', 'delivered', 'cancelled']:
-                order_obj.status = new_status
-                order_obj.save()
-                
-                # Update payment status if changing to paid
-                if new_status == 'paid':
-                    try:
-                        payment = Payment.objects.get(order=order_obj)
-                        payment.status = 'approved'
-                        payment.verified_date = datetime.now()
-                        payment.save()
-                    except Payment.DoesNotExist:
-                        pass
+        if new_status in ['unpaid', 'paid', 'processing', 'shipped', 'delivered', 'cancelled']:
+            order_obj.status = new_status
+            order_obj.save()
+
+            # Update payment status if changing to paid
+            if new_status == 'paid':
+                payment = Payment.objects.get(order=order_obj)
+                payment.status = 'approved'
+                payment.verified_date = datetime.now()
+                payment.save()
             
             return redirect('order_history_owner')
-        except Order.DoesNotExist:
-            return redirect('order_history_owner')
 
-class UserListView(LoginRequiredMixin, View):
+class UserListView(
+    View):
     def get(self, request):
         users = CustomUser.objects.all().order_by('-date_joined')
         search_query = request.GET.get('search', '')
@@ -513,14 +484,16 @@ class UserListView(LoginRequiredMixin, View):
         }
         return render(request, 'owner/user_list.html', context)
 
-class UserView(LoginRequiredMixin, View):
+class UserView(
+    View):
     def get(self, request, user_id):
         user = CustomUser.objects.get(pk=user_id)
         if not user.is_staff:
             user.delete()
         return redirect('user_list')
 
-class UserDetailView(LoginRequiredMixin, View):
+class UserDetailView(
+    View):
     def get(self, request, user_id):
         user = CustomUser.objects.get(pk=user_id)
         user_orders = Order.objects.filter(user=user)
@@ -535,7 +508,8 @@ class UserDetailView(LoginRequiredMixin, View):
         }
         return render(request, 'owner/user_detail.html', context)
 
-class StatView(View, LoginRequiredMixin):
+class StatView(
+    View):
     def get(self, request):
         # Overall statistics
         total_books = Book.objects.count()
