@@ -7,11 +7,12 @@ from datetime import datetime
 from django.utils import timezone
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, logout
+
 class LoginView(View):
     def get(self, request):
         form = AuthenticationForm()
         return render(request, 'login/login.html', {'form': form})
-    
+
     def post(self, request):
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
@@ -64,14 +65,12 @@ class ProfileView(View):
             return redirect('profile')
         return render(request, 'home/profile.html', {'form': form})
 
-class BookListView(
-    View):
+class BookListView(View):
     def get(self, request):
         books = Book.objects.all()
         return render(request, 'home/book_list.html', {'books': books})
 
-class BookDetailView(
-    View):
+class BookDetailView(View):
     def get(self, request, book_id):
         book = Book.objects.get(pk=book_id)
         reviews = Review.objects.filter(book=book).select_related('user').order_by('-created_date')
@@ -118,8 +117,7 @@ class BookDetailView(
             'form': form
         })
 
-class CategoryView(
-    View):
+class CategoryView(View):
     def get(self, request, category_id):
         category = BookCategory.objects.get(pk=category_id)
         books = Book.objects.filter(categories=category)
@@ -130,24 +128,22 @@ class CategoryView(
             'categories': categories
         })
 
-class CartView(
-    View):
+class CartView(View):
     def get(self, request, user):
-        user = CustomUser.objects.get(id=user)
-        cart = Cart.objects.filter(user=user, status='in_cart').select_related('book')
+        user_obj = CustomUser.objects.get(id=user)
+        cart = Cart.objects.filter(user=user_obj, status='in_cart').select_related('book')
 
         # Calculate totals
         total_amount = sum(item.total_price for item in cart)
         total_items = sum(item.quantity for item in cart)
 
         context = {
-            'user': user,
+            'user': user_obj,
             'cart': cart,
             'total_amount': total_amount,
             'total_items': total_items,
         }
         return render(request, 'payment/cart.html', context)
-
 
     def post(self, request, user):
         user_obj = CustomUser.objects.get(id=user)
@@ -169,9 +165,7 @@ class CartView(
             
         return redirect('cart', user=user)
 
-
-class AddToCartView(
-    View):
+class AddToCartView(View):
     def post(self, request, book_id):
         book = Book.objects.get(id=book_id)
         user = request.user
@@ -184,21 +178,18 @@ class AddToCartView(
             defaults={'quantity': 1, 'price': book.price, 'total_price': book.price}
         )
             
-
-            # If it already exists, increase the quantity
-        if cart_item.quantity < book.stock:
+        # If it already exists, increase the quantity
+        if not created and cart_item.quantity < book.stock:
             cart_item.quantity += 1
             cart_item.total_price = cart_item.price * cart_item.quantity
             cart_item.save()
 
         return redirect('cart', user=user.id)
 
-class PaymentView(
-    View):
+class PaymentView(View):
     def get(self, request, user):
-
         user_obj = CustomUser.objects.get(id=user)
-        cart_items = Cart.objects.filter(user=user_obj, status='in_cart')
+        cart_items = Cart.objects.filter(user=user_obj, status='in_cart').select_related('book')
         total_amount = sum(item.total_price for item in cart_items)
             
         context = {
@@ -208,29 +199,33 @@ class PaymentView(
         }
         return render(request, 'payment/payment.html', context)
 
-    
     def post(self, request, user):
         user_obj = CustomUser.objects.get(id=user)
         cart_items = Cart.objects.filter(user=user_obj, status='in_cart')
         payment_method = request.POST.get('method')
+        payment_slip = request.FILES.get('payment_slip')
 
         for cart_item in cart_items:
+            # Determine order status based on payment method
+            order_status = 'unpaid' if payment_method == 'cash' else 'paid'
+            
             # Create Order
             order = Order.objects.create(
                 user=user_obj,
                 cart=cart_item,
                 order_date=datetime.now(),
                 total_amount=cart_item.total_price,
-                status='unpaid' if payment_method == 'cash' else 'paid'
+                status=order_status
             )
                         
             # Create Payment
             payment = Payment.objects.create(
                 order=order,
                 payment_date=datetime.now(),
-                method=payment_method,
+                payment_method=payment_method,
                 amount=cart_item.total_price,
-                status='pending'
+                status='pending',
+                payment_slip=payment_slip if payment_method != 'cash' and payment_slip else None
             )
 
             # Add payment slip if uploaded
@@ -247,6 +242,7 @@ class PaymentView(
             
             # Update cart status AFTER all orders are created successfully
             cart_items.update(status='notin_cart')
+
         return redirect('home')
 
 
@@ -266,20 +262,18 @@ class OrderHistoryDetailView(View):
     def get(self, request, user, order):
         user_obj = CustomUser.objects.get(id=user)
         order_obj = Order.objects.get(id=order, user=user_obj)
-        cart_info = order_obj.cart
-        payment_info = Payment.objects.get(order=order_obj)
+        payment_info = Payment.objects.filter(order=order_obj).first()
             
         context = {
             'user_obj': user_obj,
             'order': order_obj,
-            'cart_info': cart_info,
+            'cart_info': order_obj.cart,
             'payment_info': payment_info,
         }
         return render(request, 'home/orderhistory_detail.html', context)
 
 
-class DashboardView(
-    View):
+class DashboardView(View):
     def get(self, request):
         # Get statistics for dashboard
         total_orders = Order.objects.count()
@@ -301,8 +295,7 @@ class DashboardView(
         }
         return render(request, 'owner/dashboard.html', context)
 
-class ManageBookListView(
-    View):
+class ManageBookListView(View):
     def get(self, request):
         books = Book.objects.all().order_by('-id')
         search_query = request.GET.get('search', '')
@@ -367,8 +360,7 @@ class ManageBookListView(
         }
         return render(request, 'owner/book_manage.html', context)
 
-class ManageBookView(
-    View):
+class ManageBookView(View):
     def get(self, request, book_id):
         book = Book.objects.get(pk=book_id)
         form = BookForm(instance=book)
@@ -382,15 +374,13 @@ class ManageBookView(
             return redirect('managelist_book')
         return render(request, 'owner/edit_book.html', {'form': form, 'book': book})
 
-class ManageBookDeleteView(
-    View):
+class ManageBookDeleteView(View):
     def get(self, request, book_id):
         book = Book.objects.get(pk=book_id)
         book.delete()
         return redirect('managelist_book')
 
-class OrderHistoryOwnerView(
-    View):
+class OrderHistoryOwnerView(View):
     def get(self, request):
         orders = Order.objects.all().order_by('-order_date').select_related('user', 'cart', 'cart__book')
         
@@ -422,12 +412,10 @@ class OrderHistoryOwnerView(
         }
         return render(request, 'owner/orderhistory_owner.html', context)
 
-class OrderHistoryOwnerDetailView(
-    View):
+class OrderHistoryOwnerDetailView(View):
     def get(self, request, order):
         order_obj = Order.objects.get(id=order)
-        payment_info = None
-        payment_info = Payment.objects.get(order=order_obj)
+        payment_info = Payment.objects.filter(order=order_obj).first()
 
         context = {
             'order': order_obj,
@@ -437,27 +425,52 @@ class OrderHistoryOwnerDetailView(
         }
         return render(request, 'owner/orderhistory_detail_owner.html', context)
 
-    
     def post(self, request, order):
         order_obj = Order.objects.get(id=order)
-        new_status = request.POST.get('status')
+        payment = Payment.objects.filter(order=order_obj).first()
+        
+        # Handle payment status update
+        payment_status = request.POST.get('payment_status')
+        if payment_status and payment:
+            if payment_status == 'paid':
+                payment.status = 'paid'
+                payment.verified_date = datetime.now()
+                payment.save()
+                # Update order status to paid if currently unpaid
+                if order_obj.status == 'unpaid':
+                    order_obj.status = 'paid'
+                    order_obj.save()
+                    
+            elif payment_status == 'cancelled':
+                payment.status = 'cancelled'
+                payment.save()
+                # Update order status to cancelled
+                order_obj.status = 'cancelled'
+                order_obj.save()
             
-            # Update order status
+            return redirect('order_history_owner_detail', order=order)
+        
+        # Handle order status update
+        new_status = request.POST.get('status')
         if new_status in ['unpaid', 'paid', 'processing', 'shipped', 'delivered', 'cancelled']:
             order_obj.status = new_status
             order_obj.save()
 
-            # Update payment status if changing to paid
-            if new_status == 'paid':
-                payment = Payment.objects.get(order=order_obj)
-                payment.status = 'approved'
-                payment.verified_date = datetime.now()
-                payment.save()
+            # Update payment status accordingly
+            if payment:
+                if new_status == 'paid':
+                    payment.status = 'paid'
+                    payment.verified_date = datetime.now()
+                    payment.save()
+                elif new_status == 'cancelled':
+                    payment.status = 'cancelled'
+                    payment.save()
             
-            return redirect('order_history_owner')
+            return redirect('order_history_owner_detail', order=order)
 
-class UserListView(
-    View):
+        return redirect('order_history_owner_detail', order=order)
+
+class UserListView(View):
     def get(self, request):
         users = CustomUser.objects.all().order_by('-date_joined')
         search_query = request.GET.get('search', '')
@@ -484,16 +497,14 @@ class UserListView(
         }
         return render(request, 'owner/user_list.html', context)
 
-class UserView(
-    View):
+class UserView(View):
     def get(self, request, user_id):
         user = CustomUser.objects.get(pk=user_id)
         if not user.is_staff:
             user.delete()
         return redirect('user_list')
 
-class UserDetailView(
-    View):
+class UserDetailView(View):
     def get(self, request, user_id):
         user = CustomUser.objects.get(pk=user_id)
         user_orders = Order.objects.filter(user=user)
@@ -508,8 +519,7 @@ class UserDetailView(
         }
         return render(request, 'owner/user_detail.html', context)
 
-class StatView(
-    View):
+class StatView(View):
     def get(self, request):
         # Overall statistics
         total_books = Book.objects.count()

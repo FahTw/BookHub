@@ -176,6 +176,115 @@
             </div>
         </div>
 
+        <!-- Payment Information Section -->
+        {% if payment_info %}
+        <div class="bg-white rounded-lg border border-gray-200 p-4 md:p-6 mb-6 shadow-sm">
+            <div class="px-6 py-4 bg-gradient-to-r from-orange-50 to-amber-50 border-b-2 border-orange-100 -mx-4 md:-mx-6 -mt-4 md:-mt-6 mb-6 rounded-t-lg">
+                <h2 class="text-xl font-bold text-gray-900 flex items-center">
+                    <svg class="w-6 h-6 text-orange-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    </svg>
+                    ข้อมูลการชำระเงิน
+                </h2>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Payment Details -->
+                <div class="space-y-4">
+                    <div class="flex items-start">
+                        <span class="text-sm font-medium text-gray-600 w-32">วิธีการชำระ:</span>
+                        <span class="text-sm text-gray-900 font-medium">{{ payment_info.payment_method }}</span>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-sm font-medium text-gray-600 w-32">วันที่ชำระเงิน:</span>
+                        <span class="text-sm text-gray-900">{{ payment_info.payment_date|date:"j M Y เวลา H:i น." }}</span>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-sm font-medium text-gray-600 w-32">จำนวนเงิน:</span>
+                        <span class="text-sm font-bold text-orange-600">{{ payment_info.amount|floatformat:0 }} บาท</span>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-sm font-medium text-gray-600 w-32">สถานะ:</span>
+                        {% if payment_info.status == 'paid' %}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 border-2 border-green-200">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                                ชำระเงินแล้ว
+                            </span>
+                        {% elif payment_info.status == 'cancelled' %}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700 border-2 border-gray-200">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                                ยกเลิก
+                            </span>
+                        {% else %}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700 border-2 border-yellow-200">
+                                รอดำเนินการ
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Payment Status Management -->
+                    <div class="pt-4 border-t border-gray-200">
+                        <h4 class="text-sm font-semibold text-gray-900 mb-3">จัดการสถานะการชำระเงิน</h4>
+                        <form method="POST" action="{% url 'order_history_owner_detail' order.id %}">
+                            {% csrf_token %}
+                            <div class="flex flex-col gap-2">
+                                <button type="submit" name="payment_status" value="paid" class="px-4 py-2 bg-green-50 text-green-700 border-2 border-green-200 rounded-lg hover:bg-green-100 transition-colors text-sm font-medium text-left flex items-center {% if payment_info.status == 'paid' %}ring-2 ring-green-500 bg-green-100{% endif %}">
+                                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                    </svg>
+                                    อนุมัติการชำระเงิน
+                                </button>
+                                <button type="submit" name="payment_status" value="cancelled" class="px-4 py-2 bg-gray-50 text-gray-700 border-2 border-gray-200 rounded-lg hover:bg-gray-100 transition-colors text-sm font-medium text-left flex items-center {% if payment_info.status == 'cancelled' %}ring-2 ring-gray-500 bg-gray-100{% endif %}">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                    ยกเลิกการชำระเงิน
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Payment Slip Image -->
+                <div class="space-y-3">
+                    <h3 class="text-sm font-semibold text-gray-900">สลิปการโอนเงิน</h3>
+                    {% if payment_info.payment_slip %}
+                        <div class="relative group">
+                            <div class="border-2 border-gray-200 rounded-lg overflow-hidden bg-gray-50 hover:border-orange-300 transition-colors">
+                                <img src="{{ payment_info.payment_slip.url }}" 
+                                     alt="สลิปการโอนเงิน" 
+                                     class="w-full h-auto object-contain max-h-96 cursor-pointer"
+                                     onclick="document.getElementById('imageModal').classList.remove('hidden')">
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2 text-center">คลิกที่รูปเพื่อดูขนาดเต็ม</p>
+                        </div>
+
+                        <!-- Image Modal -->
+                        <div id="imageModal" class="hidden fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4" onclick="this.classList.add('hidden')">
+                            <div class="relative max-w-4xl max-h-full">
+                                <button class="absolute -top-10 right-0 text-white hover:text-gray-300 text-2xl font-bold">&times; ปิด</button>
+                                <img src="{{ payment_info.payment_slip.url }}" 
+                                     alt="สลิปการโอนเงิน" 
+                                     class="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl">
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50">
+                            <svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <p class="text-sm text-gray-500">ไม่มีสลิปการโอนเงิน</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
         <!-- Order Summary Section -->
         <div class="bg-white rounded-lg border border-gray-200 p-4 md:p-6 shadow-sm">
             <h2 class="text-lg font-semibold mb-6 text-gray-900">สรุปคำสั่งซื้อ</h2>
