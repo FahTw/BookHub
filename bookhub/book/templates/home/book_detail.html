@@ -134,7 +134,7 @@
             รีวิวจากลูกค้า
         </h2>
 
-
+        <!--  ให้คะแนนรีวิว -->
         <form method="POST" class="bg-gray-50 p-6 rounded-xl shadow-sm border border-gray-200 mb-8">
             {% csrf_token %}
             <div class="space-y-6">
@@ -168,7 +168,7 @@
             </div>
         </form>
 
-        <!-- Reviews List -->
+        <!-- ลิสรีวิวทั้งหมด -->
         <div class="space-y-4">
             {% for review in reviews %}
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
