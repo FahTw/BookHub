@@ -4,13 +4,13 @@ from django.contrib.auth.decorators import login_required
 from book.views import *
 
 urlpatterns = [
-    # Public auth routes
+    # path ที่ไม่ต้องการ login ก่อน
     path('', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('register/', RegisterView.as_view(), name='register'),
 
-    # Protected routes (require login)
-    path('home/', login_required(HomeView.as_view()), name='home'), # Home page
+    # path ที่ต้องการ login ก่อน
+    path('home/', login_required(HomeView.as_view()), name='home'),
     path('profile/', login_required(ProfileView.as_view()), name='profile'),
     path('book/', login_required(BookListView.as_view()), name='book'),
     path('book/<int:book_id>/', login_required(BookDetailView.as_view()), name='book_detail'),

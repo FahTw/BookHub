@@ -1,8 +1,6 @@
 <header class="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm w-full">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 py-4 lg:py-0 lg:h-16 w-full">
-
-      <!-- Logo and Navigation -->
       <div class="flex items-center justify-between w-full lg:w-auto">
         <div class="flex items-center gap-4 lg:gap-8">
           <a href="{% url 'home' %}"
@@ -14,8 +12,6 @@
           </nav>
         </div>
       </div>
-
-      <!-- User Actions -->
       <div class="flex items-center justify-end gap-4 lg:gap-6 w-full lg:w-auto">
         <a href="{% url 'cart' user=user.id %}"
           class="relative p-2 text-gray-700 hover:text-orange-600 transition-colors">
@@ -48,8 +44,9 @@
 </header>
 
 <script>
+  // กด user profile จะแสดง menu
   function myToggle() {
     const menu = document.getElementById("user-menu");
-    menu.classList.toggle("hidden");
+    menu.classList.toggle("hidden"); // กดสลับ hidden ไปมา
   }
 </script>

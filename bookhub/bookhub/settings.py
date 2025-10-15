@@ -56,7 +56,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'APP_DIRS': True,
-        'DIRS': [BASE_DIR / 'book' / 'templates'],
+        'DIRS': [BASE_DIR / 'book' / 'templates'], # หาไฟล์ template ได้ทั้งหมด
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
