@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Get search input and status select elements
+    // ข้อความ search input เเละ ตัวเลือก status 
     const searchInput = document.querySelector('input[type="text"]');
     const statusSelect = document.querySelector('select');
 
-    // Add event listener for search input
+    // เพิ่ม event
     if (searchInput) {
         searchInput.addEventListener('input', function () {
             const searchTerm = this.value.toLowerCase();
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Add event listener for status select
+    // เพิ่ม event
     if (statusSelect) {
         statusSelect.addEventListener('change', function () {
             const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
@@ -26,18 +26,18 @@ document.addEventListener('DOMContentLoaded', function () {
         let visibleCount = 0;
 
         orderCards.forEach(card => {
-            // Get book title from h4 element (not order number)
+            // ดึงข้อมูลหนังสือ
             const bookTitleElement = card.querySelector('h4.font-semibold.text-gray-900');
             const bookTitle = bookTitleElement ? bookTitleElement.textContent.toLowerCase() : '';
             
-            // Get order status from the status badge
+            // ดึงข้อมูลสถานะคำสั่งซื้อ
             const statusBadge = card.querySelector('.inline-flex.px-3.py-1');
             const orderStatus = statusBadge ? statusBadge.textContent.toLowerCase().trim() : '';
             
-            // Check if order matches search term (book title only)
+            // เช็คข้อมูลข้อมูลสั่งซื้อตรงกับชื่อหนังสือ
             const matchesSearch = !searchTerm || bookTitle.includes(searchTerm);
             
-            // Check if order matches status filter
+            // เช็คข้อมูลสถานะสั่งซื้อตรงกับสถานะค้นหา
             const matchesStatus = !statusFilter || checkStatusMatch(orderStatus, statusFilter);
 
             if (matchesSearch && matchesStatus) {
@@ -48,30 +48,30 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        // Show/hide empty state message when no results found
+        // แสดงกับซ่อน
         const emptyState = document.querySelector('.bg-white.rounded-lg.shadow-sm.p-12.text-center');
         if (emptyState) {
             const hasNoOrders = emptyState.querySelector('h2')?.textContent.includes('ยังไม่มีประวัติการสั่งซื้อ');
             
             if (visibleCount === 0 && (searchTerm || statusFilter)) {
-                // Show "no results found" state when filtering but no matches
+                // แสดง ไม่เจอผลลัพธ์
                 emptyState.style.display = 'block';
                 const heading = emptyState.querySelector('h2');
                 const description = emptyState.querySelector('p');
                 if (heading) heading.textContent = 'ไม่พบผลลัพธ์ที่ค้นหา';
                 if (description) description.textContent = 'ลองค้นหาด้วยชื่อหนังสือหรือสถานะที่แตกต่างกัน';
             } else if (visibleCount === 0 && !searchTerm && !statusFilter && hasNoOrders) {
-                // Show original empty state when no orders exist
+                // แสดงว่างเปล่า ถ้าไม่เจอคำสั่งซื้อ
                 emptyState.style.display = 'block';
             } else if (visibleCount > 0) {
-                // Hide empty state when there are visible orders
+                // แสดงตตารางถ้ามีคำสั่งซื้อ
                 emptyState.style.display = 'none';
             }
         }
     }
 
     function checkStatusMatch(orderStatus, statusFilter) {
-        // Map status filter values to Thai status text
+        // map ค่า
         const statusMap = {
             'pending': ['รอดำเนินการ'],
             'processing': ['กำลังประมวลผล', 'กำลังเตรียมสินค้า'],
@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const statusTexts = statusMap[statusFilter];
         if (!statusTexts) return false;
 
-        // Check if order status matches any of the mapped status texts
+        // เช็คถ้ามีสถานะตรงกับที่ map
         return statusTexts.some(text => orderStatus.includes(text.toLowerCase()));
     }
 });

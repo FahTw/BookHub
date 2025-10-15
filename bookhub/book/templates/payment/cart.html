@@ -32,15 +32,13 @@
 
 {% block content %}
 <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-12">
-    <!-- Page Header -->
     <div class="mb-8">
         <h1 class="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">ตะกร้าสินค้าของฉัน</h1>
         <p class="text-gray-600">จัดการสินค้าในตะกร้าและดำเนินการชำระเงิน</p>
     </div>
 
-    <!-- Empty Cart -->
+    <!-- ตะกร้าเปล่า -->
     {% if not cart %}
-
     <div class="text-center py-12">
         <div class="mb-6">
             <svg class="w-24 h-24 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -53,14 +51,11 @@
             เลือกซื้อหนังสือ
         </a>
     </div>
-
     {% else %}
 
     <div class="lg:grid lg:grid-cols-12 lg:gap-8">
-        <!-- Cart Items Section -->
         <div class="lg:col-span-8">
             <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-                <!-- Header -->
                 <div
                     class="hidden lg:grid lg:grid-cols-12 gap-4 px-6 py-4 bg-gray-50 border-b border-gray-200 font-semibold text-sm">
                     <div class="col-span-5">สินค้า</div>
@@ -69,13 +64,13 @@
                     <div class="col-span-2 text-right">รวม</div>
                 </div>
 
-                <!-- Cart Items -->
+                <!-- แสดงสินค้าในตะกร้า -->
                 {% for item in cart %}
                 <div class="border-b border-gray-100 last:border-b-0">
-                    <!-- Desktop View -->
                     <div class="hidden lg:grid lg:grid-cols-12 gap-4 px-6 py-6 items-center">
                         <div class="col-span-5 flex items-center gap-4">
                             <div class="w-16 h-20 bg-gray-200 rounded flex-shrink-0 overflow-hidden">
+                                <!-- แสดงรูปภาพหนังสือ -->
                                 {% if item.book.image %}
                                     <img src="{{ item.book.image.url }}" alt="{{ item.book.title }}" class="w-full h-full object-cover" />
                                 {% else %}
@@ -105,6 +100,7 @@
                                         คงเหลือ {{ item.book.stock }} เล่ม
                                     </span>
                                 </div>
+                                <!-- ส่งข้อมูลผ่าน post ใช้ชื่อเป็น action มีค่าเป็น remove กับ cart_id มีค่าเป็น item.id -->
                                 <form method="post" class="inline">
                                     {% csrf_token %}
                                     <input type="hidden" name="action" value="remove">
@@ -119,16 +115,19 @@
                             ฿{{ item.price|floatformat:2 }}
                         </div>
                         <div class="col-span-2 flex items-center justify-center gap-1">
+                            <!-- ส่งข้อมูลผ่าน post ใช้ชื่อเป็น action มีค่าเป็น update กับ cart_id มีค่าเป็น item.id -->
                             <form method="post" class="flex items-center gap-1">
                                 {% csrf_token %}
                                 <input type="hidden" name="action" value="update">
                                 <input type="hidden" name="cart_id" value="{{ item.id }}">
+                                <!-- ปุ่มลด 1 -->
                                 <button type="submit" name="quantity_change" value="-1" class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 {% if item.quantity <= 1 %}opacity-50 cursor-not-allowed{% endif %}" {% if item.quantity <= 1 %}disabled{% endif %}>
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
                                     </svg>
                                 </button>
                                 <span class="w-12 text-center font-medium">{{ item.quantity }}</span>
+                                <!-- ปุ่มเพิ่ม 1 -->
                                 <button type="submit" name="quantity_change" value="1" class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 {% if item.quantity >= item.book.stock %}opacity-50 cursor-not-allowed{% endif %}" {% if item.quantity >= item.book.stock %}disabled{% endif %}>
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -143,7 +142,6 @@
                 </div>
                 {% endfor %}
 
-                <!-- Continue Shopping -->
                 <div class="p-6 border-t border-gray-200 bg-gray-50">
                     <a href="{% url 'book' %}" class="inline-flex items-center text-orange-600 hover:text-orange-700 font-medium">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -155,7 +153,6 @@
             </div>
         </div>
 
-        <!-- Order Summary Section -->
         <div class="lg:col-span-4 mt-8 lg:mt-0">
             <div class="bg-white rounded-lg shadow-sm p-6 top-24">
                 <h2 class="text-lg font-semibold text-gray-900 mb-4">สรุปรายการสั่งซื้อ</h2>

@@ -5,5 +5,5 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('book.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path('', include('book.urls')), # เพิ่ม url จาก app book
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) # เพิ่ม path folder รูปภาพ

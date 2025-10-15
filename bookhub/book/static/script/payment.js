@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Payment method selection
+    // ตัวแปร ตัวเลือกวิธีจ่ายเงิน กับ file
     const paymentRadios = document.querySelectorAll('.payment-method-radio');
     const paymentSections = document.querySelectorAll('.payment-section');
     const fileUploadSection = document.getElementById('file-upload-section');
@@ -7,10 +7,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const placeholder = document.getElementById('preview-placeholder');
     const previewContainer = document.getElementById('preview-container');
 
-
     if (fileInput) {
         fileInput.addEventListener('change', function() {
+            // ได้ 1 ไฟล์
             const file = this.files[0];
+            // ยกเลิกการเลือกจะแสดงผลเหมือนเดิม
             if (!file) {
                 placeholder.style.display = 'block';
                 previewContainer.innerHTML = '';
@@ -21,6 +22,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (placeholder) placeholder.style.display = 'none';
             previewContainer.innerHTML = '';
 
+            // แสดง รูปภาพ หรือ pdf
             if (file.type.startsWith('image/')) {
                 const img = document.createElement('img');
                 img.src = URL.createObjectURL(file);
@@ -36,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     paymentRadios.forEach(radio => {
         radio.addEventListener('change', function () {
-            // Update card styling
+            // อัพเดท card
             document.querySelectorAll('.payment-method-card').forEach(card => {
                 card.classList.remove('active', 'border-orange-500');
                 card.classList.add('border-gray-200');
@@ -46,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function () {
             selectedCard.classList.add('active', 'border-orange-500');
             selectedCard.classList.remove('border-gray-200');
 
-            // Show/hide payment sections
+            // แสดงตัวเลือกการชำระเงิน
             paymentSections.forEach(section => {
                 section.classList.add('hidden');
             });
@@ -65,14 +67,14 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // File input change listener
+    // เพิ่ม event
     if (fileInput) {
         fileInput.addEventListener('change', function() {
             updateSubmitButton();
         });
     }
 
-    // Initialize submit button state
+    // เริ่มต้น
     updateSubmitButton();
 });
 
@@ -88,7 +90,7 @@ function updateSubmitButton() {
         return;
     }
 
-    // For cash on delivery, no file upload is required
+    // ปุ่ม จะ อัพโหลดได้เมื่อ มี file หรือ เลือก จ่ายปลายทาง
     if (selectedMethod.value === 'cash') {
         submitButton.disabled = false;
         submitButton.classList.remove('opacity-50', 'cursor-not-allowed');

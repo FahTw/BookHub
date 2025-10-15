@@ -8,7 +8,6 @@
 {% block content %}
 <div class="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50">
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-12">
-        <!-- Page Header -->
         <div class="mb-8">
             <div class="flex items-center mb-4">
                 <svg class="w-8 h-8 text-orange-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -22,7 +21,7 @@
             </p>
         </div>
 
-        <!-- Filter and Search -->
+        <!-- แถบค้นหา -->
         <div class="mb-8 bg-white rounded-xl shadow-md p-6">
             <div class="flex flex-col sm:flex-row gap-4">
                 <div class="flex-1">
@@ -47,7 +46,6 @@
             </div>
         </div>
 
-        <!-- Orders List -->
         {% if orders %}
         <div class="space-y-6">
             {% for order in orders %}
@@ -111,7 +109,6 @@
                 </div>
                 
                 <div class="p-6">
-                    <!-- Order Item -->
                     <div class="flex flex-col sm:flex-row gap-4 mb-6 pb-6 border-b-2 border-gray-100">
                         <div class="w-full sm:w-24 h-36 sm:h-32 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden shadow-sm">
                             {% if order.cart.book.image %}
@@ -151,8 +148,7 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Order Summary -->
+
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-4">
                         <div class="flex flex-wrap gap-3 sm:justify-end">
                             <a href="{% url 'order_history_detail' user_obj.id order.id %}" 
@@ -189,8 +185,7 @@
             {% endfor %}
         </div>
         {% else %}
-
-        <!-- Empty State -->
+        <!-- ถ้าคำสั่งซื้อไม่มี -->
         <div class="bg-white rounded-xl shadow-md p-12 text-center border-2 border-gray-100">
             <div class="mb-6">
                 <div class="w-32 h-32 mx-auto bg-gradient-to-br from-orange-100 to-amber-100 rounded-full flex items-center justify-center">

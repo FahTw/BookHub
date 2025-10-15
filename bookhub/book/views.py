@@ -155,12 +155,10 @@ class CategoryView(View):
 
 class CartView(View):
     def get(self, request, user):
-        user_obj = CustomUser.objects.get(id=user)
-        cart = Cart.objects.filter(user=user_obj, status='in_cart').select_related('book')
-
-        # Calculate totals
-        total_amount = sum(item.total_price for item in cart)
-        total_items = sum(item.quantity for item in cart)
+        user_obj = CustomUser.objects.get(id=user) # ดึงข้อมูล user จาก user id
+        cart = Cart.objects.filter(user=user_obj, status='in_cart').select_related('book') # ใช้ select_related คือ การ join ใน sql
+        total_amount = sum(item.total_price for item in cart) # รวมราคา โดยเข้าไปในแต่ละ cart
+        total_items = sum(item.quantity for item in cart) # รวมจำนวน โดยเข้าไปในแต่ละ cart
 
         context = {
             'user': user_obj,
@@ -171,15 +169,15 @@ class CartView(View):
         return render(request, 'payment/cart.html', context)
 
     def post(self, request, user):
-        user_obj = CustomUser.objects.get(id=user)
-        action = request.POST.get('action')
-        cart_id = request.POST.get('cart_id')
-            
+        user_obj = CustomUser.objects.get(id=user) # ดึงข้อมูล user จาก user id
+        action = request.POST.get('action') # ดึงค่าจาก input ชื่อ action
+        cart_id = request.POST.get('cart_id') # ดึงค่าจาก input ชื่อ cart_id
+
         if action == 'remove' and cart_id:
             Cart.objects.filter(id=cart_id, user=user_obj).delete()
             
         elif action == 'update' and cart_id:
-            quantity_change = int(request.POST.get('quantity_change', 0))
+            quantity_change = int(request.POST.get('quantity_change', 0)) # ดึงค่าจาก button ชื่อ quantity_change จะเป็น +1 กับ -1 และมีค่าเริ่มต้นเป็น 0
             cart_item = Cart.objects.get(id=cart_id, user=user_obj)
             new_quantity = cart_item.quantity + quantity_change
                 
@@ -190,20 +188,21 @@ class CartView(View):
             
         return redirect('cart', user=user)
 
+# พวกปุ่มเพิ่มลงตะกร้า
 class AddToCartView(View):
     def post(self, request, book_id):
         book = Book.objects.get(id=book_id)
-        user = request.user
+        user = request.user # ผู้ใช้งานที่ login อยู่
             
-        # Check if the book is already in the cart
+        # get_or_create ถ้าเจอข้อมูล เก็บใน cart_item ถ้าำม่เจอ สร้างข้อมูล เก็บใน created
         cart_item, created = Cart.objects.get_or_create(
             user=user,
             book=book,
             status='in_cart',
             defaults={'quantity': 1, 'price': book.price, 'total_price': book.price}
         )
-            
-        # If it already exists, increase the quantity
+
+        # ถ้ามีอยู่แล้วจะเพิ่มจำนวน 1
         if not created and cart_item.quantity < book.stock:
             cart_item.quantity += 1
             cart_item.total_price = cart_item.price * cart_item.quantity
@@ -213,9 +212,9 @@ class AddToCartView(View):
 
 class PaymentView(View):
     def get(self, request, user):
-        user_obj = CustomUser.objects.get(id=user)
-        cart_items = Cart.objects.filter(user=user_obj, status='in_cart').select_related('book')
-        total_amount = sum(item.total_price for item in cart_items)
+        user_obj = CustomUser.objects.get(id=user) # ดึงข้อมูล user จาก user id
+        cart_items = Cart.objects.filter(user=user_obj, status='in_cart').select_related('book') # ใช้ select_related คือ การ join ใน sql
+        total_amount = sum(item.total_price for item in cart_items) # รวมราคา โดยเข้าไปในแต่ละ cart
             
         context = {
             'user_obj': user_obj,
@@ -227,14 +226,13 @@ class PaymentView(View):
     def post(self, request, user):
         user_obj = CustomUser.objects.get(id=user)
         cart_items = Cart.objects.filter(user=user_obj, status='in_cart')
-        payment_method = request.POST.get('method')
-        payment_slip = request.FILES.get('payment_slip')
+        payment_method = request.POST.get('method') # ดึงค่าจาก input ชื่อ method
+        payment_slip = request.FILES.get('payment_slip') # ดึงค่าจาก input ชื่อ payment_slip
 
         for cart_item in cart_items:
-            # Determine order status based on payment method
+            # ถ้าจ่ายเงินปลายทาง จะมีสถานะยังไม่จ่าย นอกนั้นจากแล้ว
             order_status = 'unpaid' if payment_method == 'cash' else 'paid'
-            
-            # Create Order
+
             order = Order.objects.create(
                 user=user_obj,
                 cart=cart_item,
@@ -243,7 +241,6 @@ class PaymentView(View):
                 status=order_status
             )
 
-            # Create Payment
             Payment.objects.create(
                 order=order,
                 payment_date=datetime.now(),
@@ -253,15 +250,15 @@ class PaymentView(View):
                 payment_slip=payment_slip if payment_method != 'cash' and payment_slip else None
             )
 
-        # Update all cart items to notin_cart
+        # จากอยู่ในตะกร้าสินค้า เป็น ไม่อยู่ในตะกร้าสินค้า
         cart_items.update(status='notin_cart')
         
         return redirect('home')
 
 class OrderHistoryView(View):
     def get(self, request, user):
-        user_obj = CustomUser.objects.get(id=user)
-        orders = Order.objects.filter(user=user_obj).order_by('-order_date').select_related('cart', 'cart__book')
+        user_obj = CustomUser.objects.get(id=user) # ดึงข้อมูล user จาก user id
+        orders = Order.objects.filter(user=user_obj).order_by('-order_date').select_related('cart', 'cart__book') # ใช้ select_related คือ การ join ใน sql
 
         context = {
             'orders': orders,
@@ -271,16 +268,16 @@ class OrderHistoryView(View):
         return render(request, 'home/orderhistory.html', context)
 
     def post(self, request, user):
-        user_obj = CustomUser.objects.get(id=user)
-        order_id = request.POST.get('order_id')
+        user_obj = CustomUser.objects.get(id=user) # ดึงข้อมูล user จาก user id
+        order_id = request.POST.get('order_id') # ดึงค่าจาก input ชื่อ order_id
         
         if order_id:
             order_obj = Order.objects.get(id=order_id, user=user_obj)
-            # Only allow cancellation for paid or processing orders
+            # อนุุญาตเฉพาะที่จ่ายเงินแล้วกับกำลังดำเนินการ
             if order_obj.status in ['paid', 'processing']:
                 order_obj.status = 'cancelled'
                 order_obj.save()
-                # Update payment status
+                # อัพ้เดท status payment
                 payment = Payment.objects.filter(order=order_obj).first()
                 if payment:
                     payment.status = 'cancelled'
@@ -290,10 +287,10 @@ class OrderHistoryView(View):
 
 class OrderHistoryDetailView(View):
     def get(self, request, user, order):
-        user_obj = CustomUser.objects.get(id=user)
-        order_obj = Order.objects.get(id=order, user=user_obj)
-        payment_info = Payment.objects.filter(order=order_obj).first()
-            
+        user_obj = CustomUser.objects.get(id=user) # ดึงข้อมูล user จาก user id
+        order_obj = Order.objects.get(id=order, user=user_obj) # ดึงข้อมูล order จาก order id และ user
+        payment_info = Payment.objects.filter(order=order_obj).first() # ดึงข้อมูล payment โดย filter order และเอาแค่ตัวแรก
+
         context = {
             'user_obj': user_obj,
             'order': order_obj,
@@ -302,16 +299,15 @@ class OrderHistoryDetailView(View):
         }
         return render(request, 'home/orderhistory_detail.html', context)
 
-
 class DashboardView(View):
     def get(self, request):
-        # Get statistics for dashboard
+        # ดึงข้อมูลต่างๆ
         total_orders = Order.objects.count()
-        total_revenue = Order.objects.filter(status='paid').aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+        total_revenue = Order.objects.filter(status='paid').aggregate(Sum('total_amount'))['total_amount__sum'] or 0 # ถ้าไม่มี ให้เป็น 0
         pending_orders = Order.objects.filter(status='unpaid').count()
         total_books = Book.objects.count()
         total_users = CustomUser.objects.count()
-        recent_orders = Order.objects.all().order_by('-order_date')[:5].select_related('user', 'cart', 'cart__book')
+        recent_orders = Order.objects.all().order_by('-order_date')[:5].select_related('user', 'cart', 'cart__book') # ใช้ select_related คือ การ join ใน sql
         popular_books = Book.objects.order_by('-sold')[:5]
         
         context = {
@@ -428,16 +424,13 @@ class ManageBookDeleteView(View):
 
 class OrderHistoryOwnerView(View):
     def get(self, request):
-        orders = Order.objects.all().order_by('-order_date').select_related('user', 'cart', 'cart__book')
-        
-        # Get filter parameters
-        status_filter = request.GET.get('status', '')
-        search_query = request.GET.get('search', '')
-        
-        # Apply filters
+        orders = Order.objects.all().order_by('-order_date').select_related('user', 'cart', 'cart__book') # ใช้ select_related คือ การ join ใน sql
+        status_filter = request.GET.get('status', '') # ดึงค่า status
+        search_query = request.GET.get('search', '') # ดึงค่า search
+        # เพิ่ม filters
         if status_filter:
             orders = orders.filter(status=status_filter)
-        
+        # เพิ่ม search
         if search_query:
             orders = orders.filter(
                 Q(cart__book__title__icontains=search_query) | 
@@ -446,7 +439,7 @@ class OrderHistoryOwnerView(View):
                 Q(user__email__icontains=search_query)
             )
         
-        # Calculate statistics
+        # ดึงข้อมูลต่างๆ
         context = {
             'orders': orders,
             'total_orders': Order.objects.count(),
@@ -460,8 +453,8 @@ class OrderHistoryOwnerView(View):
 
 class OrderHistoryOwnerDetailView(View):
     def get(self, request, order):
-        order_obj = Order.objects.get(id=order)
-        payment_info = Payment.objects.filter(order=order_obj).first()
+        order_obj = Order.objects.get(id=order) # ดึงข้อมูล order
+        payment_info = Payment.objects.filter(order=order_obj).first() # ดึงข้อมูล payment โดย filter order และเอาแค่ตัวแรก
 
         context = {
             'order': order_obj,
@@ -472,37 +465,36 @@ class OrderHistoryOwnerDetailView(View):
         return render(request, 'owner/orderhistory_detail_owner.html', context)
 
     def post(self, request, order):
-        order_obj = Order.objects.get(id=order)
-        payment = Payment.objects.filter(order=order_obj).first()
-        
-        # Handle payment status update
-        payment_status = request.POST.get('payment_status')
+        order_obj = Order.objects.get(id=order) # ดึงข้อมูล order
+        payment = Payment.objects.filter(order=order_obj).first() # ดึงข้อมูล payment โดย filter order และเอาแค่ตัวแรก
+        payment_status = request.POST.get('payment_status') # ดึงค่าจาก button ชื่อ payment_status
+
         if payment_status and payment:
             if payment_status == 'paid':
                 payment.status = 'paid'
                 payment.verified_date = datetime.now()
                 payment.save()
-                # Update order status to paid if currently unpaid
+                # อัพเดทสถานะคำสั่งซื้อเป็นจ่าย
                 if order_obj.status == 'unpaid':
                     order_obj.status = 'paid'
                     order_obj.save()
-                    
             elif payment_status == 'cancelled':
                 payment.status = 'cancelled'
                 payment.save()
-                # Update order status to cancelled
+                # อัพเดทสถานะคำสั่งซื้อเป็นยกเลิก
                 order_obj.status = 'cancelled'
                 order_obj.save()
             
             return redirect('order_history_owner_detail', order=order)
-        
-        # Handle order status update
-        new_status = request.POST.get('status')
+
+        # อัพเดทสถานะคำสั่ง
+        new_status = request.POST.get('status') # ดึงค่าจาก button ชื่อ status
+
         if new_status in ['unpaid', 'paid', 'processing', 'shipped', 'delivered', 'cancelled']:
             order_obj.status = new_status
             order_obj.save()
 
-            # Update payment status accordingly
+            # อัพเดทสถานะการจ่ายเงิน
             if payment:
                 if new_status == 'paid':
                     payment.status = 'paid'
@@ -575,36 +567,20 @@ class UserDetailView(View):
 
 class StatView(View):
     def get(self, request):
-        # Overall statistics
+        # ดึงข้อมูลต่างๆ
         total_books = Book.objects.count()
-        total_revenue = Order.objects.filter(
-            status__in=['paid', 'processing', 'shipped', 'delivered']
-        ).aggregate(Sum('total_amount'))['total_amount__sum'] or 0
-        total_orders = Order.objects.filter(
-            status__in=['paid', 'processing', 'shipped', 'delivered']
-        ).count()
-        total_books_sold = Book.objects.aggregate(Sum('sold'))['sold__sum'] or 0
-        
-        # Top selling books
+        total_revenue = Order.objects.filter(status__in=['paid', 'processing', 'shipped', 'delivered']).aggregate(Sum('total_amount'))['total_amount__sum'] or 0 # ถ้าไม่มี ให้เป็น 0
+        total_orders = Order.objects.filter(status__in=['paid', 'processing', 'shipped', 'delivered']).count()
+        total_books_sold = Book.objects.aggregate(Sum('sold'))['sold__sum'] or 0 # ถ้าไม่มี ให้เป็น 0
         top_selling_books = Book.objects.all().order_by('-sold')[:10]
-        
-        # Books by category with sales
-        category_stats = BookCategory.objects.annotate(
-            total_books=Count('book'),
-            total_sold=Sum('book__sold'),
-            total_revenue=Sum(
-                Case(
-                    When(
-                        book__cart__order__status__in=['paid', 'processing', 'shipped', 'delivered'], 
-                        then=F('book__cart__total_price')
-                    ),
+        category_stats = BookCategory.objects.annotate(total_books=Count('book'), total_sold=Sum('book__sold'), total_revenue=Sum(
+                Case( 
+                    When(book__cart__order__status__in=['paid', 'processing', 'shipped', 'delivered'], then=F('book__cart__total_price')),
                     default=0,
                     output_field=models.DecimalField()
-                )
+                ) # Case คือ if else, When คือ เงื่อนไข ถ้าเข้าเงื่อนไขเก็บค่าใน book__cart__total_price เริ่มต้น 0
             )
         ).order_by('-total_sold')
-        
-        # Low stock books
         low_stock_books = Book.objects.filter(stock__lt=10).order_by('stock')[:10]
         
         context = {
