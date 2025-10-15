@@ -30,8 +30,8 @@
 
       <form method="POST" class="space-y-5">
         {% csrf_token %}
-        
-        <!-- Display non-field errors (authentication errors) -->
+
+        <!-- แสดงผลถ้าขึ้น error ไม่ได้ fix ว่าเป็นอันใดอันหนึ่ง -->
         {% if form.non_field_errors %}
         <div class="bg-red-50 border border-red-200 rounded-xl p-4">
           <div class="flex items-start gap-3">
@@ -41,6 +41,7 @@
             <div class="flex-1">
               <h3 class="text-sm font-semibold text-red-800 mb-1">เข้าสู่ระบบไม่สำเร็จ</h3>
               <ul class="text-sm text-red-700 space-y-1">
+                <!-- แสดงผลข้อผิดพลาดที่เกิดขึ้น -->
                 {% for error in form.non_field_errors %}
                 <li>ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง</li>
                 {% endfor %}
@@ -62,7 +63,12 @@
               </svg>
             </div>
             <input
-              class="w-full pl-10 pr-4 py-3 border {% if form.username.errors %}border-red-500 bg-red-50{% else %}border-gray-300{% endif %} rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+              class="w-full pl-10 pr-4 py-3 border 
+              {% if form.username.errors %}
+                border-red-500 bg-red-50
+              {% else %}border-gray-300
+              {% endif %} 
+              rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
               type="text" id="user" name="username" placeholder="กรอกชื่อผู้ใช้งาน" value="{{ form.username.value|default:'' }}" required>
           </div>
           {% if form.username.errors %}

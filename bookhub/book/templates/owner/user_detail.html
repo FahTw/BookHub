@@ -26,13 +26,14 @@
 
     <div class="p-8 space-y-6">
 
-        <!-- User Info Card -->
+        <!-- ข้อมูล user -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div class="flex items-start justify-between mb-6">
                 <div>
                     <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ user_detail.get_full_name|default:user_detail.username }}</h2>
                     <p class="text-gray-600">@{{ user_detail.username }}</p>
                 </div>
+                <!-- แสดงสถานะผู้ใช้ -->
                 {% if user_detail.is_staff %}
                 <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
                     <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -40,6 +41,7 @@
                     </svg>
                     ผู้ดูแลระบบ
                 </span>
+
                 {% else %}
                 <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
                     สมาชิก
@@ -90,9 +92,9 @@
             </div>
         </div>
 
-        <!-- Statistics Cards -->
+        <!-- Cards สถิติ -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Total Orders -->
+            <!-- รวม order -->
             <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-lg">
                 <div class="flex items-center justify-between">
                     <div>
@@ -108,7 +110,7 @@
                 </div>
             </div>
 
-            <!-- Total Spent -->
+            <!-- ยอดซื้อรวม -->
             <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg">
                 <div class="flex items-center justify-between">
                     <div>
@@ -126,7 +128,7 @@
             </div>
         </div>
 
-        <!-- Recent Orders -->
+        <!-- ออเดอร์ล่าสุด -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200">
             <div class="flex items-center justify-between mb-6 px-6 pt-6">
                 <h3 class="text-lg font-semibold text-gray-900">ประวัติคำสั่งซื้อล่าสุด</h3>
@@ -148,21 +150,27 @@
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">วันที่สั่งซื้อ</th>
                         </tr>
                     </thead>
+                    <!-- ตารางรายการคำสั่งซื้อล่าสุด -->
                     <tbody class="divide-y divide-gray-200">
                         {% for order in recent_orders %}
                         <tr class="hover:bg-gray-50 transition-colors">
+                            <!-- id -->
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="text-sm font-medium text-gray-900">#{{ order.id }}</span>
                             </td>
+                            <!-- book title -->
                             <td class="px-6 py-4">
                                 <span class="text-sm text-gray-900">{{ order.cart.book.title }}</span>
                             </td>
+                            <!-- จำนวน -->
                             <td class="px-6 py-4 text-center">
                                 <span class="text-sm text-gray-900">{{ order.cart.quantity }} เล่ม</span>
                             </td>
+                            <!-- ราคาของคำสั่งซื้อ -->
                             <td class="px-6 py-4 text-center">
                                 <span class="text-sm font-medium text-gray-900">฿{{ order.total_amount|floatformat:2 }}</span>
                             </td>
+                            <!-- สถานะ -->
                             <td class="px-6 py-4 text-center">
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium 
                                     {% if order.status == 'unpaid' %}bg-red-100 text-red-800
@@ -174,6 +182,7 @@
                                     {{ order.get_status_display }}
                                 </span>
                             </td>
+                            <!-- วันที่สั่งซื้อ -->
                             <td class="px-6 py-4 text-center">
                                 <span class="text-sm text-gray-700">{{ order.order_date|date:"d/m/Y H:i" }}</span>
                             </td>

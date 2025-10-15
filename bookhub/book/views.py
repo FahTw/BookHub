@@ -10,14 +10,18 @@ from django.contrib.auth import login, logout
 
 class LoginView(View):
     def get(self, request):
+        # ดึงฟอร์ม authen ของ Django มาใช้
         form = AuthenticationForm()
         return render(request, 'login/login.html', {'form': form})
 
     def post(self, request):
+        # ตรวจสอบข้อมูลที่ผู้ใช้กรอกมา
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
+            # ดึงข้อมูลผู้ใช้จากฟอร์ม และเข้าสู่ระบบ
             user = form.get_user() 
             login(request, user)
+            # role redirect
             return redirect('dashboard' if user.is_staff else 'home')
         return render(request, 'login/login.html', {'form': form})
 
@@ -40,12 +44,16 @@ class RegisterView(View):
             return redirect('login')
         return render(request, 'login/register.html', {'form': form})
 
+# ดึงข้อมูลมาแสดงในหน้า Home
 class HomeView(View):
     def get(self, request):
+        # หมวดหมู่หนังสือ, หนังสือขายดี, รีวิวที่ดีท
         categories = BookCategory.objects.all()
+        # เรียงลำดับยอดหนังสือที่ขายได้จากมากไปน้อย 5 เล่ม
         best_sellers = Book.objects.all().order_by('-sold')[:5]
+        # รีวิวที่ได้คะแนนสูงสุด 5 รีวิว
         best_reviews = Review.objects.select_related('book', 'user').order_by('-rating', '-created_date')[:5]
-        
+        # ส่งข้อมูลไปที่ template
         context = {
             'categories': categories,
             'best_sellers': best_sellers,
@@ -55,33 +63,42 @@ class HomeView(View):
 
 class ProfileView(View):
     def get(self, request):
+        # ดึงข้อมูลมาใส่ในฟอร์ม instance เพื่อดึงข้อมูลเดิมมาแสดง
         form = UserProfileForm(instance=request.user)
         return render(request, 'home/profile.html', {'form': form})
 
     def post(self, request):
+        # instance เพื่ออัปเดตข้อมูลเดิม
         form = UserProfileForm(request.POST, instance=request.user)
         if form.is_valid():
+            # บันทึกข้อมูลลง db
             form.save()
             return redirect('profile')
+        # เอาไปแสดงใน template 
         return render(request, 'home/profile.html', {'form': form})
 
 class BookListView(View):
+    # แสดงรายการหนังสือทั้งหมด
     def get(self, request):
         books = Book.objects.all()
         return render(request, 'home/book_list.html', {'books': books})
 
 class BookDetailView(View):
+    # ดึงข้อมูลของหนังสือแต่ละเล่มมาแสดง
     def get(self, request, book_id):
         book = Book.objects.get(pk=book_id)
+        # ดึงข้อมูลรีวิวของผู user ที่เขียนไว้โดยเรียงตามวันที่ล่าสุด
         reviews = Review.objects.filter(book=book).select_related('user').order_by('-created_date')
         review_stats = reviews.aggregate(
             avg_rating=Avg('rating'),
             review_count=Count('id')
         )
+        # แสดงผลคะแนนเฉลี่ยและจำนวนคอมเมนต์, ยอดขาย
         book.rating = round(review_stats['avg_rating'], 1) if review_stats['avg_rating'] else 0.0
         book.comment_count = review_stats['review_count']
         book.sold_count = book.sold
 
+        # ดึงฟอร์มสำหรับเขียนรีวิว
         form = ReviewForm()
         return render(request, 'home/book_detail.html', {
             'book': book,
@@ -89,12 +106,14 @@ class BookDetailView(View):
             'form': form
         })
 
+    # review
     def post(self, request, book_id):
         book = Book.objects.get(pk=book_id)
         form = ReviewForm(request.POST)
         reviews = Review.objects.filter(book=book).select_related('user').order_by('-created_date')
         
         if form.is_valid():
+            # 
             review = form.save(commit=False)
             review.book = book
             review.user = request.user
@@ -105,6 +124,7 @@ class BookDetailView(View):
                 avg_rating=Avg('rating'),
                 review_count=Count('id')
             )
+            # ถ้าไม่ได้ให้ก้ set เป็น 0
             book.rating_average = review_stats['avg_rating'] or 0
             book.rating_count = review_stats['review_count']
             book.save(update_fields=['rating_average', 'rating_count'])
@@ -117,11 +137,16 @@ class BookDetailView(View):
             'form': form
         })
 
+# ดึงข้อมูลหมวดหมู่หนังสือ
 class CategoryView(View):
     def get(self, request, category_id):
+        # ดึงมาจาก cate id
         category = BookCategory.objects.get(pk=category_id)
+        # หาหนังสือตแต่ละเล่มของหมวดหมู่
         books = Book.objects.filter(categories=category)
+        # ดึงข้อมูลหมวดหมู่ทั้งหมด
         categories = BookCategory.objects.all()
+        # ส่งเทมเพลต
         return render(request, 'home/category.html', {
             'category': category,
             'books': books,
@@ -301,26 +326,33 @@ class DashboardView(View):
         return render(request, 'owner/dashboard.html', context)
 
 class ManageBookListView(View):
+    # แสดงรายการหนังสือทั้งหมด
     def get(self, request):
         books = Book.objects.all().order_by('-id')
         search_query = request.GET.get('search', '')
         
-        # Apply search filter
+        # ทำเสิชฟิลเตอร์
         if search_query:
             books = books.filter(
+                # ใช้ Q เพื่อค้นหาหลายฟิลด์
                 Q(title__icontains=search_query) |
                 Q(author__icontains=search_query) |
                 Q(publisher__icontains=search_query)
             )
         
-        # Calculate statistics
+        # สถิติหนังสือ
+        # รวมหนังสือทั้งหมด, สินค้าคงเหลือต่ำกว่า 10, สินค้าหมด, มูลค่าคงเหลือ
         total_books = Book.objects.count()
         low_stock_count = Book.objects.filter(stock__lt=10).count()
         out_of_stock_count = Book.objects.filter(stock=0).count()
+        
+        # สร้าง col total ทิพย์ไว้เพื่อคำนวณมูลค่ารวม
         total_value = Book.objects.aggregate(
+            # stock * price
             total=Sum(F('stock') * F('price'), output_field=models.DecimalField())
         )['total'] or 0
         
+        # category ทั้งหมด
         categories = BookCategory.objects.all().order_by('category_name')
         
         context = {
@@ -334,21 +366,22 @@ class ManageBookListView(View):
         }
         return render(request, 'owner/book_manage.html', context)
     
+    # create book
     def post(self, request):
-        # Check if this is a category creation request
+        # เช็คว่ามีการส่งฟอร์มเพิ่มหมวดหมู่หนังสือมาหรือไม่
         if 'category_name' in request.POST:
             category_form = BookCategoryForm(request.POST)
             if category_form.is_valid():
                 category_form.save()
                 return redirect('managelist_book')
         
-        # Handle book creation
+        # เรียกฟอร์มเพื่อเพิ่มหนังสือ
         form = BookForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             return redirect('managelist_book')
         
-        # If form is invalid, return with errors
+        #ดึงหนังสือและหมวดหมู่ทั้งหมด
         books = Book.objects.all().order_by('-id')
         categories = BookCategory.objects.all().order_by('category_name')
         
@@ -365,14 +398,20 @@ class ManageBookListView(View):
         }
         return render(request, 'owner/book_manage.html', context)
 
+
 class ManageBookView(View):
+    # ดดึงข้อมูลหนังสือมาแสดงในฟอร์ม
     def get(self, request, book_id):
+        # ดึงข้อมูลหนังสือที่ต้องการดูหน้า edit
         book = Book.objects.get(pk=book_id)
+        # ดึงข้อมูลมาใส่ในฟอร์ม instance เพื่อดึงข้อมูลเดิมมาแสดง
         form = BookForm(instance=book)
         return render(request, 'owner/edit_book.html', {'form': form, 'book': book})
 
     def post(self, request, book_id):
+        # ดึงข้อมูลหนังสือที่ต้องการแก้ไข
         book = Book.objects.get(pk=book_id)
+        # ดึงข้อมูลมาใส่ในฟอร์ม instance เพื่อดึงข้อมูลเดิมมาอัปเดตข้อมูล
         form = BookForm(request.POST, request.FILES, instance=book)
         if form.is_valid():
             form.save()
@@ -380,7 +419,9 @@ class ManageBookView(View):
         return render(request, 'owner/edit_book.html', {'form': form, 'book': book})
 
 class ManageBookDeleteView(View):
+    # ลบหนังสือ
     def get(self, request, book_id):
+        # ดึงข้อมูลหนังสือที่ต้องการลบ
         book = Book.objects.get(pk=book_id)
         book.delete()
         return redirect('managelist_book')
@@ -480,7 +521,7 @@ class UserListView(View):
         users = CustomUser.objects.all().order_by('-date_joined')
         search_query = request.GET.get('search', '')
         
-        # Apply search filter
+        # เสิชข้อมูล user
         if search_query:
             users = users.filter(
                 Q(first_name__icontains=search_query) |
@@ -488,38 +529,46 @@ class UserListView(View):
                 Q(username__icontains=search_query) |
                 Q(email__icontains=search_query)
             )
-        
-        # Calculate statistics
+        # นับวันที่ 1 ของเดือนปัจจุบัน
         first_day_of_month = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         
         context = {
+            # user ทั้งหมด, user ปกติ, user admin
             'users': users,
             'total_users': CustomUser.objects.count(),
             'regular_users': CustomUser.objects.filter(is_staff=False).count(),
             'admin_users': CustomUser.objects.filter(is_staff=True).count(),
+            # คำนวณผู้ใช้ใหม่ในเดือนนี้
             'new_users_this_month': CustomUser.objects.filter(date_joined__gte=first_day_of_month).count(),
             'search_query': search_query,
         }
         return render(request, 'owner/user_list.html', context)
 
 class UserView(View):
+    # ส่วนของการลบ user
     def get(self, request, user_id):
         user = CustomUser.objects.get(pk=user_id)
+        # ถ้าไม่เป็น admin ถึงจะลบได้
         if not user.is_staff:
             user.delete()
         return redirect('user_list')
-
+    
 class UserDetailView(View):
+    # ดึงข้อมูล user มาแสดงเป็นรายคน
     def get(self, request, user_id):
+        # ดึงขข้อมูล user รายคนและ order ที่เคยสั่ง
         user = CustomUser.objects.get(pk=user_id)
         user_orders = Order.objects.filter(user=user)
         
         context = {
             'user_detail': user,
             'total_orders': user_orders.count(),
+            # ยอดซื้อรวมที่เคยสั่ง โดยให้อยู่ในสถานะที่ระบุ
             'total_spent': user_orders.filter(
                 status__in=['paid', 'processing', 'shipped', 'delivered']
+            # รวมยอดถ้าไม่มีให้เป็น 0
             ).aggregate(Sum('total_amount'))['total_amount__sum'] or 0,
+            # ประวัติการสั่งซื้อล่าสุด 5 รายการ
             'recent_orders': user_orders.order_by('-order_date')[:5],
         }
         return render(request, 'owner/user_detail.html', context)

@@ -27,14 +27,22 @@
 
 <!-- Books Grid Section -->
 <section class="max-w-7xl mx-auto py-12 px-6">
+
+    <!-- ถ้ามีหนังสือ -->
     {% if books %}
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+
+        <!-- ลูปเเพื่อลิสข้อมูลแสดงหนังสือ -->
         {% for book in books %}
         <div class="bg-white rounded-xl shadow-lg hover:shadow-2xl border border-orange-100 overflow-hidden group">
             <!-- Book Image -->
             <div class="aspect-[3/4] bg-gradient-to-br from-orange-100 to-amber-100 relative overflow-hidden">
+
+                <!-- ถ้ามีหน้าปก -->
                 {% if book.image %}
                 <img src="{{ book.image.url }}" alt="{{ book.title }}" class="w-full h-full object-cover">
+
+                <!-- ถ้าไม่มีหน้าปก -->
                 {% else %}
                 <div class="w-full h-full flex items-center justify-center">
                     <svg class="w-20 h-20 text-orange-300" fill="currentColor" viewBox="0 0 20 20">
@@ -42,7 +50,8 @@
                     </svg>
                 </div>
                 {% endif %}
-                <!-- Stock Badge -->
+
+                <!-- stock สินค้ามีหรือไม่ -->
                 {% if book.stock > 0 %}
                 <div class="absolute top-2 right-2 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
                     มีสินค้า
@@ -54,7 +63,7 @@
                 {% endif %}
             </div>
             
-            <!-- Book Info -->
+            <!-- ข้อมูลหนังสือ -->
             <div class="p-4 space-y-3">
                 <h3 class="font-bold text-gray-800 text-sm line-clamp-2 group-hover:text-orange-600 transition-colors min-h-[2.5rem]">
                     {{ book.title }}
@@ -73,6 +82,8 @@
                        class="block w-full text-center bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-4 py-2 rounded-lg font-semibold shadow-md hover:shadow-lg">
                         ดูรายละเอียด
                     </a>
+                    
+                    <!-- ส่งข้อมูลเพิ่มสินค้าลงตะกร้า -->
                     <form method="post" action="{% url 'add_to_cart' book.id %}" class="w-full">
                         {% csrf_token %}
                         <button type="submit" 
@@ -89,6 +100,8 @@
         </div>
         {% endfor %}
     </div>
+
+    <!-- ถ้าไม่มีหนังสือ -->
     {% else %}
     <div class="text-center py-20">
         <svg class="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

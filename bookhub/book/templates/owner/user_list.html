@@ -20,7 +20,7 @@
 
     <div class="p-8 space-y-6">
 
-        <!-- Search -->
+        <!-- ค้นหาผู้ใช้ -->
         <div class="mb-6">
             <form method="GET" action="{% url 'user_list' %}">
                 <div class="relative">
@@ -52,11 +52,12 @@
                 </div>
             </div>
 
-            <!-- Regular Users -->
+            <!-- สมาชิกทั่วไป -->
             <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-green-100 text-sm font-medium">สมาชิกทั่วไป</p>
+                        <!-- ดึง user มาแสดง ไม่รวมแอดมิน -->
                         <p class="text-3xl font-bold mt-2">{{ regular_users }}</p>
                         <p class="text-green-100 text-xs mt-1">บัญชีผู้ใช้</p>
                     </div>
@@ -68,7 +69,7 @@
                 </div>
             </div>
 
-            <!-- Admin Users -->
+            <!-- แอดมิน Users -->
             <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white shadow-lg">
                 <div class="flex items-center justify-between">
                     <div>
@@ -84,7 +85,7 @@
                 </div>
             </div>
 
-            <!-- New Users This Month -->
+            <!-- สมาชิกใหม่เดือนนี้ -->
             <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white shadow-lg">
                 <div class="flex items-center justify-between">
                     <div>
@@ -101,7 +102,7 @@
             </div>
         </div>
 
-        <!-- Users Table -->
+        <!-- ตารางผู้ใช้ -->
         {% if users %}
         <div class="bg-white rounded-xl shadow-sm border border-gray-200">
             <div class="flex items-center justify-between mb-6 px-6 pt-6">
@@ -112,6 +113,7 @@
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead class="bg-gray-50 border-b border-gray-200">
+                        <!-- คอลัมน์ -->
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชื่อผู้ใช้</th>
@@ -123,6 +125,7 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
+                        <!-- ลูปข้อมูลรายการผู้ใช้ -->
                         {% for u in users %}
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -138,6 +141,7 @@
                             <td class="px-6 py-4">
                                 <span class="text-sm text-gray-700">{{ u.phone|default:"-" }}</span>
                             </td>
+                            <!-- เช็คสถานะว่าเป็นผู้ดูแลระบบหรือสมาชิก -->
                             <td class="px-6 py-4 text-center">
                                 {% if u.is_staff %}
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
@@ -152,6 +156,7 @@
                                 </span>
                                 {% endif %}
                             </td>
+                            <!-- เป็นสมาชิกตั้งแต่ ให้แสดงรูปแบบวันเดือนปี -->
                             <td class="px-6 py-4 text-center">
                                 <span class="text-sm text-gray-700">{{ u.date_joined|date:"d/m/Y" }}</span>
                             </td>
@@ -163,6 +168,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                         </svg>
                                     </a>
+                                    <!-- เช็คสถานะผู้ใช้ถ้าไม่เป็น admin ถึงลบได้-->
                                     {% if not u.is_staff %}
                                     <form method="GET" action="{% url 'user_delete' u.id %}" style="display: inline;">
                                         <button type="submit" class="text-red-600 hover:text-red-800 p-2 hover:bg-red-50 rounded transition-colors" title="ลบ">
@@ -171,6 +177,7 @@
                                             </svg>
                                         </button>
                                     </form>
+                                    <!-- แอดมินลบไม่ได้ -->
                                     {% else %}
                                     <span class="text-gray-400 p-2 cursor-not-allowed" title="ไม่สามารถลบผู้ดูแลระบบได้">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -187,7 +194,7 @@
             </div>
         </div>
         {% else %}
-        <!-- Empty State -->
+        <!-- ไม่มีผู้ใช้ -->
         <div class="bg-white rounded-lg shadow-sm p-12 text-center">
             <div class="mb-6">
                 <svg class="w-24 h-24 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
