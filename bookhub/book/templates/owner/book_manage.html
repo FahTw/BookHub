@@ -25,7 +25,7 @@
     </div>
 
     <div class="p-8 space-y-6">
-        <!-- Search -->
+        <!-- ค้นหาข้อมูล -->
         <div>
             <form method="GET" action="{% url 'managelist_book' %}">
                 <div class="relative">
@@ -39,13 +39,14 @@
             </form>
         </div>
 
-        <!-- Stats Cards -->
+        <!-- cart สถิติต่างๆ-->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Total Books -->
+            <!-- จำนวนหนังสือทั้งหมด -->
             <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-lg">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-blue-100 text-sm font-medium">หนังสือทั้งหมด</p>
+
                         <p class="text-3xl font-bold mt-2">{{ total_books }}</p>
                         <p class="text-blue-100 text-xs mt-1">รายการ</p>
                     </div>
@@ -107,7 +108,7 @@
             </div>
         </div>
 
-        <!-- Books Table -->
+        <!-- ตารางรายการลิสหนังสือ -->
         {% if books %}
         <div class="bg-white rounded-xl shadow-sm border border-gray-200">
             <div class="flex items-center justify-between mb-6 px-6 pt-6">
@@ -130,6 +131,7 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
+                        <!-- ดึงหนังสือทั้งหมดมาแสดง -->
                         {% for book in books %}
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -182,7 +184,7 @@
             </div>
         </div>
         {% else %}
-        <!-- Empty State -->
+        <!-- ถ้าไม่มีหนังสือเลย -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
             <div class="mb-6">
                 <svg class="w-24 h-24 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -202,7 +204,7 @@
     </div>
 </main>
 
-<!-- Create Book Modal -->
+<!-- modal ของ create book-->
 <div id="createBookModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div class="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
@@ -257,6 +259,7 @@
                             </button>
                         </label>
                         <div class="max-h-40 overflow-y-auto border border-gray-300 rounded-lg p-3 bg-gray-50">
+                            <!-- เลือกหมวดหมู่หนังสือ -->
                             {% if categories %}
                                 <div class="space-y-2">
                                     {% for category in categories %}
@@ -267,6 +270,7 @@
                                     {% endfor %}
                                 </div>
                             {% else %}
+                            <!-- ถ้าไม่มีหมวดหมู่หนังสือ -->
                                 <p class="text-sm text-gray-500 text-center py-2">ยังไม่มีประเภทหนังสือ</p>
                             {% endif %}
                         </div>
@@ -299,7 +303,7 @@
     </div>
 </div>
 
-<!-- Create Category Modal -->
+<!-- เพิ่มหมวดหมู่ใหม่ -->
 <div id="createCategoryModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
         <div class="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center rounded-t-lg">
@@ -311,6 +315,7 @@
             </button>
         </div>
         <div class="p-6">
+            <!-- ฟอร์มสร้างหมวดหมู่หนังสือ -->
             <form method="POST" action="{% url 'managelist_book' %}" id="createCategoryForm">
                 {% csrf_token %}
                 <div class="space-y-4">

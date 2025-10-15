@@ -31,17 +31,21 @@ class UserProfileForm(ModelForm):
     class Meta:
         model = CustomUser
         fields = ['first_name', 'last_name', 'email', 'address', 'phone', 'province', 'postal_code']
-
+    
+    # ตรวจสอบความถูกต้องของข้อมูล
     def clean(self):
         cleaned_data = super().clean()
         phone = cleaned_data.get("phone")
         email = cleaned_data.get("email")
         postal_code = cleaned_data.get("postal_code")
+        
+        # ดึง user_id 
         user_id = self.instance.id
 
         if phone and not phone.isdigit():
             self.add_error('phone', "เบอร์โทรศัพท์ต้องเป็นตัวเลขเท่านั้น")
-
+        
+        # ตรวจสอบ email ว่ามีการใช้งานแล้วหรือไม่ โดยยกเว้นตเจ้าของ id นั้นๆ
         if email and CustomUser.objects.filter(email=email).exclude(id=user_id).exists():
             self.add_error('email', "อีเมลถูกใช้งานแล้ว กรุณาใช้อีเมลอื่น")
         
