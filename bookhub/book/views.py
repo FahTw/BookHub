@@ -7,6 +7,7 @@ from datetime import datetime
 from django.utils import timezone
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, logout
+from django.http import HttpResponse
 
 class LoginView(View):
     def get(self, request):
@@ -301,6 +302,8 @@ class OrderHistoryDetailView(View):
 
 class DashboardView(View):
     def get(self, request):
+        if not request.user.is_staff:
+            return HttpResponse(status=403)
         # ดึงข้อมูลต่างๆ
         total_orders = Order.objects.count()
         total_revenue = Order.objects.filter(status='paid').aggregate(Sum('total_amount'))['total_amount__sum'] or 0 # ถ้าไม่มี ให้เป็น 0
@@ -324,6 +327,8 @@ class DashboardView(View):
 class ManageBookListView(View):
     # แสดงรายการหนังสือทั้งหมด
     def get(self, request):
+        if not request.user.is_staff:
+            return HttpResponse(status=403)
         books = Book.objects.all().order_by('-id')
         search_query = request.GET.get('search', '')
         
@@ -398,6 +403,8 @@ class ManageBookListView(View):
 class ManageBookView(View):
     # ดดึงข้อมูลหนังสือมาแสดงในฟอร์ม
     def get(self, request, book_id):
+        if not request.user.is_staff:
+            return HttpResponse(status=403)
         # ดึงข้อมูลหนังสือที่ต้องการดูหน้า edit
         book = Book.objects.get(pk=book_id)
         # ดึงข้อมูลมาใส่ในฟอร์ม instance เพื่อดึงข้อมูลเดิมมาแสดง
@@ -417,6 +424,8 @@ class ManageBookView(View):
 class ManageBookDeleteView(View):
     # ลบหนังสือ
     def get(self, request, book_id):
+        if not request.user.is_staff:
+            return HttpResponse(status=403)
         # ดึงข้อมูลหนังสือที่ต้องการลบ
         book = Book.objects.get(pk=book_id)
         book.delete()
@@ -424,6 +433,8 @@ class ManageBookDeleteView(View):
 
 class OrderHistoryOwnerView(View):
     def get(self, request):
+        if not request.user.is_staff:
+            return HttpResponse(status=403)
         orders = Order.objects.all().order_by('-order_date').select_related('user', 'cart', 'cart__book') # ใช้ select_related คือ การ join ใน sql
         status_filter = request.GET.get('status', '') # ดึงค่า status
         search_query = request.GET.get('search', '') # ดึงค่า search
@@ -453,6 +464,8 @@ class OrderHistoryOwnerView(View):
 
 class OrderHistoryOwnerDetailView(View):
     def get(self, request, order):
+        if not request.user.is_staff:
+            return HttpResponse(status=403)
         order_obj = Order.objects.get(id=order) # ดึงข้อมูล order
         payment_info = Payment.objects.filter(order=order_obj).first() # ดึงข้อมูล payment โดย filter order และเอาแค่ตัวแรก
 
@@ -510,6 +523,8 @@ class OrderHistoryOwnerDetailView(View):
 
 class UserListView(View):
     def get(self, request):
+        if not request.user.is_staff:
+            return HttpResponse(status=403)
         users = CustomUser.objects.all().order_by('-date_joined')
         search_query = request.GET.get('search', '')
         
@@ -539,6 +554,8 @@ class UserListView(View):
 class UserView(View):
     # ส่วนของการลบ user
     def get(self, request, user_id):
+        if not request.user.is_staff:
+            return HttpResponse(status=403)
         user = CustomUser.objects.get(pk=user_id)
         # ถ้าไม่เป็น admin ถึงจะลบได้
         if not user.is_staff:
@@ -548,6 +565,8 @@ class UserView(View):
 class UserDetailView(View):
     # ดึงข้อมูล user มาแสดงเป็นรายคน
     def get(self, request, user_id):
+        if not request.user.is_staff:
+            return HttpResponse(status=403)
         # ดึงขข้อมูล user รายคนและ order ที่เคยสั่ง
         user = CustomUser.objects.get(pk=user_id)
         user_orders = Order.objects.filter(user=user)
@@ -567,6 +586,8 @@ class UserDetailView(View):
 
 class StatView(View):
     def get(self, request):
+        if not request.user.is_staff:
+            return HttpResponse(status=403)
         # ดึงข้อมูลต่างๆ
         total_books = Book.objects.count()
         total_revenue = Order.objects.filter(status__in=['paid', 'processing', 'shipped', 'delivered']).aggregate(Sum('total_amount'))['total_amount__sum'] or 0 # ถ้าไม่มี ให้เป็น 0
